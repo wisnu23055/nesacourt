@@ -553,7 +553,7 @@
                                      class="w-12 h-12 rounded-lg object-cover shrink-0">
                                 <div>
                                     <h5 class="text-xs sm:text-sm font-semibold text-white">Paket Ayam Geprek Sambal Korek</h5>
-                                    <p class="text-[11px] text-slate-300 mt-0.5">Waktu siap 8 menit • Stan Bu Titik</p>
+                                    <p class="text-[11px] text-slate-300 mt-0.5">Waktu siap 8 menit | Stan Bu Titik</p>
                                 </div>
                             </div>
                             <div class="text-right shrink-0">
@@ -646,7 +646,7 @@
                 <p>© 2026 NesaCourt (Universitas Negeri Surabaya - Vokasi). Seluruh hak cipta dilindungi.</p>
                 <div class="flex items-center justify-center gap-5 flex-wrap">
                     <a href="#" class="hover:text-white transition whitespace-nowrap">Kebijakan Privasi</a>
-                    <span>•</span>
+                    <span>|</span>
                     <a href="#" class="hover:text-white transition whitespace-nowrap">Syarat dan Ketentuan</a>
                 </div>
             </div>

@@ -138,7 +138,7 @@
                 <p>© 2026 NesaCourt (Universitas Negeri Surabaya - Vokasi). Seluruh hak cipta dilindungi.</p>
                 <div class="flex items-center justify-center gap-4 flex-wrap">
                     <a href="#" class="hover:text-white transition whitespace-nowrap">Kebijakan Privasi</a>
-                    <span>•</span>
+                    <span>|</span>
                     <a href="#" class="hover:text-white transition whitespace-nowrap">Syarat dan Ketentuan</a>
                 </div>
             </div>

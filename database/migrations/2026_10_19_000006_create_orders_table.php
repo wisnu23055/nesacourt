@@ -18,7 +18,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number', 20)->unique();
-            $table->string('access_token', 64);
+            $table->foreignId('buyer_id')->constrained('users');
+            $table->string('access_token', 64)->nullable();
             $table->foreignId('seller_id')->constrained('seller_profiles');
             $table->string('customer_name', 100);
             $table->enum('order_status', [

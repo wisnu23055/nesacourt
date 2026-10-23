@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('recommendation_logs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('users');
             $table->string('session_id', 100);
             $table->decimal('budget', 12, 2);
             $table->string('taste_preference', 100);

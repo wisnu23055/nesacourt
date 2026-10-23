@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders');
             $table->foreignId('actor_user_id')->nullable()->constrained('users');
-            $table->enum('actor_type', ['system', 'seller', 'admin']);
+            $table->enum('actor_type', ['system', 'seller', 'admin', 'buyer']);
             $table->string('old_order_status', 30);
             $table->string('new_order_status', 30);
             $table->string('old_payment_status', 30);

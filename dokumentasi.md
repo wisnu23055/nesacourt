@@ -153,4 +153,51 @@ Frontend telah menyiapkan markup Blade, form binding, dan Alpine.js state yang s
     - Tampilan stepper di mobile dan tablet kini berbentuk satu garis lurus horizontal yang rapi dan dapat digeser/di-scroll ke kanan-kiri (`min-w-[620px] overflow-x-auto thin-scrollbar`) dengan scrollbar kapsul ultra-ramping (4px), tanpa panah tombol default browser yang tebal, serta dilengkapi petunjuk geser tipis di layar mobile.
     - Dilengkapi banner notifikasi siap ambil jika pesanan mencapai tahap ke-5 (*Siap Diambil*), rincian menu pesanan, dan tombol aksi struk digital serta pemesanan menu baru berdimensi seragam.
 
+---
+
+## 3. Kelompok 3: Sisi Penjual / Pemilik Stan (F-15 s/d F-24) — Selesai
+
+Layout standar khusus penjual telah diimplementasikan pada `resources/views/layouts/seller.blade.php` dengan tema visual yang selaras penuh dengan NesaCourt:
+- **Desain Konsisten 1 Tema**: Menggunakan palet utama `#2563eb` (Brand Blue), aksen status `#059669` (Emerald/Success) dan `#d97706` (Amber/Warning), latar belakang `bg-slate-50`, cards `rounded-2xl border border-slate-200/80 shadow-xs`.
+- **Bebas Emoticon Sembarangan (Zero Emojis)**: Seluruh simbol visual menggunakan **Lucide Icons** resmi yang elegan dan berstandar profesional.
+- **Standar Dimensi Tombol**: `h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center`.
+- **Navigasi Multi-Device Responsif**: Desktop sidebar kiri dengan saklar operasional Buka/Tutup stan, off-canvas drawer di tablet, dan fixed bottom bar navigasi di layar smartphone.
+
+### Rincian 10 Halaman Sisi Penjual:
+1. **F-15: Dashboard Stan Penjual** (`/penjual/dashboard`)
+   - Header profil pemilik stan (Pak Bambang - Stan 01 Barokah), status operasional aktif, akses cepat 4 aksi dapur (Pesanan Masuk, Tambah Menu, Kelola Stok, QRIS).
+   - 4 kartu metrik utama (Total Omset Hari Ini, Pesanan Masuk, Porsi Terjual, Menu Perlu Restok).
+   - Antrean pesanan dapur aktif dengan tombol aksi langsung dan daftar menu terlaris stan.
+2. **F-16: Kelola Menu Stan** (`/penjual/menu`)
+   - Pencarian real-time menu, filter kategori masakan (Makanan Utama, Minuman Segar, Camilan), serta filter ketersediaan.
+   - Tabel responsif (desktop) dan card view (mobile/tablet) memuat foto menu, harga, sisa porsi, toggle switch ketersediaan, serta modal konfirmasi hapus menu.
+3. **F-17: Tambah & Edit Menu Stan** (`/penjual/menu/create`)
+   - Form pembuatan & modifikasi menu: Nama menu, kategori, harga jual, estimasi waktu penyajian, stok awal porsi, status ketersediaan awal, deskripsi komposisi makanan.
+   - Dropzone unggah foto hidangan dengan preview visual dan tips fotografi menu menarik.
+4. **F-18: Kelola Stok Porsi Harian** (`/penjual/stok`)
+   - Pengontrol stok porsi cepat dengan tombol minus, plus, dan ketik manual angka porsi.
+   - Indikator warna porsi (Hijau > 5 porsi, Kuning 1-5 porsi menipis, Merah 0 porsi habis otomatis di katalog pembeli).
+   - Tombol shortcut set standar pagi porsi dan simpan perubahan stok massal.
+5. **F-19: Pengaturan QRIS Stan** (`/penjual/qris`)
+   - Tampilan visual kode QRIS statis resmi stan (`asset('images/qris.jpeg')`), NMID `ID1020039281920`, dan identitas merchant Bank Jatim.
+   - Form ganti foto QRIS dan konfigurasi rekening penampung bank pencairan penjualan.
+6. **F-20: Pesanan Masuk Dapur Stan** (`/penjual/pesanan`)
+   - Tab filter pesanan: Semua, Perlu Verifikasi, Sedang Dimasak, Siap Diambil, Selesai.
+   - Card pesanan memuat nomor antrean besar (#08), jam order, catatan dapur dari mahasiswa, rincian item masakan, dan tombol percepat status pesanan.
+   - Fitur toggle suara bel dapur dan indikator live antrean.
+7. **F-21: Detail & Konfirmasi Bayar** (`/penjual/pesanan/detail`)
+   - Stepper horizontal perjalanan status pesanan yang presisi dan senada dengan tampilan pembeli.
+   - Informasi lengkap data mahasiswa pemesan, nomor meja kantin, kontak WhatsApp, serta rincian biaya bersih.
+   - Kartu verifikasi bukti pembayaran QRIS dan tombol kontrol tahapan proses dapur.
+8. **F-22: Riwayat Penjualan & Rekap** (`/penjual/laporan`)
+   - Filter rentang waktu: Hari Ini, 7 Hari Terakhir, Bulan Ini, Semester Ganjil.
+   - 4 metrik performa omset, grafik batang CSS tren pendapatan mingguan (Senin - Minggu), dan tabel log transaksi selesai dengan modal ekspor Excel/CSV.
+9. **F-23: AI Demand Forecasting** (`/penjual/prediksi`)
+   - Analisis model cerdas berbasis data historis dan jadwal kuliah kampus untuk estimasi porsi masakan esok hari.
+   - Tabel rekomendasi porsi, tren persentase, faktor penentu (cuaca terik & jadwal praktikum mahasiswa), serta daftar estimasi belanja bahan baku pasar.
+10. **F-24: Profil Stan & Jam Operasional** (`/penjual/profil`)
+    - Identitas profil stan di food court UNESA, lokasi nomor counter, nomor WhatsApp pengelola, foto etalase stan.
+    - Jadwal buka-tutup harian sinkron operasional kampus, serta form keamanan ubah kata sandi akun stan.
+
+
 

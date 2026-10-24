@@ -4,7 +4,7 @@ Berikut adalah daftar halaman NesaCourt yang **Sudah Dibuat** dan yang **Belum D
 
 ---
 
-## A. Halaman yang Sudah Dibuat (14 Halaman)
+## A. Halaman yang Sudah Dibuat (24 Halaman)
 
 | No | Role | Nama Halaman | Link Halaman | Status |
 | :---: | :--- | :--- | :--- | :---: |
@@ -22,23 +22,23 @@ Berikut adalah daftar halaman NesaCourt yang **Sudah Dibuat** dan yang **Belum D
 | 12 | **Pembeli** | Status Pesanan Real-time | [http://127.0.0.1:8000/pesanan/status](http://127.0.0.1:8000/pesanan/status) | Selesai |
 | 13 | **Pembeli** | Riwayat & Struk Digital | [http://127.0.0.1:8000/riwayat](http://127.0.0.1:8000/riwayat) | Selesai |
 | 14 | **Pembeli** | Profil Mahasiswa | [http://127.0.0.1:8000/profil](http://127.0.0.1:8000/profil) | Selesai |
+| 15 | **Penjual** | Dashboard Stan Penjual | [http://127.0.0.1:8000/penjual/dashboard](http://127.0.0.1:8000/penjual/dashboard) | Selesai |
+| 16 | **Penjual** | Kelola Menu Stan | [http://127.0.0.1:8000/penjual/menu](http://127.0.0.1:8000/penjual/menu) | Selesai |
+| 17 | **Penjual** | Tambah & Edit Menu | [http://127.0.0.1:8000/penjual/menu/create](http://127.0.0.1:8000/penjual/menu/create) | Selesai |
+| 18 | **Penjual** | Kelola Stok Porsi Harian | [http://127.0.0.1:8000/penjual/stok](http://127.0.0.1:8000/penjual/stok) | Selesai |
+| 19 | **Penjual** | Pengaturan QRIS Stan | [http://127.0.0.1:8000/penjual/qris](http://127.0.0.1:8000/penjual/qris) | Selesai |
+| 20 | **Penjual** | Pesanan Masuk Dapur | [http://127.0.0.1:8000/penjual/pesanan](http://127.0.0.1:8000/penjual/pesanan) | Selesai |
+| 21 | **Penjual** | Detail & Konfirmasi Bayar | [http://127.0.0.1:8000/penjual/pesanan/detail](http://127.0.0.1:8000/penjual/pesanan/detail) | Selesai |
+| 22 | **Penjual** | Riwayat Penjualan & Rekap | [http://127.0.0.1:8000/penjual/laporan](http://127.0.0.1:8000/penjual/laporan) | Selesai |
+| 23 | **Penjual** | AI Demand Forecasting | [http://127.0.0.1:8000/penjual/prediksi](http://127.0.0.1:8000/penjual/prediksi) | Selesai |
+| 24 | **Penjual** | Profil Stan & Jam Operasional | [http://127.0.0.1:8000/penjual/profil](http://127.0.0.1:8000/penjual/profil) | Selesai |
 
 ---
 
-## B. Halaman yang Belum Dibuat (17 Halaman)
+## B. Halaman yang Belum Dibuat (7 Halaman)
 
 | No | Role | Nama Halaman | Link Rencana | Status |
 | :---: | :--- | :--- | :--- | :---: |
-| 15 | **Penjual** | Dashboard Stan Penjual | [http://127.0.0.1:8000/penjual/dashboard](http://127.0.0.1:8000/penjual/dashboard) | Belum |
-| 16 | **Penjual** | Daftar Menu Stan | [http://127.0.0.1:8000/penjual/menu](http://127.0.0.1:8000/penjual/menu) | Belum |
-| 17 | **Penjual** | Tambah & Edit Menu | [http://127.0.0.1:8000/penjual/menu/create](http://127.0.0.1:8000/penjual/menu/create) | Belum |
-| 18 | **Penjual** | Kelola Stok Porsi | [http://127.0.0.1:8000/penjual/stok](http://127.0.0.1:8000/penjual/stok) | Belum |
-| 19 | **Penjual** | Pengaturan QRIS Stan | [http://127.0.0.1:8000/penjual/qris](http://127.0.0.1:8000/penjual/qris) | Belum |
-| 20 | **Penjual** | Pesanan Masuk Dapur | [http://127.0.0.1:8000/penjual/pesanan](http://127.0.0.1:8000/penjual/pesanan) | Belum |
-| 21 | **Penjual** | Detail & Konfirmasi Bayar | [http://127.0.0.1:8000/penjual/pesanan/detail](http://127.0.0.1:8000/penjual/pesanan/detail) | Belum |
-| 22 | **Penjual** | Riwayat & Rekap Penjualan | [http://127.0.0.1:8000/penjual/laporan](http://127.0.0.1:8000/penjual/laporan) | Belum |
-| 23 | **Penjual** | AI Demand Forecasting | [http://127.0.0.1:8000/penjual/prediksi](http://127.0.0.1:8000/penjual/prediksi) | Belum |
-| 24 | **Penjual** | Profil & Jam Operasional Stan | [http://127.0.0.1:8000/penjual/profil](http://127.0.0.1:8000/penjual/profil) | Belum |
 | 25 | **Admin** | Dashboard Utama Admin | [http://127.0.0.1:8000/admin/dashboard](http://127.0.0.1:8000/admin/dashboard) | Belum |
 | 26 | **Admin** | Manajemen Stan Kantin | [http://127.0.0.1:8000/admin/stan](http://127.0.0.1:8000/admin/stan) | Belum |
 | 27 | **Admin** | Monitoring Menu Seluruh Stan | [http://127.0.0.1:8000/admin/menu](http://127.0.0.1:8000/admin/menu) | Belum |

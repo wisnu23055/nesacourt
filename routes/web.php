@@ -25,3 +25,19 @@ Route::view('/pesanan/status', 'buyer.order-status')->name('buyer.order-status')
 Route::view('/riwayat', 'buyer.history')->name('buyer.history');
 Route::view('/profil', 'buyer.profile')->name('buyer.profile');
 
+/*
+|--------------------------------------------------------------------------
+| Kelompok 3: Sisi Penjual / Pemilik Stan (F-15 s/d F-24)
+|--------------------------------------------------------------------------
+*/
+Route::view('/penjual/dashboard', 'seller.dashboard')->name('seller.dashboard');
+Route::view('/penjual/menu', 'seller.menu.index')->name('seller.menu.index');
+Route::view('/penjual/menu/create', 'seller.menu.form')->name('seller.menu.create');
+Route::view('/penjual/stok', 'seller.stock')->name('seller.stock');
+Route::view('/penjual/qris', 'seller.qris')->name('seller.qris');
+Route::view('/penjual/pesanan', 'seller.orders.index')->name('seller.orders.index');
+Route::view('/penjual/pesanan/detail', 'seller.orders.detail')->name('seller.orders.detail');
+Route::view('/penjual/laporan', 'seller.reports')->name('seller.reports');
+Route::view('/penjual/prediksi', 'seller.forecast')->name('seller.forecast');
+Route::view('/penjual/profil', 'seller.profile')->name('seller.profile');
+

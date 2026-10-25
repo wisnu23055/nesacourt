@@ -176,7 +176,7 @@
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
         <div>
-            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Katalog Menu & Stan</h1>
+            <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Katalog Menu & Stan</h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">Pilih aneka kuliner halal, higienis, dan ramah kantong mahasiswa di Food Court UNESA Ketintang.</p>
         </div>
         <div class="flex items-center gap-2">
@@ -223,27 +223,32 @@
     <!-- Menu Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         <template x-for="item in filteredMenus" :key="item.id">
-            <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden hover:shadow-md transition flex flex-col justify-between group">
+            <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden hover:shadow-md transition flex flex-col justify-between">
                 <!-- Top Part -->
                 <div>
+                    <!-- Food Photo without floating badges -->
                     <div class="relative h-44 w-full bg-slate-100 overflow-hidden cursor-pointer" @click="openDetail(item)">
-                        <img :src="item.image" :alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <span class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-sm text-[10px] font-bold text-slate-800" x-text="item.seller">
-                        </span>
-
-                        <!-- Stock Badge -->
-                        <span x-show="item.stock > 0" class="absolute bottom-3 left-3 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-200" x-text="'Tersedia ' + item.stock + ' Porsi'">
-                        </span>
-                        <span x-show="item.stock === 0" class="absolute bottom-3 left-3 px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 text-[10px] font-semibold border border-rose-200">
-                            Porsi Habis
-                        </span>
+                        <img :src="item.image" 
+                             :alt="item.name" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
 
-                    <div class="p-4 space-y-2">
-                        <h3 class="text-sm font-bold text-slate-900 group-hover:text-brand-600 transition cursor-pointer" @click="openDetail(item)" x-text="item.name"></h3>
-                        <p class="text-xs text-slate-500 line-clamp-2" x-text="item.description"></p>
-                        
-                        <div class="flex items-center justify-between pt-2">
+                    <!-- Content: Food Name, Stan Name Below It, Desc, Price -->
+                    <div class="p-4 space-y-1.5">
+                        <h3 class="text-sm font-bold text-slate-900 hover:text-brand-600 transition cursor-pointer" @click="openDetail(item)" x-text="item.name"></h3>
+                        <!-- Nama Stan di bawah nama menu masakan -->
+                        <p class="text-[11px] font-semibold text-slate-500 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+                                <path d="M2 7h20" />
+                                <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7" />
+                            </svg>
+                            <span x-text="item.seller"></span>
+                        </p>
+                        <p class="text-xs text-slate-500 line-clamp-2 pt-0.5" x-text="item.description"></p>
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                             <span class="text-sm font-extrabold text-brand-700" x-text="formatRupiah(item.price)"></span>
                             <span class="text-[11px] text-slate-400" x-text="'Masak ' + item.prepTime"></span>
                         </div>
@@ -251,19 +256,14 @@
                 </div>
 
                 <!-- Action Button -->
-                <div class="p-4 pt-0 grid grid-cols-2 gap-2">
-                    <button type="button" 
-                            @click="openDetail(item)" 
-                            class="whitespace-nowrap w-full inline-flex items-center justify-center py-2 px-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition">
-                        <span>Lihat Detail</span>
-                    </button>
+                <div class="p-4 pt-0">
                     <button type="button" 
                             :disabled="item.stock === 0"
                             @click="addToCart({ id: item.id, name: item.name, price: item.price, seller: item.seller })" 
                             :class="item.stock === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm'"
-                            class="whitespace-nowrap w-full inline-flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl text-xs font-semibold transition">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        <span x-text="item.stock === 0 ? 'Habis' : 'Tambah'"></span>
+                            class="whitespace-nowrap w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span x-text="item.stock === 0 ? 'Porsi Habis' : 'Tambah ke Keranjang'"></span>
                     </button>
                 </div>
             </div>

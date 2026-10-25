@@ -8,23 +8,18 @@
     <!-- Left Side: Campus Identity & Informational -->
     <div class="lg:col-span-5 bg-slate-900 text-white p-6 sm:p-7 flex flex-col justify-between">
         <div>
-            <!-- Top Badges -->
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-white/10 text-white border border-white/10 whitespace-nowrap">
-                    Portal Masuk Sivitas
-                </span>
-            </div>
-            <p class="text-xs text-slate-400 mt-1">Universitas Negeri Surabaya</p>
+            <!-- Campus Label -->
+            <p class="text-xs font-semibold text-slate-400">Universitas Negeri Surabaya</p>
 
             <!-- Headline -->
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight mt-4 text-white">
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight mt-3 text-white">
                 Sistem Pemesanan Food Court
             </h1>
             <p class="mt-2 text-slate-300 text-xs leading-relaxed">
                 Silakan masuk menggunakan akun terdaftar Anda untuk memesan hidangan dari berbagai stan kantin kampus UNESA.
             </p>
 
-            <!-- Photo of Canteen (Hidden on Mobile & Tablet, Visible on Desktop) -->
+            <!-- Photo of Canteen (Tersembunyi di Mobile, Hanya Tampil di Desktop) -->
             <div class="hidden lg:block mt-5 rounded-xl overflow-hidden border border-white/15 aspect-[16/10] relative">
                 <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80" 
                      alt="Kantin Kampus UNESA" 
@@ -32,18 +27,6 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
                 <div class="absolute bottom-2 left-2.5 right-2.5 text-[11px] text-slate-200">
                     Kafetaria Kampus Ketintang
-                </div>
-            </div>
-
-            <!-- Authentic Feature List -->
-            <div class="mt-4 space-y-2 text-xs text-slate-300 border-t border-white/10 pt-3">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-                    <span>Pilihan menu lengkap dari seluruh stan</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-                    <span>Pembayaran praktis melalui QRIS statis</span>
                 </div>
             </div>
         </div>
@@ -130,7 +113,7 @@
                 <div class="pt-1">
                     <button type="submit" 
                             :disabled="loading" 
-                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 transition disabled:opacity-75 disabled:cursor-not-allowed whitespace-nowrap">
+                            class="w-full h-10 inline-flex items-center justify-center gap-2 px-4 rounded-lg text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 transition disabled:opacity-75 disabled:cursor-not-allowed whitespace-nowrap">
                         <template x-if="!loading">
                             <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
                                 <span>Masuk ke Akun</span>
@@ -160,8 +143,8 @@
                 </div>
             </div>
 
-            <!-- SSO UNESA Button (Single Line) -->
-            <button type="button" class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 border border-slate-200 hover:border-slate-300 rounded-lg text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm whitespace-nowrap">
+            <!-- SSO UNESA Button (Tinggi Sama persis h-10) -->
+            <button type="button" class="w-full h-10 inline-flex items-center justify-center gap-2 px-4 border border-slate-200 hover:border-slate-300 rounded-lg text-xs sm:text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm whitespace-nowrap">
                 <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>

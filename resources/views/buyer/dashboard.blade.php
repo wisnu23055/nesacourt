@@ -10,7 +10,8 @@
         status: 'Sedang Dimasak di Dapur',
         statusDesc: 'Pesanan nomor antrean A-09 sedang disiapkan penjual',
         progress: 65,
-        eta: '~7 Menit'
+        eta: '~7 Menit',
+        image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=150&q=80'
     },
     budgetFilter: 'semua',
     popularMenus: [
@@ -20,7 +21,6 @@
             price: 13000,
             stall: 'Stan 01 Barokah',
             sellerName: 'Stan 01 - Barokah Rasa',
-            stock: 12,
             prepTime: 'Masak ~7 menit',
             image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80',
             desc: 'Ayam krispi gurih digeprek sambal pedas segar disajikan dengan nasi hangat dan lalapan mentimun.'
@@ -31,7 +31,6 @@
             price: 14000,
             stall: 'Stan 02 Soto Bu Siti',
             sellerName: 'Stan 02 - Soto Bu Siti',
-            stock: 8,
             prepTime: 'Masak ~5 menit',
             image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80',
             desc: 'Soto ayam kuah kuning hangat dengan taburan koya gurih melimpah, bihun, irisan telur, dan jeruk nipis.'
@@ -42,7 +41,6 @@
             price: 4000,
             stall: 'Stan 04 Jus Vokasi',
             sellerName: 'Stan 04 - Jus Vokasi',
-            stock: 35,
             prepTime: 'Siap ~2 menit',
             image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
             desc: 'Teh melati racikan khas disajikan dingin dengan gelas jumbo, sangat menyegarkan saat cuaca panas.'
@@ -53,7 +51,6 @@
             price: 8000,
             stall: 'Stan 03 Geprek Mas Bro',
             sellerName: 'Stan 03 - Geprek Mas Bro',
-            stock: 15,
             prepTime: 'Masak ~4 menit',
             image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80',
             desc: 'Kentang goreng renyah bertabur bumbu keju manis gurih untuk teman nugas santai.'
@@ -64,7 +61,6 @@
             price: 10000,
             stall: 'Stan 04 Jus Vokasi',
             sellerName: 'Stan 04 - Jus Vokasi',
-            stock: 20,
             prepTime: 'Siap ~3 menit',
             image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=600&q=80',
             desc: 'Kaya nutrisi buah alpukat segar dengan susu cokelat manis, pengganjal lapar praktis di kampus.'
@@ -75,7 +71,6 @@
             price: 15000,
             stall: 'Stan 01 Barokah',
             sellerName: 'Stan 01 - Barokah Rasa',
-            stock: 10,
             prepTime: 'Masak ~6 menit',
             image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=600&q=80',
             desc: 'Paket komplit hemat mahasiswa: Nasi hangat, ayam goreng penyet sambal terasi dan segelas es teh manis.'
@@ -133,9 +128,10 @@
             </div>
         </form>
 
-        <!-- Category Shortcuts -->
+        <!-- Category Shortcuts (Horizontal di Samping Icon, Center Container & Ramping) -->
         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1">
-            <a href="{{ url('/katalog?kategori=makanan') }}" class="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-brand-200 hover:bg-brand-50/40 transition flex items-center gap-2.5 group">
+            <a href="{{ url('/katalog?kategori=makanan') }}" 
+               class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:bg-brand-50/40 transition flex items-center justify-center gap-2.5 group">
                 <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 group-hover:text-brand-600 shrink-0 shadow-2xs">
                     <i data-lucide="utensils" class="w-4 h-4"></i>
                 </div>
@@ -145,7 +141,8 @@
                 </div>
             </a>
 
-            <a href="{{ url('/katalog?kategori=berkuah') }}" class="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-brand-200 hover:bg-brand-50/40 transition flex items-center gap-2.5 group">
+            <a href="{{ url('/katalog?kategori=berkuah') }}" 
+               class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:bg-brand-50/40 transition flex items-center justify-center gap-2.5 group">
                 <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 group-hover:text-brand-600 shrink-0 shadow-2xs">
                     <i data-lucide="flame" class="w-4 h-4"></i>
                 </div>
@@ -155,7 +152,8 @@
                 </div>
             </a>
 
-            <a href="{{ url('/katalog?kategori=minuman') }}" class="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-brand-200 hover:bg-brand-50/40 transition flex items-center gap-2.5 group">
+            <a href="{{ url('/katalog?kategori=minuman') }}" 
+               class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:bg-brand-50/40 transition flex items-center justify-center gap-2.5 group">
                 <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 group-hover:text-brand-600 shrink-0 shadow-2xs">
                     <i data-lucide="coffee" class="w-4 h-4"></i>
                 </div>
@@ -165,7 +163,8 @@
                 </div>
             </a>
 
-            <a href="{{ url('/katalog?kategori=camilan') }}" class="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-brand-200 hover:bg-brand-50/40 transition flex items-center gap-2.5 group">
+            <a href="{{ url('/katalog?kategori=camilan') }}" 
+               class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:bg-brand-50/40 transition flex items-center justify-center gap-2.5 group">
                 <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 group-hover:text-brand-600 shrink-0 shadow-2xs">
                     <i data-lucide="cookie" class="w-4 h-4"></i>
                 </div>
@@ -175,7 +174,8 @@
                 </div>
             </a>
 
-            <a href="{{ url('/katalog?kategori=paket') }}" class="col-span-2 sm:col-span-1 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-brand-200 hover:bg-brand-50/40 transition flex items-center gap-2.5 group">
+            <a href="{{ url('/katalog?kategori=paket') }}" 
+               class="col-span-2 sm:col-span-1 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:bg-brand-50/40 transition flex items-center justify-center gap-2.5 group">
                 <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 group-hover:text-brand-600 shrink-0 shadow-2xs">
                     <i data-lucide="badge-percent" class="w-4 h-4"></i>
                 </div>
@@ -187,33 +187,50 @@
         </div>
     </div>
 
-    <!-- Active Ongoing Order Tracker Card -->
-    <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
-                    <i data-lucide="clock-3" class="w-5 h-5"></i>
-                </div>
+    <!-- Active Ongoing Order Tracker Card (Dengan Foto Pesanan) -->
+    <div class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+        <!-- Section Title & Description -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+                <i data-lucide="activity" class="w-4 h-4 text-slate-900"></i>
+                <h2 class="text-sm font-bold text-slate-900">Pesanan Aktif Sedang Diproses</h2>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-bold">
+                <span class="relative flex h-1.5 w-1.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
+                </span>
+                Proses Dapur
+            </span>
+        </div>
+        <p class="text-xs text-slate-500 -mt-1">Pantau kemajuan pesanan makanan Anda yang sedang dimasak di dapur stan kantin secara real-time.</p>
+
+        <!-- Order Information Box dengan Foto Makanan -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="flex items-center gap-3.5">
+                <img :src="activeOrder.image" 
+                     alt="Foto Pesanan Aktif" 
+                     class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
                 <div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-bold text-slate-900" x-text="activeOrder.id">NC-20261021-8842</span>
                         <span class="text-slate-300 font-normal">|</span>
                         <span class="text-xs font-bold text-amber-600" x-text="activeOrder.status">Sedang Dimasak di Dapur</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-0.5" x-text="activeOrder.stall + ' | ' + activeOrder.statusDesc"></p>
+                    <p class="text-xs text-slate-500 mt-0.5" x-text="activeOrder.stall + ' | ' + activeOrder.statusDesc">Stan 01 - Barokah Rasa | Pesanan nomor antrean A-09 sedang disiapkan penjual</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <a href="{{ url('/pesanan/status') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-slate-50 text-slate-700 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-800 active:bg-amber-600 active:text-white transition group shadow-2xs">
-                    <i data-lucide="radio" class="w-3.5 h-3.5 text-amber-600"></i>
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="{{ url('/pesanan/status') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition shadow-2xs">
+                    <i data-lucide="radio" class="w-3.5 h-3.5 text-slate-900"></i>
                     <span>Pantau Status Real-time</span>
-                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-800 group-hover:translate-x-0.5 transition-all"></i>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </a>
             </div>
         </div>
 
         <!-- Progress Step Bar -->
-        <div class="space-y-1.5">
+        <div class="space-y-1.5 pt-1">
             <div class="flex items-center justify-between text-xs text-slate-500">
                 <span class="font-medium text-slate-700">Estimasi siap ambil: <strong class="text-slate-900" x-text="activeOrder.eta">~7 Menit</strong></span>
                 <span class="font-bold text-brand-600" x-text="activeOrder.progress + '%'">65%</span>
@@ -224,167 +241,80 @@
         </div>
     </div>
 
-    <!-- Student Budget Menu Finder (Clean Practical Feature, No AI Gimmicks) -->
-    <div class="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-3.5">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
+    <!-- Rekomendasi Menu Sesuai Uang Saku Mahasiswa (Header Rata Kiri) -->
+    <div class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2">
+                <i data-lucide="wallet" class="w-4 h-4 text-slate-900"></i>
                 <h2 class="text-sm sm:text-base font-bold text-slate-900">Rekomendasi Menu Sesuai Uang Saku Mahasiswa</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Pilih batas anggaran Anda untuk langsung melihat menu yang tersedia di kantin</p>
             </div>
-            <a href="{{ url('/rekomendasi') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 shadow-sm transition">
-                <span>Filter Kriteria Lengkap</span>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-            </a>
+            <p class="text-xs text-slate-500">Pilih batas pengeluaran jajan Anda untuk menampilkan pilihan menu yang pas di kantin</p>
         </div>
 
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <!-- Budget Selection Cards Grid (Center Tengah & Rapi) -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1">
             <button type="button" 
                     @click="budgetFilter = 'semua'" 
-                    :class="budgetFilter === 'semua' ? 'border-amber-300 bg-amber-50/90 text-amber-900 font-bold shadow-2xs' : 'border-slate-200 bg-slate-50 text-slate-700 font-semibold hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'" 
-                    class="whitespace-nowrap px-3.5 py-1.5 rounded-xl border text-xs transition">
-                Semua Anggaran
+                    class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1"
+                    :class="budgetFilter === 'semua' 
+                        ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                <span class="text-[10px] font-semibold text-slate-500">Semua Harga</span>
+                <span class="text-xs font-bold text-slate-900 block">Semua Budget</span>
+                <span class="text-[10px] text-slate-500 block">Semua Menu Kantin</span>
             </button>
+
             <button type="button" 
                     @click="budgetFilter = '5000'" 
-                    :class="budgetFilter === '5000' ? 'border-amber-300 bg-amber-50/90 text-amber-900 font-bold shadow-2xs' : 'border-slate-200 bg-slate-50 text-slate-700 font-semibold hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'" 
-                    class="whitespace-nowrap px-3.5 py-1.5 rounded-xl border text-xs transition">
-                Budget &le; Rp 5.000 (Minuman Segar)
+                    class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1"
+                    :class="budgetFilter === '5000' 
+                        ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                <span class="text-[10px] font-semibold text-slate-500">Maks. 5 Ribu</span>
+                <span class="text-xs font-bold text-slate-900 block">&le; Rp 5.000</span>
+                <span class="text-[10px] text-slate-500 block">Minuman Dingin</span>
             </button>
+
             <button type="button" 
                     @click="budgetFilter = '10000'" 
-                    :class="budgetFilter === '10000' ? 'border-amber-300 bg-amber-50/90 text-amber-900 font-bold shadow-2xs' : 'border-slate-200 bg-slate-50 text-slate-700 font-semibold hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'" 
-                    class="whitespace-nowrap px-3.5 py-1.5 rounded-xl border text-xs transition">
-                Budget &le; Rp 10.000 (Camilan & Jus)
+                    class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1"
+                    :class="budgetFilter === '10000' 
+                        ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                <span class="text-[10px] font-semibold text-slate-500">Maks. 10 Ribu</span>
+                <span class="text-xs font-bold text-slate-900 block">&le; Rp 10.000</span>
+                <span class="text-[10px] text-slate-500 block">Camilan & Aneka Jus</span>
             </button>
+
             <button type="button" 
                     @click="budgetFilter = '15000'" 
-                    :class="budgetFilter === '15000' ? 'border-amber-300 bg-amber-50/90 text-amber-900 font-bold shadow-2xs' : 'border-slate-200 bg-slate-50 text-slate-700 font-semibold hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'" 
-                    class="whitespace-nowrap px-3.5 py-1.5 rounded-xl border text-xs transition">
-                Budget &le; Rp 15.000 (Nasi Ayam Komplit)
+                    class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1"
+                    :class="budgetFilter === '15000' 
+                        ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                <span class="text-[10px] font-semibold text-slate-500">Maks. 15 Ribu</span>
+                <span class="text-xs font-bold text-slate-900 block">&le; Rp 15.000</span>
+                <span class="text-[10px] text-slate-500 block">Nasi & Lauk Utama</span>
             </button>
+
             <button type="button" 
                     @click="budgetFilter = '20000'" 
-                    :class="budgetFilter === '20000' ? 'border-amber-300 bg-amber-50/90 text-amber-900 font-bold shadow-2xs' : 'border-slate-200 bg-slate-50 text-slate-700 font-semibold hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'" 
-                    class="whitespace-nowrap px-3.5 py-1.5 rounded-xl border text-xs transition">
-                Budget &le; Rp 20.000 (Paket Kenyang)
+                    class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1"
+                    :class="budgetFilter === '20000' 
+                        ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                <span class="text-[10px] font-semibold text-slate-500">Maks. 20 Ribu</span>
+                <span class="text-xs font-bold text-slate-900 block">&le; Rp 20.000</span>
+                <span class="text-[10px] text-slate-500 block">Paket Komplit Kenyang</span>
             </button>
         </div>
     </div>
 
-    <!-- Stan Kantin Populer Ketintang -->
+    <!-- Menu Terlaris Mahasiswa UNESA Hari Ini (Tanpa Tulisan Budget di Samping Judul) -->
     <div class="space-y-4">
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900">Stan Kantin Ketintang</h2>
-                <p class="text-xs text-slate-500">Pilih stan untuk melihat menu spesifik yang sedang aktif</p>
-            </div>
-            <a href="{{ url('/katalog') }}" class="whitespace-nowrap text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
-                <span>Lihat Semua Stan</span>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-            </a>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Stan 1 -->
-            <a href="{{ url('/katalog?stan=barokah') }}" class="group p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-brand-300 hover:shadow-md transition space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md">Stan 01</span>
-                    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-                        <span class="relative flex h-2 w-2 shrink-0">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        <span>Buka</span>
-                    </span>
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold text-slate-900 group-hover:text-brand-600 transition">Stan Barokah Rasa</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Spesialis Ayam Geprek & Nasi Penyet</p>
-                </div>
-                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>12 Menu Aktif</span>
-                    <span class="font-semibold text-slate-700">Mulai Rp 10.000</span>
-                </div>
-            </a>
-
-            <!-- Stan 2 -->
-            <a href="{{ url('/katalog?stan=soto') }}" class="group p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-brand-300 hover:shadow-md transition space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md">Stan 02</span>
-                    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-                        <span class="relative flex h-2 w-2 shrink-0">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        <span>Buka</span>
-                    </span>
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold text-slate-900 group-hover:text-brand-600 transition">Soto Lamongan Bu Siti</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Kuah Koya Gurih & Nasi Rawon</p>
-                </div>
-                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>8 Menu Aktif</span>
-                    <span class="font-semibold text-slate-700">Mulai Rp 12.000</span>
-                </div>
-            </a>
-
-            <!-- Stan 3 -->
-            <a href="{{ url('/katalog?stan=geprek') }}" class="group p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-brand-300 hover:shadow-md transition space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md">Stan 03</span>
-                    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-                        <span class="relative flex h-2 w-2 shrink-0">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        <span>Buka</span>
-                    </span>
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold text-slate-900 group-hover:text-brand-600 transition">Geprek Mas Bro</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Ayam Krispi Sambal Bawang & Keju</p>
-                </div>
-                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>15 Menu Aktif</span>
-                    <span class="font-semibold text-slate-700">Mulai Rp 11.000</span>
-                </div>
-            </a>
-
-            <!-- Stan 4 -->
-            <a href="{{ url('/katalog?stan=minuman') }}" class="group p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-brand-300 hover:shadow-md transition space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md">Stan 04</span>
-                    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-                        <span class="relative flex h-2 w-2 shrink-0">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        <span>Buka</span>
-                    </span>
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold text-slate-900 group-hover:text-brand-600 transition">Aneka Jus & Es Vokasi</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Jus Buah Segar, Es Teh & Kopi Susu</p>
-                </div>
-                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                    <span>18 Menu Aktif</span>
-                    <span class="font-semibold text-slate-700">Mulai Rp 3.000</span>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <!-- Menu Terlaris Mahasiswa UNESA Hari Ini -->
-    <div class="space-y-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <div class="flex items-center gap-2">
-                    <h2 class="text-base sm:text-lg font-bold text-slate-900">Menu Terlaris Hari Ini</h2>
-                    <template x-if="budgetFilter !== 'semua'">
-                        <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold" x-text="'Budget ≤ ' + formatRupiah(parseInt(budgetFilter))"></span>
-                    </template>
-                </div>
+                <h2 class="text-base sm:text-lg font-bold text-slate-900">Menu Terlaris Hari Ini</h2>
                 <p class="text-xs text-slate-500">Paling banyak dipesan mahasiswa di jam istirahat kuliah</p>
             </div>
             <a href="{{ url('/katalog') }}" class="whitespace-nowrap text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
@@ -397,19 +327,29 @@
             <template x-for="item in filteredMenus" :key="item.id">
                 <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden hover:shadow-md transition flex flex-col justify-between">
                     <div>
+                        <!-- Food Photo without floating badges -->
                         <div class="relative h-44 w-full bg-slate-100 overflow-hidden">
                             <img :src="item.image" 
                                  :alt="item.name" 
                                  class="w-full h-full object-cover">
-                            <span class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-[10px] font-bold text-slate-800" x-text="item.stall">
-                            </span>
-                            <span class="absolute bottom-3 left-3 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-200" x-text="'Tersedia ' + item.stock + ' Porsi'">
-                            </span>
                         </div>
-                        <div class="p-4 space-y-2">
+                        
+                        <!-- Content: Food Name, Stan Name Below It, Desc, Price -->
+                        <div class="p-4 space-y-1.5">
                             <h3 class="text-sm font-bold text-slate-900" x-text="item.name"></h3>
-                            <p class="text-xs text-slate-500 line-clamp-2" x-text="item.desc"></p>
-                            <div class="flex items-center justify-between pt-1">
+                            <!-- Nama Stan di bawah nama menu masakan -->
+                            <p class="text-[11px] font-semibold text-slate-500 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                    <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+                                    <path d="M2 7h20" />
+                                    <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7" />
+                                </svg>
+                                <span x-text="item.stall"></span>
+                            </p>
+                            <p class="text-xs text-slate-500 line-clamp-2 pt-0.5" x-text="item.desc"></p>
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
                                 <span class="text-sm font-extrabold text-brand-700" x-text="formatRupiah(item.price)"></span>
                                 <span class="text-[11px] text-slate-400" x-text="item.prepTime"></span>
                             </div>
@@ -435,4 +375,12 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    });
+</script>
 @endsection

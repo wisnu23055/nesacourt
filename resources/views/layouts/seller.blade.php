@@ -228,8 +228,11 @@
             <header class="lg:hidden w-full bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
                 <div class="px-4 h-16 flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <button type="button" @click="sidebarOpen = true" class="h-10 w-10 rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-xs inline-flex items-center justify-center transition active:scale-95" aria-label="Buka Menu Sidebar">
-                            <i data-lucide="menu" class="w-5 h-5 text-white"></i>
+                        <button type="button" 
+                                @click="sidebarOpen = true" 
+                                class="p-2 rounded-xl text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80 bg-white shadow-2xs inline-flex items-center justify-center transition active:scale-95" 
+                                aria-label="Buka Menu Sidebar">
+                            <i data-lucide="menu" class="w-5 h-5"></i>
                         </button>
                         <a href="{{ url('/penjual/dashboard') }}" class="flex items-center gap-2">
                             <div class="w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-sm">
@@ -277,8 +280,8 @@
                                 <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold">N</div>
                                 <span class="font-bold text-base text-slate-900">Stan Penjual</span>
                             </div>
-                            <button type="button" @click="sidebarOpen = false" class="h-9 w-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 inline-flex items-center justify-center transition active:scale-95" aria-label="Tutup Menu Sidebar">
-                                <i data-lucide="x" class="w-5 h-5 text-slate-900"></i>
+                            <button type="button" @click="sidebarOpen = false" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition" aria-label="Tutup Menu Sidebar">
+                                <i data-lucide="x" class="w-5 h-5"></i>
                             </button>
                         </div>
 

@@ -82,149 +82,253 @@
         }
     </style>
 </head>
-<body class="min-h-full flex flex-col justify-between text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-700 pb-16 md:pb-0"
+<body class="min-h-full text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-700"
       x-data="cartStore()"
       x-init="initCart()">
 
-    <!-- Top Navigation Bar -->
-    <header class="w-full bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <!-- Brand Logo -->
-            <a href="{{ url('/dashboard') }}" class="flex items-center gap-2.5 group shrink-0">
-                <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-base shadow-sm shadow-brand-500/20 group-hover:bg-brand-700 transition shrink-0">
-                    N
+    <div class="min-h-screen flex flex-col bg-slate-50">
+        <!-- Area Utama (Sidebar + Konten Halaman) -->
+        <div class="flex-1 flex min-w-0">
+            <!-- Desktop Sidebar Navigation (Kiri) - Desain Bersih Identik Penjual -->
+            <aside class="hidden lg:flex lg:flex-col lg:w-64 bg-white border-r border-slate-200 shrink-0 sticky top-0 self-start h-screen z-30">
+                <!-- Brand Logo & Portal Info -->
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <a href="{{ url('/dashboard') }}" class="flex items-center gap-2.5 group">
+                        <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-base shadow-sm shadow-brand-500/20 group-hover:bg-brand-700 transition shrink-0">
+                            N
+                        </div>
+                        <div>
+                            <span class="font-bold text-base text-slate-900 tracking-tight block leading-tight">NesaCourt</span>
+                            <p class="text-[10px] text-brand-600 font-semibold">Portal Pembeli</p>
+                        </div>
+                    </a>
                 </div>
-                <div>
-                    <span class="font-bold text-base sm:text-lg text-slate-900 tracking-tight block">NesaCourt</span>
-                    <p class="text-[10px] text-slate-500 font-medium -mt-0.5">Food Court UNESA</p>
+
+                <!-- Navigation Links (Tanpa Bungkus Container Label) -->
+                <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto thin-scrollbar text-xs font-semibold">
+                    <a href="{{ url('/dashboard') }}" 
+                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition {{ request()->is('dashboard*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400 {{ request()->is('dashboard*') ? '!text-brand-600' : '' }}"></i>
+                            <span>Dashboard</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ url('/katalog') }}" 
+                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition {{ request()->is('katalog*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="utensils" class="w-4 h-4 text-slate-400 {{ request()->is('katalog*') ? '!text-brand-600' : '' }}"></i>
+                            <span>Katalog Menu & Stan</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ url('/rekomendasi') }}" 
+                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition {{ request()->is('rekomendasi*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-slate-400 {{ request()->is('rekomendasi*') ? '!text-brand-600' : '' }}"></i>
+                            <span>Rekomendasi AI</span>
+                        </div>
+                        <span class="text-xs font-bold text-amber-600">Cerdas</span>
+                    </a>
+
+                    <button type="button" 
+                            @click="drawerOpen = true" 
+                            class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="shopping-bag" class="w-4 h-4 text-slate-400"></i>
+                            <span>Keranjang Pesanan</span>
+                        </div>
+                        <span x-show="totalCount > 0" 
+                              x-text="totalCount" 
+                              class="text-xs font-bold text-brand-600">
+                        </span>
+                    </button>
+
+                    <a href="{{ url('/pesanan/status') }}" 
+                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition {{ request()->is('pesanan/status*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="activity" class="w-4 h-4 text-slate-400 {{ request()->is('pesanan/status*') ? '!text-brand-600' : '' }}"></i>
+                            <span>Status Pesanan</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ url('/riwayat') }}" 
+                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition {{ request()->is('riwayat*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="receipt" class="w-4 h-4 text-slate-400 {{ request()->is('riwayat*') ? '!text-brand-600' : '' }}"></i>
+                            <span>Riwayat Transaksi</span>
+                        </div>
+                    </a>
+
+                    <a href="{{ url('/profil') }}" 
+                       class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition {{ request()->is('profil*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <div class="flex items-center gap-2.5">
+                            <i data-lucide="user" class="w-4 h-4 text-slate-400 {{ request()->is('profil*') ? '!text-brand-600' : '' }}"></i>
+                            <span>Profil Mahasiswa</span>
+                        </div>
+                    </a>
+                </nav>
+
+                <!-- Bottom User Card in Sidebar -->
+                <div class="p-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <a href="{{ url('/profil') }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
+                             alt="Foto Mahasiswa" 
+                             class="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
+                        <div class="min-w-0">
+                            <span class="text-xs font-bold text-slate-900 block truncate">Aditya Pratama</span>
+                            <span class="text-[10px] text-slate-400 block truncate">NIM: 23055310001</span>
+                        </div>
+                    </a>
+                    <a href="{{ url('/login') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </a>
                 </div>
-            </a>
+            </aside>
 
-            <!-- Desktop Nav Links (Tampil di Layar Lebar Desktop) -->
-            <nav class="hidden lg:flex items-center gap-6 text-xs sm:text-sm font-semibold text-slate-600">
-                <a href="{{ url('/dashboard') }}" class="hover:text-brand-600 transition whitespace-nowrap {{ request()->is('dashboard*') ? 'text-brand-600 font-bold' : '' }}">
-                    Dashboard
-                </a>
-                <a href="{{ url('/katalog') }}" class="hover:text-brand-600 transition whitespace-nowrap {{ request()->is('katalog*') ? 'text-brand-600 font-bold' : '' }}">
-                    Katalog Menu
-                </a>
-                <a href="{{ url('/rekomendasi') }}" class="hover:text-brand-600 transition whitespace-nowrap {{ request()->is('rekomendasi*') ? 'text-brand-600 font-bold' : '' }}">
-                    Rekomendasi AI
-                </a>
-                <a href="{{ url('/riwayat') }}" class="hover:text-brand-600 transition whitespace-nowrap {{ request()->is('riwayat*') ? 'text-brand-600 font-bold' : '' }}">
-                    Riwayat Pesanan
-                </a>
-            </nav>
+            <!-- Main Content Wrapper -->
+            <div class="flex-1 flex flex-col min-w-0">
+                <!-- Mobile Header - Hamburger Bersih Senada Penjual -->
+                <header class="lg:hidden w-full bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
+                    <div class="px-4 h-16 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <button type="button" 
+                                    @click="sidebarOpen = true" 
+                                    class="p-2 rounded-xl text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80 bg-white shadow-2xs inline-flex items-center justify-center transition active:scale-95" 
+                                    aria-label="Buka Menu Sidebar">
+                                <i data-lucide="menu" class="w-5 h-5"></i>
+                            </button>
+                            <a href="{{ url('/dashboard') }}" class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-sm">
+                                    N
+                                </div>
+                                <span class="font-bold text-base text-slate-900">NesaCourt</span>
+                            </a>
+                        </div>
 
-            <!-- Right Header Actions -->
-            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                <!-- Cart Button with Counter -->
-                <button type="button" 
-                        @click="drawerOpen = true" 
-                        class="relative p-2 rounded-xl text-slate-700 hover:text-brand-600 hover:bg-slate-100 transition"
-                        title="Lihat Keranjang">
-                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                    <span x-show="totalCount > 0" 
-                          x-text="totalCount" 
-                          x-cloak
-                          class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
-                    </span>
-                </button>
-
-                <!-- Profile Menu -->
-                <a href="{{ url('/profil') }}" class="flex items-center gap-2 pl-2 border-l border-slate-200 hover:opacity-80 transition">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
-                         alt="Mahasiswa" 
-                         class="w-7 h-7 rounded-full object-cover ring-1 ring-slate-200">
-                    <div class="hidden sm:block text-left">
-                        <span class="text-xs font-bold text-slate-900 block leading-tight">Aditya</span>
-                        <span class="text-[10px] text-slate-500 block leading-tight">Mahasiswa UNESA</span>
+                        <div class="flex items-center gap-2">
+                            <!-- Mobile Cart Button -->
+                            <button type="button" 
+                                    @click="drawerOpen = true" 
+                                    class="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition"
+                                    title="Lihat Keranjang">
+                                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                                <span x-show="totalCount > 0" 
+                                      x-text="totalCount" 
+                                      x-cloak
+                                      class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
+                                </span>
+                            </button>
+                            <a href="{{ url('/profil') }}" class="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-slate-200">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Mahasiswa" class="w-full h-full object-cover">
+                            </a>
+                        </div>
                     </div>
-                </a>
+                </header>
 
-                <!-- Hamburger Button for Mobile & Tablet (< lg) -->
-                <button type="button" 
-                        @click="mobileNavOpen = !mobileNavOpen; $nextTick(() => lucide.createIcons())" 
-                        class="lg:hidden p-2 rounded-xl text-slate-700 hover:text-brand-600 hover:bg-slate-100 transition shrink-0"
-                        title="Menu Navigasi">
-                    <i data-lucide="menu" class="w-5 h-5" x-show="!mobileNavOpen"></i>
-                    <i data-lucide="x" class="w-5 h-5" x-show="mobileNavOpen" x-cloak></i>
-                </button>
-            </div>
-        </div>
+                <!-- Mobile Off-canvas Drawer Navigation -->
+                <div x-show="sidebarOpen" 
+                     x-cloak 
+                     class="relative z-50 lg:hidden" 
+                     role="dialog" 
+                     aria-modal="true">
+                    <div x-show="sidebarOpen" 
+                         x-transition:enter="transition-opacity ease-linear duration-200"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="transition-opacity ease-linear duration-200"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" 
+                         @click="sidebarOpen = false"></div>
 
-        <!-- Mobile & Tablet Dropdown Navigation Drawer -->
-        <div x-show="mobileNavOpen" 
-             x-cloak 
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 -translate-y-2"
-             x-transition:enter-end="opacity-100 translate-y-0"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100 translate-y-0"
-             x-transition:leave-end="opacity-0 -translate-y-2"
-             @click.outside="mobileNavOpen = false"
-             class="lg:hidden border-t border-slate-200 bg-white/95 backdrop-blur-md shadow-xl px-4 py-4 space-y-3">
-            
-            <!-- Student Mini Info -->
-            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
-                     alt="Mahasiswa" 
-                     class="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200">
-                <div class="min-w-0">
-                    <span class="text-xs font-bold text-slate-900 block truncate">Aditya Pratama</span>
-                    <span class="text-[11px] text-slate-500 block truncate">NIM: 23055310001 | Vokasi UNESA</span>
+                    <div class="fixed inset-0 flex z-40">
+                        <div x-show="sidebarOpen" 
+                             x-transition:enter="transition ease-in-out duration-300 transform"
+                             x-transition:enter-start="-translate-x-full"
+                             x-transition:enter-end="translate-x-0"
+                             x-transition:leave="transition ease-in-out duration-300 transform"
+                             x-transition:leave-start="translate-x-0"
+                             x-transition:leave-end="-translate-x-full"
+                             class="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-xl">
+                            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold">N</div>
+                                    <span class="font-bold text-base text-slate-900">Portal Pembeli</span>
+                                </div>
+                                <button type="button" @click="sidebarOpen = false" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition" aria-label="Tutup Menu Sidebar">
+                                    <i data-lucide="x" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+
+                            <!-- Mobile Drawer Nav Links -->
+                            <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto text-xs font-semibold thin-scrollbar">
+                                <a href="{{ url('/dashboard') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition {{ request()->is('dashboard*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400 {{ request()->is('dashboard*') ? '!text-brand-600' : '' }}"></i>
+                                    <span>Dashboard</span>
+                                </a>
+
+                                <a href="{{ url('/katalog') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition {{ request()->is('katalog*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                                    <i data-lucide="utensils" class="w-4 h-4 text-slate-400 {{ request()->is('katalog*') ? '!text-brand-600' : '' }}"></i>
+                                    <span>Katalog Menu & Stan</span>
+                                </a>
+
+                                <a href="{{ url('/rekomendasi') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl transition {{ request()->is('rekomendasi*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                                    <div class="flex items-center gap-2.5">
+                                        <i data-lucide="sparkles" class="w-4 h-4 text-slate-400 {{ request()->is('rekomendasi*') ? '!text-brand-600' : '' }}"></i>
+                                        <span>Rekomendasi AI</span>
+                                    </div>
+                                    <span class="text-xs font-bold text-amber-600">Cerdas</span>
+                                </a>
+
+                                <button type="button" 
+                                        @click="sidebarOpen = false; drawerOpen = true"
+                                        class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer">
+                                    <div class="flex items-center gap-2.5">
+                                        <i data-lucide="shopping-bag" class="w-4 h-4 text-slate-400"></i>
+                                        <span>Keranjang Pesanan</span>
+                                    </div>
+                                    <span x-show="totalCount > 0" 
+                                          x-text="totalCount" 
+                                          class="text-xs font-bold text-brand-600">
+                                    </span>
+                                </button>
+
+                                <a href="{{ url('/pesanan/status') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition {{ request()->is('pesanan/status*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                                    <i data-lucide="activity" class="w-4 h-4 text-slate-400 {{ request()->is('pesanan/status*') ? '!text-brand-600' : '' }}"></i>
+                                    <span>Status Pesanan</span>
+                                </a>
+
+                                <a href="{{ url('/riwayat') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition {{ request()->is('riwayat*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                                    <i data-lucide="receipt" class="w-4 h-4 text-slate-400 {{ request()->is('riwayat*') ? '!text-brand-600' : '' }}"></i>
+                                    <span>Riwayat Transaksi</span>
+                                </a>
+
+                                <a href="{{ url('/profil') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition {{ request()->is('profil*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                                    <i data-lucide="user" class="w-4 h-4 text-slate-400 {{ request()->is('profil*') ? '!text-brand-600' : '' }}"></i>
+                                    <span>Profil Mahasiswa</span>
+                                </a>
+
+                                <div class="pt-4 border-t border-slate-100">
+                                    <a href="{{ url('/login') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 font-semibold hover:bg-rose-50 transition">
+                                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                                        <span>Keluar Akun</span>
+                                    </a>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Nav Links List (Tanpa Icon) -->
-            <nav class="space-y-1 text-xs">
-                <a href="{{ url('/dashboard') }}" @click="mobileNavOpen = false" 
-                   class="block p-2.5 rounded-xl font-semibold transition {{ request()->is('dashboard*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    Dashboard Pembeli
-                </a>
-
-                <a href="{{ url('/katalog') }}" @click="mobileNavOpen = false" 
-                   class="block p-2.5 rounded-xl font-semibold transition {{ request()->is('katalog*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    Katalog Menu & Stan
-                </a>
-
-                <a href="{{ url('/rekomendasi') }}" @click="mobileNavOpen = false" 
-                   class="block p-2.5 rounded-xl font-semibold transition {{ request()->is('rekomendasi*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    Rekomendasi Menu Cerdas
-                </a>
-
-                <a href="{{ url('/riwayat') }}" @click="mobileNavOpen = false" 
-                   class="block p-2.5 rounded-xl font-semibold transition {{ request()->is('riwayat*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    Riwayat Transaksi Pesanan
-                </a>
-
-                <a href="{{ url('/profil') }}" @click="mobileNavOpen = false" 
-                   class="block p-2.5 rounded-xl font-semibold transition {{ request()->is('profil*') ? 'bg-brand-50 text-brand-700 font-bold' : 'text-slate-700 hover:bg-slate-50' }}">
-                    Profil Mahasiswa
-                </a>
-            </nav>
-
-            <!-- Bottom Action Row (Tanpa Icon) -->
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                <button type="button" 
-                        @click="mobileNavOpen = false; drawerOpen = true" 
-                        class="whitespace-nowrap flex-1 inline-flex items-center justify-center py-2 px-3 rounded-xl bg-brand-50 text-brand-700 text-xs font-bold hover:bg-brand-100 transition">
-                    <span>Keranjang (<span x-text="totalCount">0</span>)</span>
-                </button>
-                <a href="{{ url('/login') }}" 
-                   class="whitespace-nowrap inline-flex items-center justify-center py-2 px-4 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition">
-                    <span>Keluar</span>
-                </a>
+                <!-- Page Main Content Slot -->
+                <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+                    @yield('content')
+                </main>
             </div>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        @yield('content')
-    </main>
-
-    <!-- Cart Slide-Over Drawer -->
+    <!-- Cart Slide-Over Drawer (MUNCUL DI SEBELAH KIRI) -->
     <div x-show="drawerOpen" 
          x-cloak 
          class="fixed inset-0 z-50 overflow-hidden" 
@@ -234,21 +338,28 @@
         <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" 
              @click="drawerOpen = false"></div>
 
-        <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-            <div class="pointer-events-auto w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between">
+        <div class="pointer-events-none fixed inset-y-0 left-0 flex max-w-full pr-10">
+            <div x-show="drawerOpen"
+                 x-transition:enter="transform transition ease-in-out duration-300"
+                 x-transition:enter-start="-translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transform transition ease-in-out duration-300"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="-translate-x-full"
+                 class="pointer-events-auto w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between z-50">
                 <!-- Header -->
                 <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-600"></i>
+                        <i data-lucide="shopping-bag" class="w-5 h-5 text-slate-900"></i>
                         <h3 class="text-sm sm:text-base font-bold text-slate-900">Keranjang Pesanan</h3>
                     </div>
-                    <button type="button" @click="drawerOpen = false" class="text-slate-400 hover:text-slate-600 p-1">
+                    <button type="button" @click="drawerOpen = false" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
 
                 <!-- Body Item List -->
-                <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+                <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 thin-scrollbar">
                     <template x-if="items.length === 0">
                         <div class="text-center py-16 space-y-3">
                             <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
@@ -266,12 +377,9 @@
                     <template x-if="items.length > 0">
                         <div class="space-y-3">
                             <!-- Single-Seller Stall Banner -->
-                            <div class="p-2.5 rounded-lg bg-brand-50 border border-brand-200 flex items-center justify-between text-xs text-brand-800">
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="store" class="w-4 h-4 text-brand-600"></i>
-                                    <span>Stan: <strong x-text="currentSeller"></strong></span>
-                                </div>
-                                <span class="text-[10px] text-brand-600 bg-white px-2 py-0.5 rounded border border-brand-200">1 Transaksi QRIS</span>
+                            <div class="p-2.5 rounded-lg bg-brand-50 border border-brand-200 flex items-center gap-2 text-xs text-brand-800">
+                                <i data-lucide="store" class="w-4 h-4 text-brand-600"></i>
+                                <span>Stan: <strong x-text="currentSeller"></strong></span>
                             </div>
 
                             <!-- Item List -->
@@ -345,96 +453,11 @@
         </div>
     </div>
 
-    <!-- Mobile Bottom Navigation Bar -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-4 flex items-center justify-around shadow-lg">
-        <a href="{{ url('/dashboard') }}" class="flex flex-col items-center gap-1 text-[10px] font-medium {{ request()->is('dashboard*') ? 'text-brand-600 font-bold' : 'text-slate-500' }}">
-            <i data-lucide="home" class="w-4 h-4"></i>
-            <span>Beranda</span>
-        </a>
-        <a href="{{ url('/katalog') }}" class="flex flex-col items-center gap-1 text-[10px] font-medium {{ request()->is('katalog*') ? 'text-brand-600 font-bold' : 'text-slate-500' }}">
-            <i data-lucide="utensils" class="w-4 h-4"></i>
-            <span>Katalog</span>
-        </a>
-        <a href="{{ url('/rekomendasi') }}" class="flex flex-col items-center gap-1 text-[10px] font-medium {{ request()->is('rekomendasi*') ? 'text-brand-600 font-bold' : 'text-slate-500' }}">
-            <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
-            <span>AI Saran</span>
-        </a>
-        <a href="{{ url('/riwayat') }}" class="flex flex-col items-center gap-1 text-[10px] font-medium {{ request()->is('riwayat*') ? 'text-brand-600 font-bold' : 'text-slate-500' }}">
-            <i data-lucide="clock" class="w-4 h-4"></i>
-            <span>Riwayat</span>
-        </a>
-        <a href="{{ url('/profil') }}" class="flex flex-col items-center gap-1 text-[10px] font-medium {{ request()->is('profil*') ? 'text-brand-600 font-bold' : 'text-slate-500' }}">
-            <i data-lucide="user" class="w-4 h-4"></i>
-            <span>Profil</span>
-        </a>
-    </nav>
-
-    <!-- Main Footer Identik -->
-    <footer class="bg-slate-950 text-slate-300 text-sm py-12 border-t border-slate-800 w-full mt-10">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <!-- Col 1: Brand -->
-                <div class="space-y-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-base shrink-0">
-                            N
-                        </div>
-                        <span class="font-bold text-base text-white tracking-tight">NesaCourt</span>
-                    </div>
-                    <p class="text-slate-400 text-xs leading-relaxed">
-                        Sistem Pemesanan dan Rekomendasi Makanan berbasis web untuk Food Court Universitas Negeri Surabaya (UNESA).
-                    </p>
-                </div>
-
-                <!-- Col 2: Navigasi -->
-                <div class="space-y-2.5">
-                    <p class="font-semibold text-white text-xs">Navigasi Utama</p>
-                    <ul class="space-y-2 text-xs">
-                        <li><a href="{{ url('/dashboard') }}" class="text-slate-300 hover:text-white transition whitespace-nowrap">Dashboard</a></li>
-                        <li><a href="{{ url('/katalog') }}" class="text-slate-300 hover:text-white transition whitespace-nowrap">Katalog Menu</a></li>
-                        <li><a href="{{ url('/rekomendasi') }}" class="text-slate-300 hover:text-white transition whitespace-nowrap">Rekomendasi Cerdas AI</a></li>
-                        <li><a href="{{ url('/riwayat') }}" class="text-slate-300 hover:text-white transition whitespace-nowrap">Riwayat Pesanan</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 3: Lokasi -->
-                <div class="space-y-2.5">
-                    <p class="font-semibold text-white text-xs">Lokasi Layanan</p>
-                    <ul class="space-y-2 text-xs text-slate-300">
-                        <li class="whitespace-nowrap">Kafetaria Kampus Ketintang</li>
-                        <li class="whitespace-nowrap">Food Court Vokasi UNESA</li>
-                        <li class="whitespace-nowrap">Kafetaria Kampus Lidah Wetan</li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Akses Akun -->
-                <div class="space-y-2.5">
-                    <p class="font-semibold text-white text-xs">Akses Akun</p>
-                    <ul class="space-y-2 text-xs">
-                        <li><a href="{{ url('/profil') }}" class="text-slate-300 hover:text-white transition whitespace-nowrap">Pengaturan Akun Mahasiswa</a></li>
-                        <li><a href="{{ url('/riwayat') }}" class="text-slate-300 hover:text-white transition whitespace-nowrap">Status Pembayaran QRIS</a></li>
-                        <li><a href="{{ url('/') }}" class="text-slate-300 hover:text-white transition whitespace-nowrap">Halaman Depan Publik</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Copyright Line -->
-            <div class="pt-6 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left text-xs text-slate-400">
-                <p>© 2026 NesaCourt (Universitas Negeri Surabaya - Vokasi). Seluruh hak cipta dilindungi.</p>
-                <div class="flex items-center justify-center gap-4 flex-wrap">
-                    <a href="#" class="hover:text-white transition whitespace-nowrap">Kebijakan Privasi</a>
-                    <span>|</span>
-                    <a href="#" class="hover:text-white transition whitespace-nowrap">Syarat dan Ketentuan</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Global Cart Script via Alpine.js -->
+    <!-- Global Cart & Sidebar Script via Alpine.js -->
     <script>
         function cartStore() {
             return {
-                mobileNavOpen: false,
+                sidebarOpen: false,
                 drawerOpen: false,
                 items: [],
                 currentSeller: '',
@@ -454,7 +477,7 @@
                         }
                     }
 
-                    // Dummy data sementara untuk pengujian desain keranjang pesanan
+                    // Dummy data awal jika keranjang kosong
                     if (!this.items || this.items.length === 0) {
                         this.items = [
                             {
@@ -565,7 +588,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
         });
     </script>
 </body>

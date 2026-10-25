@@ -5,54 +5,33 @@
 @section('content')
 <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200 grid grid-cols-1 lg:grid-cols-12 min-h-[520px]">
 
-    <!-- Left Side: Identity & Benefits (Blue) -->
+    <!-- Left Side: Campus Identity & Informational -->
     <div class="lg:col-span-5 bg-slate-900 text-white p-6 sm:p-7 flex flex-col justify-between">
         <div>
-            <!-- Badge -->
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-white/10 text-white border border-white/10 whitespace-nowrap">
-                    Portal Mahasiswa
-                </span>
-            </div>
-            <p class="text-xs text-slate-400 mt-1">Universitas Negeri Surabaya</p>
+            <!-- Campus Label -->
+            <p class="text-xs font-semibold text-slate-400">Universitas Negeri Surabaya</p>
 
             <!-- Headline -->
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight mt-4 text-white">
+            <h1 class="text-xl sm:text-2xl font-bold tracking-tight mt-3 text-white">
                 Buat Akun NesaCourt
             </h1>
             <p class="mt-2 text-slate-300 text-xs leading-relaxed">
                 Daftar akun untuk kemudahan memesan makanan dan mengakses layanan di Food Court UNESA.
             </p>
-        </div>
 
-        <!-- Visual Media Card (Hidden on Mobile & Tablet, Visible on Desktop) -->
-        <div class="hidden lg:block my-4 relative rounded-xl overflow-hidden border border-white/15 aspect-[16/9]">
-            <img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=800&q=80" 
-                 alt="Kantin Mahasiswa" 
-                 class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-            
-            <div class="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px]">
-                <p class="text-white">Kafetaria Kampus Ketintang</p>
-                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500 text-white whitespace-nowrap">
-                    Buka Sekarang
-                </span>
+            <!-- Photo of Canteen (Tersembunyi di Mobile, Hanya Tampil di Desktop) -->
+            <div class="hidden lg:block mt-5 rounded-xl overflow-hidden border border-white/15 aspect-[16/10] relative">
+                <img src="https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=800&q=80" 
+                     alt="Kantin Mahasiswa" 
+                     class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                <div class="absolute bottom-2 left-2.5 right-2.5 text-[11px] text-slate-200">
+                    Kafetaria Kampus Ketintang
+                </div>
             </div>
         </div>
 
-        <!-- Key Benefits List -->
-        <div class="space-y-2 text-xs text-slate-300 border-t border-white/10 pt-3">
-            <div class="flex items-center gap-2">
-                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-                <span>Pemesanan cepat tanpa antrean kasir</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-                <span>Informasi stok porsi menu kantin real-time</span>
-            </div>
-        </div>
-
-        <!-- Bottom -->
+        <!-- Integrated Campus Footer -->
         <div class="pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
             <span>Sistem Terintegrasi UNESA</span>
             <span>Ketintang &amp; Lidah Wetan</span>
@@ -62,16 +41,12 @@
     <!-- Right Side: Form Container -->
     <div class="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-center" x-data="{ showPassword: false, showConfirmPassword: false, loading: false }">
         <div class="max-w-lg w-full mx-auto">
-            <!-- Header Badge & Title -->
+            <!-- Header Title -->
             <div class="mb-5">
-                <div class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-md mb-2">
-                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                    <span>Pendaftaran Akun Baru</span>
-                </div>
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                <h2 class="text-xl font-bold text-slate-900 tracking-tight">
                     Daftar sebagai Mahasiswa
                 </h2>
-                <p class="text-slate-500 text-xs sm:text-sm mt-1">
+                <p class="text-slate-500 text-xs mt-1">
                     Lengkapi data diri untuk membuat akun NesaCourt Anda.
                 </p>
             </div>
@@ -197,16 +172,16 @@
                 <div class="pt-2">
                     <button type="submit" 
                             :disabled="loading" 
-                            class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition disabled:opacity-75 disabled:cursor-not-allowed whitespace-nowrap">
+                            class="w-full h-10 inline-flex items-center justify-center gap-2 px-4 rounded-lg text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 transition disabled:opacity-75 disabled:cursor-not-allowed whitespace-nowrap">
                         <template x-if="!loading">
-                            <span class="inline-flex items-center gap-2 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
                                 <span>Daftar sebagai Mahasiswa</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                             </span>
                         </template>
                         <template x-if="loading">
-                            <span class="inline-flex items-center gap-2 whitespace-nowrap">
-                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
+                                <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
@@ -218,10 +193,10 @@
             </form>
 
             <!-- Bottom Login Link -->
-            <p class="mt-5 text-center text-xs text-slate-500 font-medium">
+            <p class="mt-5 text-center text-xs text-slate-500">
                 Sudah memiliki akun? 
-                <a href="{{ url('/login') }}" class="font-bold text-brand-600 hover:text-brand-700 transition whitespace-nowrap">
-                    Masuk sekarang!
+                <a href="{{ url('/login') }}" class="font-semibold text-brand-600 hover:text-brand-700 transition whitespace-nowrap">
+                    Masuk ke Akun
                 </a>
             </p>
         </div>

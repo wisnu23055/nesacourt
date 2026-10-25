@@ -4,12 +4,9 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
-    budget: 15000,
-    selectedTaste: 'pedas',
-    selectedTime: '10',
-    selectedCategory: 'semua',
-    isSearching: false,
-    hasSearched: true,
+    budget: 'semua',
+    selectedTaste: 'semua',
+    selectedTime: 'semua',
 
     menusDatabase: [
         {
@@ -22,8 +19,7 @@
             category: 'makanan',
             stock: 14,
             image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80',
-            aiReason: 'Masuk dalam budget Rp 15.000, rasa pedas nagih, dan waktu penyajian cepat 7 menit saat jeda kuliah.',
-            matchScore: 98
+            aiReason: 'Ayam krispi gurih dengan sambal bawang pedas segar, cocok dinikmati saat jeda perkuliahan.'
         },
         {
             id: 202,
@@ -35,8 +31,7 @@
             category: 'makanan',
             stock: 12,
             image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=600&q=80',
-            aiReason: 'Solusi paling hemat, sudah termasuk nasi komplit dan minuman jumbo pas dengan batas anggaran Anda.',
-            matchScore: 95
+            aiReason: 'Solusi paling hemat, sudah termasuk nasi komplit dan minuman jumbo pas dengan batas anggaran Anda.'
         },
         {
             id: 203,
@@ -48,8 +43,7 @@
             category: 'makanan',
             stock: 8,
             image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80',
-            aiReason: 'Kuah kaldu kuning hangat gurih dan cepat disajikan hanya dalam waktu 5 menit.',
-            matchScore: 91
+            aiReason: 'Kuah kaldu kuning hangat gurih dan cepat disajikan hanya dalam waktu 5 menit.'
         },
         {
             id: 204,
@@ -61,8 +55,7 @@
             category: 'makanan',
             stock: 18,
             image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80',
-            aiReason: 'Harga Rp 12.000 menyisakan Rp 3.000 dari budget Anda, porsi mengenyangkan.',
-            matchScore: 88
+            aiReason: 'Nasi goreng harum beraroma wok dengan telur ceplok setengah matang yang mengenyangkan.'
         },
         {
             id: 205,
@@ -74,8 +67,7 @@
             category: 'minuman',
             stock: 10,
             image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=600&q=80',
-            aiReason: 'Kaya nutrisi buah asli, cocok sebagai pengganjal lapar manis di sela-sela praktikum.',
-            matchScore: 84
+            aiReason: 'Kaya nutrisi buah asli, cocok sebagai pengganjal lapar manis di sela-sela praktikum.'
         },
         {
             id: 206,
@@ -87,228 +79,237 @@
             category: 'minuman',
             stock: 40,
             image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-            aiReason: 'Harga sangat murah, porsi ekstra jumbo siap minum dalam 2 menit.',
-            matchScore: 80
+            aiReason: 'Harga sangat murah, porsi ekstra jumbo siap minum dalam 2 menit.'
         }
     ],
 
     get recommendedResults() {
         return this.menusDatabase.filter(m => {
-            const matchBudget = m.price <= this.budget;
-            const matchCategory = this.selectedCategory === 'semua' || m.category === this.selectedCategory;
-            const matchTime = m.prepTime <= parseInt(this.selectedTime);
-            return matchBudget && matchCategory && matchTime;
-        }).sort((a, b) => b.matchScore - a.matchScore);
-    },
-
-    triggerSearch() {
-        this.isSearching = true;
-        setTimeout(() => {
-            this.isSearching = false;
-            this.hasSearched = true;
-        }, 300);
+            const matchBudget = this.budget === 'semua' || m.price <= parseInt(this.budget);
+            const matchTaste = this.selectedTaste === 'semua' || m.taste === this.selectedTaste;
+            const matchTime = this.selectedTime === 'semua' || (
+                this.selectedTime === '20' ? true : m.prepTime <= parseInt(this.selectedTime)
+            );
+            return matchBudget && matchTaste && matchTime;
+        });
     }
 }">
 
-    <!-- Top Header Card (Identik dengan Dashboard) -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-5">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-            <div class="flex items-center gap-3.5">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
-                     alt="Foto Mahasiswa" 
-                     class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Rekomendasi Menu Kantin</h1>
-                        <span class="text-slate-300 font-normal">|</span>
-                        <span class="text-xs font-semibold text-brand-600">Sesuai Uang Saku Mahasiswa</span>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: 23055310001)</p>
-                </div>
-            </div>
-
-            <!-- Operating Hours Badge with Blinking Dot -->
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 shrink-0 self-start md:self-auto">
-                <span class="relative flex h-2 w-2 shrink-0">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span>Kantin Ketintang Buka | 08.00 - 17.00 WIB</span>
-            </div>
+    <!-- Header Section (Judul Semi-Bold) -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Rekomendasi Menu Kantin</h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Pilihan menu terbaik yang disesuaikan dengan kriteria uang saku dan selera mahasiswa di Food Court UNESA Ketintang.</p>
         </div>
-
-        <!-- Quick Budget Filter Pills (Kuning Transparan Halus) -->
-        <div class="space-y-2">
-            <span class="text-xs font-bold text-slate-800 block">Pilihan Cepat Batas Anggaran:</span>
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                <button type="button" 
-                        @click="budget = 5000; triggerSearch()" 
-                        :class="budget === 5000 ? 'bg-amber-50/90 text-amber-900 font-bold border-amber-300 ring-1 ring-amber-300/40 shadow-2xs' : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'"
-                        class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition">
-                    Budget &le; Rp 5.000 (Minuman Segar)
-                </button>
-                <button type="button" 
-                        @click="budget = 10000; triggerSearch()" 
-                        :class="budget === 10000 ? 'bg-amber-50/90 text-amber-900 font-bold border-amber-300 ring-1 ring-amber-300/40 shadow-2xs' : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'"
-                        class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition">
-                    Budget &le; Rp 10.000 (Camilan & Jus)
-                </button>
-                <button type="button" 
-                        @click="budget = 15000; triggerSearch()" 
-                        :class="budget === 15000 ? 'bg-amber-50/90 text-amber-900 font-bold border-amber-300 ring-1 ring-amber-300/40 shadow-2xs' : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'"
-                        class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition">
-                    Budget &le; Rp 15.000 (Nasi Ayam Komplit)
-                </button>
-                <button type="button" 
-                        @click="budget = 20000; triggerSearch()" 
-                        :class="budget === 20000 ? 'bg-amber-50/90 text-amber-900 font-bold border-amber-300 ring-1 ring-amber-300/40 shadow-2xs' : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800'"
-                        class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-semibold transition">
-                    Budget &le; Rp 20.000 (Paket Kenyang)
-                </button>
-            </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-600 shrink-0 self-start md:self-auto shadow-2xs">
+            <span class="relative flex h-2 w-2 shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>Kantin Ketintang Buka | 08.00 - 17.00 WIB</span>
         </div>
     </div>
 
-    <!-- Criteria Filter Form Card (Tema Biru, Kontainer Anggaran di Tengah & Lebih Panjang) -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-5">
-        <div>
-            <h2 class="text-sm sm:text-base font-bold text-slate-900">Tentukan Kriteria Menu Pilihan Anda</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Sesuaikan batas nominal uang saku, selera rasa, dan maksimal waktu tunggu persiapan menu di kantin.</p>
+    <!-- Filter Rekomendasi Menu Kantin (Tema Dashboard Sesuai Desain & Fitur Utuh) -->
+    <div class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="sliders-horizontal" class="w-4 h-4 text-slate-900"></i>
+                    <h2 class="text-sm sm:text-base font-bold text-slate-900">Filter & Kriteria Rekomendasi Menu</h2>
+                </div>
+                <p class="text-xs text-slate-500">Sesuaikan batas anggaran uang saku, selera rasa, dan maksimal waktu tunggu persiapan di kantin</p>
+            </div>
+            <!-- Tombol Reset jika filter sedang aktif -->
+            <button type="button" 
+                    x-show="budget !== 'semua' || selectedTaste !== 'semua' || selectedTime !== 'semua'"
+                    @click="budget = 'semua'; selectedTaste = 'semua'; selectedTime = 'semua'"
+                    class="whitespace-nowrap self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition cursor-pointer">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Reset Kriteria</span>
+            </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-10 gap-5 pt-1">
-            
-            <!-- 1. Preferensi Rasa (Sisi Kiri, 3 Kolom) -->
-            <div class="lg:col-span-3 p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/70 space-y-3.5 flex flex-col justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-brand-50 border border-brand-200/80 flex items-center justify-center text-brand-600 shrink-0 shadow-2xs">
-                        <i data-lucide="utensils" class="w-4 h-4 text-brand-600"></i>
+        <!-- 1. Batas Anggaran Mahasiswa (Budget Cards Grid Identik Dashboard) -->
+        <div class="space-y-2.5">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 shadow-2xs">
+                    <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-slate-900 block leading-tight">1. Batas Anggaran Uang Saku</span>
+                    <span class="text-[10px] text-slate-500 block">Pilih batas maksimal pengeluaran jajan per porsi</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                <button type="button" 
+                        @click="budget = 'semua'" 
+                        class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1 cursor-pointer"
+                        :class="budget === 'semua' 
+                            ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                    <span class="text-[10px] font-semibold text-slate-500">Semua Harga</span>
+                    <span class="text-xs font-bold text-slate-900 block">Semua Budget</span>
+                    <span class="text-[10px] text-slate-500 block">Semua Menu Kantin</span>
+                </button>
+
+                <button type="button" 
+                        @click="budget = '5000'" 
+                        class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1 cursor-pointer"
+                        :class="budget === '5000' 
+                            ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                    <span class="text-[10px] font-semibold text-slate-500">Maks. 5 Ribu</span>
+                    <span class="text-xs font-bold text-slate-900 block">&le; Rp 5.000</span>
+                    <span class="text-[10px] text-slate-500 block">Minuman Dingin</span>
+                </button>
+
+                <button type="button" 
+                        @click="budget = '10000'" 
+                        class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1 cursor-pointer"
+                        :class="budget === '10000' 
+                            ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                    <span class="text-[10px] font-semibold text-slate-500">Maks. 10 Ribu</span>
+                    <span class="text-xs font-bold text-slate-900 block">&le; Rp 10.000</span>
+                    <span class="text-[10px] text-slate-500 block">Camilan & Aneka Jus</span>
+                </button>
+
+                <button type="button" 
+                        @click="budget = '15000'" 
+                        class="p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1 cursor-pointer"
+                        :class="budget === '15000' 
+                            ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                    <span class="text-[10px] font-semibold text-slate-500">Maks. 15 Ribu</span>
+                    <span class="text-xs font-bold text-slate-900 block">&le; Rp 15.000</span>
+                    <span class="text-[10px] text-slate-500 block">Nasi & Lauk Utama</span>
+                </button>
+
+                <button type="button" 
+                        @click="budget = '20000'" 
+                        class="col-span-2 sm:col-span-1 p-3 rounded-xl border text-center transition select-none flex flex-col items-center justify-center gap-1 cursor-pointer"
+                        :class="budget === '20000' 
+                            ? 'border-brand-600 bg-brand-50/70 ring-1 ring-brand-500/20 shadow-2xs' 
+                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100/80'">
+                    <span class="text-[10px] font-semibold text-slate-500">Maks. 20 Ribu</span>
+                    <span class="text-xs font-bold text-slate-900 block">&le; Rp 20.000</span>
+                    <span class="text-[10px] text-slate-500 block">Paket Komplit Kenyang</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 2 & 3. Preferensi Karakter Rasa dan Maksimal Waktu Tunggu (Dua Kolom Bertema Dashboard) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+            <!-- Preferensi Rasa -->
+            <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200/70 space-y-2.5">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 shadow-2xs">
+                        <i data-lucide="utensils" class="w-3.5 h-3.5"></i>
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-slate-900 block leading-tight">Preferensi Rasa</label>
-                        <span class="text-[10px] text-slate-500 block">Karakter cita rasa menu</span>
+                        <span class="text-xs font-bold text-slate-900 block leading-tight">2. Preferensi Karakter Rasa</span>
+                        <span class="text-[10px] text-slate-500 block">Karakter cita rasa menu masakan</span>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-3 gap-1.5 pt-1">
+                <div class="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-3 lg:grid-cols-6 gap-1.5 pt-0.5">
                     <button type="button" 
-                            @click="selectedTaste = 'pedas'; triggerSearch()" 
-                            :class="selectedTaste === 'pedas' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
+                            @click="selectedTaste = 'semua'" 
+                            :class="selectedTaste === 'semua' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
+                        Bebas
+                    </button>
+                    <button type="button" 
+                            @click="selectedTaste = 'pedas'" 
+                            :class="selectedTaste === 'pedas' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
                         Pedas
                     </button>
                     <button type="button" 
-                            @click="selectedTaste = 'gurih'; triggerSearch()" 
-                            :class="selectedTaste === 'gurih' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
+                            @click="selectedTaste = 'gurih'" 
+                            :class="selectedTaste === 'gurih' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
                         Gurih
                     </button>
                     <button type="button" 
-                            @click="selectedTaste = 'manis'; triggerSearch()" 
-                            :class="selectedTaste === 'manis' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
+                            @click="selectedTaste = 'manis'" 
+                            :class="selectedTaste === 'manis' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
                         Manis
                     </button>
                     <button type="button" 
-                            @click="selectedTaste = 'berkuah'; triggerSearch()" 
-                            :class="selectedTaste === 'berkuah' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
+                            @click="selectedTaste = 'berkuah'" 
+                            :class="selectedTaste === 'berkuah' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
                         Berkuah
                     </button>
                     <button type="button" 
-                            @click="selectedTaste = 'segar'; triggerSearch()" 
-                            :class="selectedTaste === 'segar' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
+                            @click="selectedTaste = 'segar'" 
+                            :class="selectedTaste === 'segar' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
                         Segar
                     </button>
-                    <button type="button" 
-                            @click="selectedTaste = 'semua'; triggerSearch()" 
-                            :class="selectedTaste === 'semua' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
-                        Bebas
-                    </button>
                 </div>
             </div>
 
-            <!-- 2. Batas Anggaran Mahasiswa (Di Tengah & Lebih Panjang: 4 Kolom) -->
-            <div class="lg:col-span-4 p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/70 space-y-3.5 flex flex-col justify-between">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-brand-50 border border-brand-200/80 flex items-center justify-center text-brand-600 shrink-0 shadow-2xs">
-                            <i data-lucide="wallet" class="w-4 h-4 text-brand-600"></i>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-900 block leading-tight">Batas Anggaran Mahasiswa</label>
-                            <span class="text-[10px] text-slate-500 block">Uang saku maksimal</span>
-                        </div>
-                    </div>
-                    <span class="text-xs font-extrabold text-brand-700 bg-brand-50 border border-brand-200 px-3 py-1 rounded-lg" x-text="formatRupiah(budget)">Rp 15.000</span>
-                </div>
-
-                <div class="space-y-1.5 pt-1">
-                    <input type="range" 
-                           min="4000" 
-                           max="30000" 
-                           step="1000" 
-                           x-model.number="budget" 
-                           @input="triggerSearch()"
-                           class="w-full accent-brand-600 cursor-pointer">
-                    <div class="flex justify-between text-[10px] text-slate-400 font-medium">
-                        <span>Rp 4.000</span>
-                        <span>Rp 15.000</span>
-                        <span>Rp 30.000</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. Maksimal Waktu Tunggu (Sisi Kanan, 3 Kolom) -->
-            <div class="lg:col-span-3 p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/70 space-y-3.5 flex flex-col justify-between">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-brand-50 border border-brand-200/80 flex items-center justify-center text-brand-600 shrink-0 shadow-2xs">
-                        <i data-lucide="clock" class="w-4 h-4 text-brand-600"></i>
+            <!-- Maksimal Waktu Tunggu -->
+            <div class="p-4 rounded-xl bg-slate-50/70 border border-slate-200/70 space-y-2.5">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 shadow-2xs">
+                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-slate-900 block leading-tight">Maksimal Waktu Tunggu</label>
-                        <span class="text-[10px] text-slate-500 block">Durasi persiapan dapur</span>
+                        <span class="text-xs font-bold text-slate-900 block leading-tight">3. Maksimal Waktu Tunggu</span>
+                        <span class="text-[10px] text-slate-500 block">Durasi persiapan dapur stan</span>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-3 gap-1.5 pt-1">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-0.5">
                     <button type="button" 
-                            @click="selectedTime = '5'; triggerSearch()" 
-                            :class="selectedTime === '5' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
+                            @click="selectedTime = 'semua'" 
+                            :class="selectedTime === 'semua' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
+                        Semua
+                    </button>
+                    <button type="button" 
+                            @click="selectedTime = '5'" 
+                            :class="selectedTime === '5' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
                         &le; 5 Mnt
                     </button>
                     <button type="button" 
-                            @click="selectedTime = '10'; triggerSearch()" 
-                            :class="selectedTime === '10' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
+                            @click="selectedTime = '10'" 
+                            :class="selectedTime === '10' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
                         &le; 10 Mnt
                     </button>
                     <button type="button" 
-                            @click="selectedTime = '20'; triggerSearch()" 
-                            :class="selectedTime === '20' ? 'bg-brand-600 text-white font-bold border-brand-600 shadow-2xs' : 'bg-white border border-slate-200 text-slate-700 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700'"
-                            class="whitespace-nowrap py-1.5 px-2 rounded-xl text-xs font-semibold text-center transition">
+                            @click="selectedTime = '20'" 
+                            :class="selectedTime === '20' 
+                                ? 'border-brand-600 bg-brand-50/80 text-brand-700 font-bold ring-1 ring-brand-500/20 shadow-2xs' 
+                                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'"
+                            class="whitespace-nowrap py-1.5 px-2 rounded-xl border text-xs font-semibold text-center transition cursor-pointer">
                         Santai (&gt; 15 Mnt)
                     </button>
                 </div>
             </div>
-
-        </div>
-
-        <!-- Submit Button Row (Solid Brand Blue) -->
-        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2 text-xs text-slate-500">
-                <i data-lucide="info" class="w-4 h-4 text-brand-600"></i>
-                <span>Sistem secara otomatis menyesuaikan rekomendasi dengan kondisi ketersediaan menu di stan.</span>
-            </div>
-            <button type="button" 
-                    @click="triggerSearch()" 
-                    class="whitespace-nowrap w-full sm:w-auto h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 shadow-sm transition">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5" :class="isSearching ? 'animate-spin' : ''"></i>
-                <span>Terapkan Kriteria Rekomendasi</span>
-            </button>
         </div>
     </div>
 
@@ -325,43 +326,43 @@
         <!-- Grid Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <template x-for="item in recommendedResults" :key="item.id">
-                <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden hover:shadow-md transition flex flex-col justify-between group">
+                <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden hover:shadow-md transition flex flex-col justify-between">
                     <div>
-                        <!-- Photo & Badges -->
+                        <!-- Food Photo without floating badges -->
                         <div class="relative h-44 w-full bg-slate-100 overflow-hidden">
-                            <img :src="item.image" :alt="item.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                            
-                            <!-- Stan Name Badge -->
-                            <span class="absolute top-3 left-3 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-[10px] font-bold text-slate-800" x-text="item.seller"></span>
-                            
-                            <!-- Match Badge Clean -->
-                            <span class="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 text-[10px] font-bold border border-brand-200 shadow-2xs" x-text="'Kecocokan ' + item.matchScore + '%'"></span>
-
-                            <!-- Portion Stock Badge -->
-                            <span class="absolute bottom-3 left-3 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-200" x-text="'Tersedia ' + item.stock + ' Porsi'"></span>
+                            <img :src="item.image" 
+                                 :alt="item.name" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         </div>
 
-                        <!-- Info & Reason -->
-                        <div class="p-4 space-y-2.5">
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-900" x-text="item.name"></h3>
-                                <div class="flex items-center justify-between mt-1">
-                                    <span class="text-sm font-extrabold text-brand-700" x-text="formatRupiah(item.price)"></span>
-                                    <span class="text-[11px] text-slate-400" x-text="'Masak ~' + item.prepTime + ' Menit'"></span>
-                                </div>
+                        <!-- Content: Food Name, Stan Name Below It, Desc, Price -->
+                        <div class="p-4 space-y-1.5">
+                            <h3 class="text-sm font-bold text-slate-900" x-text="item.name"></h3>
+                            <!-- Nama Stan di bawah nama menu masakan -->
+                            <p class="text-[11px] font-semibold text-slate-500 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                    <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+                                    <path d="M2 7h20" />
+                                    <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7" />
+                                </svg>
+                                <span x-text="item.seller"></span>
+                            </p>
+                            <p class="text-xs text-slate-500 line-clamp-2 pt-0.5" x-text="item.aiReason"></p>
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                                <span class="text-sm font-extrabold text-brand-700" x-text="formatRupiah(item.price)"></span>
+                                <span class="text-[11px] text-slate-400" x-text="'Masak ~' + item.prepTime + ' Menit'"></span>
                             </div>
-
-                            <!-- Clean Reason Text (No AI gimmick quote box) -->
-                            <p class="text-xs text-slate-600 leading-relaxed" x-text="item.aiReason"></p>
                         </div>
                     </div>
 
-                    <!-- Add Button (Single Line Solid Brand Blue) -->
+                    <!-- Add Button -->
                     <div class="p-4 pt-0">
                         <button type="button" 
                                 @click="addToCart({ id: item.id, name: item.name, price: item.price, seller: item.seller })" 
                                 class="whitespace-nowrap w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 shadow-sm transition">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             <span>Tambah ke Keranjang</span>
                         </button>
                     </div>
@@ -369,19 +370,19 @@
             </template>
         </div>
 
-        <!-- Empty State When Budget Is Too Low -->
+        <!-- Empty State When No Menu Matches Criteria -->
         <div x-show="recommendedResults.length === 0" class="text-center py-16 bg-white rounded-2xl border border-slate-200/80 p-8 space-y-3">
-            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
-                <i data-lucide="alert-circle" class="w-6 h-6"></i>
+            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                <i data-lucide="search-x" class="w-6 h-6"></i>
             </div>
             <h4 class="text-sm font-bold text-slate-900">Belum Ada Menu yang Sesuai Kriteria</h4>
             <p class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-                Budget yang Anda tentukan terlalu rendah atau waktu tunggu terlalu singkat untuk menu yang tersedia. Coba tingkatkan slider anggaran di atas Rp 10.000.
+                Kombinasi batas anggaran, preferensi rasa, atau waktu tunggu tidak menemukan menu yang cocok. Coba sesuaikan pilihan filter di atas.
             </p>
             <button type="button" 
-                    @click="budget = 15000; selectedTime = '10'; selectedCategory = 'semua'; triggerSearch()" 
-                    class="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 transition">
-                Reset ke Rekomendasi Standar
+                    @click="budget = 'semua'; selectedTaste = 'semua'; selectedTime = 'semua'" 
+                    class="whitespace-nowrap inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 transition cursor-pointer">
+                Reset Semua Filter
             </button>
         </div>
     </div>

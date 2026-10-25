@@ -41,3 +41,16 @@ Route::view('/penjual/laporan', 'seller.reports')->name('seller.reports');
 Route::view('/penjual/prediksi', 'seller.forecast')->name('seller.forecast');
 Route::view('/penjual/profil', 'seller.profile')->name('seller.profile');
 
+/*
+|--------------------------------------------------------------------------
+| Kelompok 4: Sisi Admin / Pengelola Food Court (F-25 s/d F-31)
+|--------------------------------------------------------------------------
+*/
+Route::view('/admin/dashboard', 'admin.dashboard')->name('admin.dashboard');
+Route::view('/admin/stan', 'admin.stalls')->name('admin.stalls');
+Route::view('/admin/menu', 'admin.menu')->name('admin.menu');
+Route::view('/admin/pesanan', 'admin.orders')->name('admin.orders');
+Route::view('/admin/pesanan/detail', 'admin.order-detail')->name('admin.order-detail');
+Route::view('/admin/laporan', 'admin.reports')->name('admin.reports');
+Route::view('/admin/log', 'admin.logs')->name('admin.logs');
+

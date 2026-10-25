@@ -49,14 +49,14 @@ Daftar inventaris halaman NesaCourt yang dikelompokkan secara terpisah berdasark
 
 ---
 
-## 4. Halaman Admin / Pengelola Food Court (7 Halaman — Belum Dibuat)
+## 4. Halaman Admin / Pengelola Food Court (7 Halaman — Selesai)
 
-| No | Role | Nama Halaman | Link Rencana | Status |
+| No | Role | Nama Halaman | Link Halaman | Status |
 | :---: | :--- | :--- | :--- | :---: |
-| 1 | **Admin** | Dashboard Utama Admin | [http://127.0.0.1:8000/admin/dashboard](http://127.0.0.1:8000/admin/dashboard) | Belum |
-| 2 | **Admin** | Manajemen Stan Kantin | [http://127.0.0.1:8000/admin/stan](http://127.0.0.1:8000/admin/stan) | Belum |
-| 3 | **Admin** | Monitoring Menu Seluruh Stan | [http://127.0.0.1:8000/admin/menu](http://127.0.0.1:8000/admin/menu) | Belum |
-| 4 | **Admin** | Monitoring Pesanan Food Court | [http://127.0.0.1:8000/admin/pesanan](http://127.0.0.1:8000/admin/pesanan) | Belum |
-| 5 | **Admin** | Detail Pesanan & Audit | [http://127.0.0.1:8000/admin/pesanan/detail](http://127.0.0.1:8000/admin/pesanan/detail) | Belum |
-| 6 | **Admin** | Laporan Keuangan Kantin | [http://127.0.0.1:8000/admin/laporan](http://127.0.0.1:8000/admin/laporan) | Belum |
-| 7 | **Admin** | Log Aktivitas Sistem | [http://127.0.0.1:8000/admin/log](http://127.0.0.1:8000/admin/log) | Belum |
+| 1 | **Admin** | Dashboard Utama Admin | [http://127.0.0.1:8000/admin/dashboard](http://127.0.0.1:8000/admin/dashboard) | Selesai |
+| 2 | **Admin** | Manajemen Stan Kantin | [http://127.0.0.1:8000/admin/stan](http://127.0.0.1:8000/admin/stan) | Selesai |
+| 3 | **Admin** | Monitoring Menu Seluruh Stan | [http://127.0.0.1:8000/admin/menu](http://127.0.0.1:8000/admin/menu) | Selesai |
+| 4 | **Admin** | Monitoring Pesanan Food Court | [http://127.0.0.1:8000/admin/pesanan](http://127.0.0.1:8000/admin/pesanan) | Selesai |
+| 5 | **Admin** | Detail Pesanan & Audit | [http://127.0.0.1:8000/admin/pesanan/detail](http://127.0.0.1:8000/admin/pesanan/detail) | Selesai |
+| 6 | **Admin** | Laporan Keuangan Kantin | [http://127.0.0.1:8000/admin/laporan](http://127.0.0.1:8000/admin/laporan) | Selesai |
+| 7 | **Admin** | Log Aktivitas Sistem | [http://127.0.0.1:8000/admin/log](http://127.0.0.1:8000/admin/log) | Selesai |

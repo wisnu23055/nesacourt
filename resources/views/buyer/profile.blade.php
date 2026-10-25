@@ -50,35 +50,35 @@
             </div>
         </div>
 
-        <!-- Quick Activity Stats (Clean Minimalist Cards) -->
+        <!-- Quick Activity Stats (Center Tengah & Ikon Hitam) -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-brand-50 border border-brand-200/70 flex items-center justify-center text-brand-600 shrink-0">
-                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col items-center justify-center text-center space-y-1.5">
+                <div class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-900 shrink-0 shadow-2xs">
+                    <i data-lucide="shopping-bag" class="w-4 h-4 text-slate-900"></i>
                 </div>
                 <div>
-                    <span class="text-[10px] text-slate-500 block font-medium">Total Pesanan Selesai</span>
-                    <span class="text-xs sm:text-sm font-bold text-slate-900">14 Transaksi</span>
+                    <span class="text-[11px] text-slate-500 block font-medium">Total Pesanan Selesai</span>
+                    <span class="text-sm font-bold text-slate-900 block mt-0.5">14 Transaksi</span>
                 </div>
             </div>
 
-            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200/70 flex items-center justify-center text-amber-600 shrink-0">
-                    <i data-lucide="store" class="w-4 h-4"></i>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col items-center justify-center text-center space-y-1.5">
+                <div class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-900 shrink-0 shadow-2xs">
+                    <i data-lucide="store" class="w-4 h-4 text-slate-900"></i>
                 </div>
                 <div>
-                    <span class="text-[10px] text-slate-500 block font-medium">Stan Langganan Utama</span>
-                    <span class="text-xs sm:text-sm font-bold text-slate-900">Stan 01 Barokah</span>
+                    <span class="text-[11px] text-slate-500 block font-medium">Stan Langganan Utama</span>
+                    <span class="text-sm font-bold text-slate-900 block mt-0.5">Stan 01 Barokah</span>
                 </div>
             </div>
 
-            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200/70 flex items-center justify-center text-emerald-600 shrink-0">
-                    <i data-lucide="qr-code" class="w-4 h-4"></i>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col items-center justify-center text-center space-y-1.5">
+                <div class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-900 shrink-0 shadow-2xs">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-slate-900"></i>
                 </div>
                 <div>
-                    <span class="text-[10px] text-slate-500 block font-medium">Metode Pembayaran</span>
-                    <span class="text-xs sm:text-sm font-bold text-slate-900">QRIS Statis Kantin</span>
+                    <span class="text-[11px] text-slate-500 block font-medium">Metode Pembayaran</span>
+                    <span class="text-sm font-bold text-slate-900 block mt-0.5">QRIS Statis Kantin</span>
                 </div>
             </div>
         </div>
@@ -102,7 +102,7 @@
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-4 shadow-xs flex flex-col justify-between">
             <div>
                 <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
-                    <i data-lucide="user-check" class="w-4 h-4 text-brand-600"></i>
+                    <i data-lucide="user-check" class="w-4 h-4 text-slate-900"></i>
                     <span>Informasi Pribadi Mahasiswa</span>
                 </h3>
 
@@ -145,7 +145,7 @@
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-4 shadow-xs flex flex-col justify-between">
             <div>
                 <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
-                    <i data-lucide="shield-check" class="w-4 h-4 text-brand-600"></i>
+                    <i data-lucide="shield-check" class="w-4 h-4 text-slate-900"></i>
                     <span>Keamanan & Kata Sandi</span>
                 </h3>
 

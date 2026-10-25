@@ -14,15 +14,18 @@
             <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
             <span class="text-slate-900 font-semibold">Keranjang Belanja</span>
         </div>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Keranjang Pesanan</h1>
+        <div class="flex items-center gap-2.5">
+            <i data-lucide="shopping-bag" class="w-6 h-6 text-slate-900 shrink-0"></i>
+            <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Keranjang Pesanan</h1>
+        </div>
         <p class="text-xs sm:text-sm text-slate-500 mt-1">Periksa kembali rincian porsi makanan dan minuman Anda sebelum melakukan konfirmasi meja dan pembayaran.</p>
     </div>
 
     <!-- Empty State -->
     <template x-if="items.length === 0">
         <div class="text-center py-20 bg-white rounded-2xl border border-slate-200/80 p-8 space-y-4">
-            <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-                <i data-lucide="shopping-bag" class="w-8 h-8"></i>
+            <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center mx-auto">
+                <i data-lucide="shopping-bag" class="w-8 h-8 text-slate-900"></i>
             </div>
             <h3 class="text-base font-bold text-slate-900">Keranjang Belanja Anda Masih Kosong</h3>
             <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
@@ -51,15 +54,15 @@
                 <!-- Single Seller Notice Banner -->
                 <div class="p-3.5 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-between text-xs text-brand-900">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center shrink-0">
-                            <i data-lucide="store" class="w-4 h-4"></i>
+                        <div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0">
+                            <i data-lucide="store" class="w-4 h-4 text-white"></i>
                         </div>
                         <div>
                             <span class="block font-bold">Pesanan dari <span x-text="currentSeller"></span></span>
                             <span class="text-[11px] text-brand-700">QRIS Statis pembayaran ditujukan langsung ke stan ini</span>
                         </div>
                     </div>
-                    <span class="text-[11px] font-semibold text-brand-700 bg-white px-2.5 py-1 rounded-md border border-brand-200">
+                    <span class="text-xs font-semibold text-brand-700 shrink-0">
                         1 Stan / Transaksi
                     </span>
                 </div>
@@ -68,10 +71,10 @@
                 <div class="bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-hidden shadow-xs">
                     <template x-for="item in items" :key="item.id">
                         <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 shrink-0">
-                                    <i data-lucide="utensils" class="w-5 h-5 text-brand-600"></i>
-                                </div>
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <img :src="item.image || getItemImage(item)" 
+                                     :alt="item.name" 
+                                     class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
                                 <div class="min-w-0">
                                     <h4 class="text-sm font-bold text-slate-900 truncate" x-text="item.name"></h4>
                                     <p class="text-xs text-brand-700 font-semibold mt-0.5" x-text="formatRupiah(item.price) + ' / porsi'"></p>
@@ -117,7 +120,10 @@
             <!-- Right 1 Col: Order Summary & Checkout CTA -->
             <div class="space-y-4">
                 <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-4 shadow-xs">
-                    <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100">Ringkasan Pembayaran</h3>
+                    <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
+                        <i data-lucide="receipt" class="w-4 h-4 text-slate-900"></i>
+                        <span>Ringkasan Pembayaran</span>
+                    </h3>
 
                     <div class="space-y-2.5 text-xs text-slate-600">
                         <div class="flex items-center justify-between">

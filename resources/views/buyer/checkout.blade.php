@@ -33,7 +33,10 @@
             <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
             <span class="text-slate-900 font-semibold">Konfirmasi Checkout</span>
         </div>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Konfirmasi Pesanan</h1>
+        <div class="flex items-center gap-2.5">
+            <i data-lucide="clipboard-check" class="w-6 h-6 text-slate-900 shrink-0"></i>
+            <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Konfirmasi Pesanan</h1>
+        </div>
         <p class="text-xs sm:text-sm text-slate-500 mt-1">Lengkapi data meja atau bungkus sebelum melakukan transfer QRIS ke stan penjual.</p>
     </div>
 
@@ -46,7 +49,7 @@
             <!-- 1. Opsi Tipe Layanan (Makan di Tempat / Bawa Pulang) -->
             <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-4 shadow-xs">
                 <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="utensils-crossed" class="w-4 h-4 text-brand-600"></i>
+                    <i data-lucide="utensils-crossed" class="w-4 h-4 text-slate-900"></i>
                     <span>Tipe Pemesanan Makanan</span>
                 </h3>
 
@@ -55,7 +58,7 @@
                             @click="serviceType = 'dine_in'" 
                             :class="serviceType === 'dine_in' ? 'border-brand-600 bg-brand-50/50 ring-1 ring-brand-600' : 'border-slate-200 bg-white hover:bg-slate-50'"
                             class="p-4 rounded-xl border text-left flex items-start gap-3 transition">
-                        <div class="p-2 rounded-lg bg-white shadow-xs border border-slate-100 text-brand-600 shrink-0">
+                        <div class="p-2 rounded-lg bg-white shadow-xs border border-slate-100 text-slate-900 shrink-0">
                             <i data-lucide="coffee" class="w-5 h-5"></i>
                         </div>
                         <div>
@@ -68,7 +71,7 @@
                             @click="serviceType = 'takeaway'" 
                             :class="serviceType === 'takeaway' ? 'border-brand-600 bg-brand-50/50 ring-1 ring-brand-600' : 'border-slate-200 bg-white hover:bg-slate-50'"
                             class="p-4 rounded-xl border text-left flex items-start gap-3 transition">
-                        <div class="p-2 rounded-lg bg-white shadow-xs border border-slate-100 text-brand-600 shrink-0">
+                        <div class="p-2 rounded-lg bg-white shadow-xs border border-slate-100 text-slate-900 shrink-0">
                             <i data-lucide="package-check" class="w-5 h-5"></i>
                         </div>
                         <div>
@@ -92,7 +95,7 @@
             <!-- 2. Data Pemesan Mahasiswa -->
             <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-4 shadow-xs">
                 <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <i data-lucide="user" class="w-4 h-4 text-brand-600"></i>
+                    <i data-lucide="user" class="w-4 h-4 text-slate-900"></i>
                     <span>Informasi Pemesan Mahasiswa</span>
                 </h3>
 
@@ -124,7 +127,7 @@
             <!-- 3. Ketentuan QRIS Statis -->
             <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2 text-xs text-amber-900">
                 <div class="flex items-center gap-2 font-bold">
-                    <i data-lucide="qr-code" class="w-4 h-4 text-amber-700"></i>
+                    <i data-lucide="qr-code" class="w-4 h-4 text-slate-900"></i>
                     <span>Ketentuan Pembayaran QRIS Statis Stan</span>
                 </div>
                 <p class="leading-relaxed text-[11px] text-amber-800">
@@ -137,11 +140,14 @@
         <!-- Right 1 Col: Summary & Checkout Button -->
         <div class="space-y-4">
             <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-4 shadow-xs">
-                <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100">Detail Pesanan Stan</h3>
+                <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
+                    <i data-lucide="receipt" class="w-4 h-4 text-slate-900"></i>
+                    <span>Detail Pesanan Stan</span>
+                </h3>
 
                 <!-- Stan Name -->
                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 flex items-center gap-2">
-                    <i data-lucide="store" class="w-4 h-4 text-brand-600 shrink-0"></i>
+                    <i data-lucide="store" class="w-4 h-4 text-slate-900 shrink-0"></i>
                     <span class="truncate">Stan: <strong x-text="currentSeller || 'Stan 01 - Barokah Rasa'"></strong></span>
                 </div>
 

@@ -13,6 +13,7 @@
             id: 'NC-20261021-8842',
             date: '21 Okt 2026, 12:30 WIB',
             stall: 'Stan 01 - Barokah Rasa',
+            stallImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=120&q=80',
             status: 'Sedang Dimasak di Dapur',
             statusCode: 'diproses',
             total: 17000,
@@ -28,6 +29,7 @@
             id: 'NC-20261020-4412',
             date: '20 Okt 2026, 13:15 WIB',
             stall: 'Stan 02 - Soto Bu Siti',
+            stallImage: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=120&q=80',
             status: 'Pesanan Selesai',
             statusCode: 'selesai',
             total: 18000,
@@ -43,6 +45,7 @@
             id: 'NC-20261019-1092',
             date: '19 Okt 2026, 11:45 WIB',
             stall: 'Stan 03 - Geprek Mas Bro',
+            stallImage: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=120&q=80',
             status: 'Pesanan Selesai',
             statusCode: 'selesai',
             total: 20000,
@@ -58,6 +61,7 @@
             id: 'NC-20261017-0841',
             date: '17 Okt 2026, 09:10 WIB',
             stall: 'Stan 04 - Aneka Jus Vokasi',
+            stallImage: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=120&q=80',
             status: 'Pesanan Selesai',
             statusCode: 'selesai',
             total: 10000,
@@ -146,9 +150,9 @@
                 <!-- Card Header -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
-                            <i data-lucide="store" class="w-5 h-5"></i>
-                        </div>
+                        <img :src="order.stallImage" 
+                             :alt="order.stall" 
+                             class="w-11 h-11 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-xs font-bold text-slate-900" x-text="order.id"></span>

@@ -385,9 +385,14 @@
                             <!-- Item List -->
                             <template x-for="item in items" :key="item.id">
                                 <div class="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/50 gap-3">
-                                    <div class="flex-1 min-w-0">
-                                        <h4 class="text-xs font-bold text-slate-900 truncate" x-text="item.name"></h4>
-                                        <p class="text-xs text-brand-600 font-semibold mt-0.5" x-text="formatRupiah(item.price)"></p>
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <img :src="item.image || getItemImage(item)" 
+                                             :alt="item.name" 
+                                             class="w-10 h-10 rounded-lg object-cover ring-1 ring-slate-200 shrink-0">
+                                        <div class="min-w-0">
+                                            <h4 class="text-xs font-bold text-slate-900 truncate" x-text="item.name"></h4>
+                                            <p class="text-xs text-brand-600 font-semibold mt-0.5" x-text="formatRupiah(item.price)"></p>
+                                        </div>
                                     </div>
                                     <div class="flex items-center gap-2 shrink-0">
                                         <button type="button" @click="updateQty(item.id, -1)" class="w-6 h-6 rounded bg-white border border-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs hover:bg-slate-100">-</button>
@@ -464,6 +469,30 @@
                 showConflictModal: false,
                 pendingItem: null,
 
+                getItemImage(item) {
+                    if (item && item.image) return item.image;
+                    const name = (item?.name || '').toLowerCase();
+                    if (name.includes('geprek') || name.includes('penyet') || name.includes('ayam')) {
+                        return 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80';
+                    }
+                    if (name.includes('soto')) {
+                        return 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80';
+                    }
+                    if (name.includes('teh')) {
+                        return 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80';
+                    }
+                    if (name.includes('jus') || name.includes('alpukat')) {
+                        return 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=600&q=80';
+                    }
+                    if (name.includes('kopi')) {
+                        return 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80';
+                    }
+                    if (name.includes('kentang') || name.includes('goreng')) {
+                        return 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80';
+                    }
+                    return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+                },
+
                 initCart() {
                     const saved = localStorage.getItem('nesacourt_cart');
                     if (saved) {
@@ -485,6 +514,7 @@
                                 name: 'Ayam Geprek Sambal Bawang Level 3',
                                 price: 13000,
                                 seller: 'Stan 01 - Barokah Rasa',
+                                image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80',
                                 qty: 1
                             },
                             {
@@ -492,10 +522,18 @@
                                 name: 'Es Teh Manis Jumbo Vokasi',
                                 price: 4000,
                                 seller: 'Stan 01 - Barokah Rasa',
+                                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
                                 qty: 2
                             }
                         ];
                         this.currentSeller = 'Stan 01 - Barokah Rasa';
+                        this.saveCart();
+                    } else {
+                        // Pastikan item yang sudah ada di localStorage diperkaya dengan URL foto makanan
+                        this.items = this.items.map(item => ({
+                            ...item,
+                            image: item.image || this.getItemImage(item)
+                        }));
                         this.saveCart();
                     }
                 },
@@ -519,12 +557,14 @@
                     const existing = this.items.find(i => i.id === item.id);
                     if (existing) {
                         existing.qty += 1;
+                        if (!existing.image) existing.image = item.image || this.getItemImage(item);
                     } else {
                         this.items.push({
                             id: item.id,
                             name: item.name,
                             price: item.price,
                             seller: item.seller,
+                            image: item.image || this.getItemImage(item),
                             qty: 1
                         });
                     }
@@ -539,6 +579,7 @@
                             name: this.pendingItem.name,
                             price: this.pendingItem.price,
                             seller: this.pendingItem.seller,
+                            image: this.pendingItem.image || this.getItemImage(this.pendingItem),
                             qty: 1
                         }];
                         this.currentSeller = this.pendingItem.seller;

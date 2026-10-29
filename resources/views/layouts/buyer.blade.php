@@ -176,11 +176,11 @@
                              alt="Foto Mahasiswa" 
                              class="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
                         <div class="min-w-0">
-                            <span class="text-xs font-bold text-slate-900 block truncate">Aditya Pratama</span>
-                            <span class="text-[10px] text-slate-400 block truncate">NIM: 23055310001</span>
+                            <span class="text-xs font-bold text-slate-900 block truncate">{{ auth()->user()->name ?? 'Aditya Pratama' }}</span>
+                            <span class="text-[10px] text-slate-400 block truncate">NIM: {{ auth()->user()->phone ?? '23055310001' }}</span>
                         </div>
                     </a>
-                    <a href="{{ url('/login') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
+                    <a href="{{ route('logout') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                     </a>
                 </div>
@@ -310,7 +310,7 @@
                                 </a>
 
                                 <div class="pt-4 border-t border-slate-100">
-                                    <a href="{{ url('/login') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 font-semibold hover:bg-rose-50 transition">
+                                    <a href="{{ route('logout') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 font-semibold hover:bg-rose-50 transition">
                                         <i data-lucide="log-out" class="w-4 h-4"></i>
                                         <span>Keluar Akun</span>
                                     </a>

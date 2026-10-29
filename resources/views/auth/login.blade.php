@@ -55,6 +55,12 @@
             <form action="{{ url('/login') }}" method="POST" @submit="loading = true" class="space-y-3.5">
                 @csrf
 
+                @if ($errors->any())
+                    <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
                 <!-- Input Email Kampus / NIM -->
                 <div>
                     <label for="login" class="block text-xs font-semibold text-slate-700 mb-1">
@@ -67,6 +73,7 @@
                         <input type="text" 
                                name="login" 
                                id="login" 
+                               value="{{ old('login') }}"
                                required 
                                placeholder="nama@mhs.unesa.ac.id atau NIM" 
                                class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500 transition">

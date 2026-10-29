@@ -216,7 +216,7 @@
                         <span class="text-[10px] text-slate-400 block truncate">Pemilik Stan 01</span>
                     </div>
                 </div>
-                <a href="{{ url('/login') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
+                <a href="{{ route('logout') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
                     <i data-lucide="log-out" class="w-4 h-4"></i>
                 </a>
             </div>
@@ -344,7 +344,7 @@
                                 <span>Profil Stan</span>
                             </a>
                             <div class="pt-4 border-t border-slate-100">
-                                <a href="{{ url('/login') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 font-semibold hover:bg-rose-50 transition">
+                                <a href="{{ route('logout') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 font-semibold hover:bg-rose-50 transition">
                                     <i data-lucide="log-out" class="w-4 h-4"></i>
                                     <span>Keluar Akun</span>
                                 </a>

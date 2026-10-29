@@ -55,6 +55,16 @@
             <form action="{{ url('/register') }}" method="POST" @submit="loading = true" class="space-y-3.5">
                 @csrf
 
+                @if ($errors->any())
+                    <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <!-- Nama Lengkap -->
                 <div>
                     <label for="name" class="block text-xs font-semibold text-slate-700 mb-1">
@@ -67,6 +77,7 @@
                         <input type="text" 
                                name="name" 
                                id="name" 
+                               value="{{ old('name') }}"
                                required 
                                placeholder="Nama lengkap sesuai KTM" 
                                class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition">
@@ -87,6 +98,7 @@
                             <input type="text" 
                                    name="nim" 
                                    id="nim" 
+                                   value="{{ old('nim') }}"
                                    required 
                                    placeholder="11 digit NIM" 
                                    class="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition">
@@ -105,6 +117,7 @@
                             <input type="email" 
                                    name="email" 
                                    id="email" 
+                                   value="{{ old('email') }}"
                                    required 
                                    placeholder="nama@mhs.unesa.ac.id" 
                                    class="w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-600 transition">

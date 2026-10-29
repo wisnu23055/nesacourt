@@ -201,7 +201,7 @@
                             <span class="text-[10px] text-slate-400 block truncate">Kepala Pengelola</span>
                         </div>
                     </div>
-                    <a href="{{ url('/login') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
+                    <a href="{{ route('logout') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                     </a>
                 </div>
@@ -333,8 +333,8 @@
                                     <span class="text-[10px] text-slate-400 block">Kepala Pengelola</span>
                                 </div>
                             </div>
-                            <a href="{{ url('/login') }}" class="p-2 text-slate-400 hover:text-rose-600">
-                                <i data-lucide="log-out" class="w-4 h-4"></i>
+                            <a href="{{ route('logout') }}" class="p-2 text-slate-400 hover:text-rose-600">
+                                <i data-lucide="log-out" class="w-5 h-5"></i>
                             </a>
                         </div>
                     </div>

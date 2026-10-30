@@ -60,28 +60,38 @@ Untuk sementara waktu, sistem pembayaran menggunakan **QRIS Statis**:
 Frontend telah menyiapkan markup Blade, form binding, dan Alpine.js state yang siap disambungkan ke Controller & Model Laravel:
 
 1. **Dashboard & Katalog (`F-05`, `F-06`, `F-07`)**:
-   - Model yang dibutuhkan: `Stall` (Stan), `Menu` (Menu makanan/minuman), `Category`.
-   - Kolom porsi stok: `Menu::portion_stock` (bila `0`, tombol tambah otomatis dinonaktifkan).
+   - Model yang digunakan: `SellerProfile` (Stan), `Menu` (Menu makanan/minuman), `Category`.
+   - Kolom porsi stok: `Menu::stock` (integer, bila `0` atau status `habis`, tombol tambah dinonaktifkan).
 
 2. **Rekomendasi Cerdas AI (`F-08`)**:
    - Parameter input: `budget` (integer), `taste` (string), `max_prep_time` (integer), `category` (string).
-   - Logika filtering mengurutkan menu stan yang `price <= budget` dan `prep_time <= max_prep_time`.
+   - Logika filtering saat ini menggunakan rule-based SQL/PHP sebagai baseline sebelum terhubung ke microservice Python terpisah.
 
 3. **Checkout & Order Creation (`F-10`, `F-11`)**:
-   - Action: `POST /orders`
+   - Action: `POST /checkout` (form submit terproteksi atomik `DB::transaction` & `lockForUpdate`).
    - Payload:
      - `seller_id`: ID Stan terpilih (aturan 1 order = 1 stan).
      - `service_type`: `'dine_in'` | `'takeaway'`.
-     - `table_number`: String nomor meja (wajib jika `dine_in`).
+     - `table_number`: String nomor meja (opsional jika `dine_in`).
+     - `customer_name`: Nama pemesan.
      - `customer_phone`: String nomor WhatsApp aktif.
      - `order_notes`: Catatan pesanan khusus.
-     - `items`: Array item `[{ menu_id, qty, notes, price }]`.
-   - Response: Redirect ke `/pesanan/bayar` membawa objek pesanan baru dengan status awal `menunggu_pembayaran`.
+     - `items`: Array item `[{ id, qty }]`.
+   - Response: Redirect ke `/pesanan/bayar?order=NC-XXXX` dengan status awal `dibuat` dan `payment_status` `menunggu`.
+   - Batas waktu pembayaran: 15 menit (`payment_deadline`). Bila kedaluwarsa, scheduler `orders:cancel-expired` otomatis membatalkan pesanan dan mengembalikan kuantitas stok.
 
-4. **Status Pesanan Real-time (`F-12`)**:
+4. **Pembatalan Pesanan & Rollback Stok (B-15)**:
+   - Pembeli dapat membatalkan pesanan mandiri sebelum membayar via `POST /pesanan/{order_number}/batal`.
+   - Penjual dapat membatalkan pesanan via `POST /penjual/pesanan/{order_number}/status` (`order_status: dibatalkan`).
+   - Kuantitas stok porsi menu otomatis dikembalikan secara atomik ke database.
+
+5. **Status Pesanan Real-time (`F-12`)**:
    - Tahapan status:
-     `dibuat` ➔ `menunggu_pembayaran` ➔ `dikonfirmasi` ➔ `diproses` ➔ `siap_diambil` ➔ `selesai`.
-   - Endpoint polling atau SSE/WebSocket jika backend siap.
+     `dibuat` ➔ `diterima` ➔ `diproses` ➔ `siap` ➔ `selesai` (atau `dibatalkan`).
+   - Halaman pelacakan dilengkapi auto-polling setiap 12 detik.
+
+6. **Integrasi Admin & Komponen Bersama (`F-25` s/d `F-34`)**:
+   - Dokumentasi lengkap untuk F-25 s/d F-34 tersedia pada berkas pendamping `dokumentasi-backend.md`.
 
 ---
 

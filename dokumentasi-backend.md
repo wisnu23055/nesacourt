@@ -174,9 +174,46 @@ Seluruh fitur Sisi Penjual (**F-15 s/d F-24**) telah terhubung penuh secara dina
 
 ---
 
-## 7. Rencana Kerja Selanjutnya
+## 7. Integrasi Sisi Admin / Pengelola Food Court (Tahap 4 — SELESAI)
 
-### Tahap 4: Integrasi Sisi Admin / Pengelola Food Court (F-25 s/d F-31)
-1. Monitoring status stan kantin aktif/nonaktif (`/admin/dashboard` & `/admin/stan`).
-2. Rekapitulasi transaksi keseluruhan food court untuk evaluasi pengelola (`/admin/laporan`).
-3. Audit log aktivitas perubahan data sistem dan pengelolaan akun pengguna (`/admin/pengguna`).
+Seluruh fitur Sisi Admin (**F-25 s/d F-31**) telah terhubung penuh secara dinamis antara `AdminController`, Eloquent model, skema database, dan tampilan Blade Alpine.js:
+
+### A. Capaian Fitur & Pengujian
+1. **F-25: Dashboard Admin / Eksekutif (`/admin/dashboard`)**:
+   - Agregasi omset platform hari ini/keseluruhan dari seluruh stan kantin.
+   - Ringkasan total pesanan selesai, rasio stan buka vs total stan, dan estimasi waktu penyiapan rata-rata.
+   - Kartu monitoring ringkas performa tiap stan (omset & pesanan hari ini).
+   - Tabel 10 transaksi terbaru lintas stan dengan indikator status real-time.
+2. **F-26: Manajemen & Monitoring Stan Kantin (`/admin/stan`)**:
+   - Monitoring daftar stan terdaftar beserta lokasi counter, pemilik, jumlah menu, dan status sewa counter.
+   - Registrasi stan kantin baru (`POST /admin/stan`) yang otomatis membuat akun user pengelola dan profil stan.
+   - Toggle instan status operasional buka/tutup stan (`POST /admin/stan/{id}/toggle`).
+3. **F-27: Monitoring Menu & Stok Lintas Stan (`/admin/menu`)**:
+   - Pengawasan katalog seluruh menu dari seluruh stan di food court.
+   - Filter multivariabel berdasarkan stan kantin dan kategori kuliner.
+   - Kontrol ketersediaan menu darurat oleh admin (`POST /admin/menu/{id}/toggle`).
+4. **F-28: Pengawasan Arus Pesanan Kantin (`/admin/pesanan`)**:
+   - Tab navigasi pesanan real-time (*Semua*, *Sedang Dimasak*, *Siap Diambil*, *Pesanan Selesai*) dengan counter dinamis.
+   - Filter transaksi per stan kantin dan pencarian nama/ID pesanan.
+5. **F-29: Audit Transaksi & Detail Pesanan (`/admin/pesanan/{id}` & `/admin/pesanan/detail`)**:
+   - Audit mendalam transaksi: identitas mahasiswa pemesan, profil stan penyedia, rincian menu yang dibeli, dan tera harga.
+   - Bukti kepatuhan pembayaran QRIS statis stan kantin dan tombol cetak lembar audit transaksi.
+6. **F-30: Rekapitulasi Laporan Keuangan Platform (`/admin/laporan`)**:
+   - Perhitungan total perputaran omset bruto food court, total pesanan terlayani, setoran sewa counter, dan rata-rata nilai belanja mahasiswa.
+   - Breakdown performa finansial per stan kantin.
+7. **F-31: Viewer Log Aktivitas & Status Pesanan (`/admin/log`)**:
+   - Audit trail lengkap riwayat transisi status pesanan dari tabel `order_status_logs`.
+   - Filter kategori aktivitas dan pencarian deskripsi log.
+
+### B. Otomasi Pengujian Unit / Feature
+- Dibuat pengujian otomatis `tests/Feature/AdminTest.php` yang memverifikasi pembatasan otorisasi role (buyer dilarang akses admin / 403), akses dashboard admin, manajemen stan & toggle status, pengawasan menu lintas stan & toggle ketersediaan, pengawasan arus pesanan & audit detail, rekapitulasi laporan finansial, dan audit log viewer.
+- Hasil uji: **5 test suites, 56 assertions passed (exit 0)**.
+
+---
+
+## 8. Rencana Kerja Selanjutnya (Tahap Terakhir)
+
+### Tahap 5: Komponen Bersama & Hardening Sistem (F-32 s/d F-34)
+1. **F-32**: Notifikasi Status Pesanan & Polling Real-time.
+2. **F-33**: Pengelolaan Halaman Kesalahan / Error Pages Kustom (403, 404, 500) yang serasi dengan desain tema NesaCourt.
+3. **F-34**: Optimasi Performa, Sanitasi Input, dan Verifikasi Akhir Build Aset (`npm run build`).

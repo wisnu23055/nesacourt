@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BuyerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -25,18 +26,22 @@ Route::view('/forgot-password', 'auth.forgot-password')->name('password.request'
 |--------------------------------------------------------------------------
 */
 // Menu & katalog publik
-Route::view('/katalog', 'buyer.catalog')->name('buyer.catalog');
-Route::view('/rekomendasi', 'buyer.recommendation')->name('buyer.recommendation');
-Route::view('/keranjang', 'buyer.cart')->name('buyer.cart');
+Route::get('/katalog', [BuyerController::class, 'catalog'])->name('buyer.catalog');
+Route::get('/rekomendasi', [BuyerController::class, 'recommendation'])->name('buyer.recommendation');
+Route::get('/keranjang', [BuyerController::class, 'cart'])->name('buyer.cart');
 
 // Area pembeli terautentikasi
 Route::middleware(['auth', 'role:buyer,admin'])->group(function () {
-    Route::view('/dashboard', 'buyer.dashboard')->name('buyer.dashboard');
-    Route::view('/checkout', 'buyer.checkout')->name('buyer.checkout');
-    Route::view('/pesanan/bayar', 'buyer.payment')->name('buyer.payment');
-    Route::view('/pesanan/status', 'buyer.order-status')->name('buyer.order-status');
-    Route::view('/riwayat', 'buyer.history')->name('buyer.history');
-    Route::view('/profil', 'buyer.profile')->name('buyer.profile');
+    Route::get('/dashboard', [BuyerController::class, 'dashboard'])->name('buyer.dashboard');
+    Route::get('/checkout', [BuyerController::class, 'checkout'])->name('buyer.checkout');
+    Route::post('/checkout', [BuyerController::class, 'storeOrder'])->name('buyer.checkout.store');
+    Route::get('/pesanan/bayar', [BuyerController::class, 'payment'])->name('buyer.payment');
+    Route::post('/pesanan/{order_number}/konfirmasi-bayar', [BuyerController::class, 'confirmPayment'])->name('buyer.payment.confirm');
+    Route::get('/pesanan/status', [BuyerController::class, 'orderStatus'])->name('buyer.order-status');
+    Route::get('/riwayat', [BuyerController::class, 'history'])->name('buyer.history');
+    Route::get('/profil', [BuyerController::class, 'profile'])->name('buyer.profile');
+    Route::post('/profil', [BuyerController::class, 'updateProfile'])->name('buyer.profile.update');
+    Route::post('/profil/password', [BuyerController::class, 'updatePassword'])->name('buyer.profile.password');
 });
 
 /*

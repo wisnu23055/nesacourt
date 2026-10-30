@@ -5,74 +5,27 @@
 @section('content')
 <div class="space-y-6" x-data="{
     appliedSuccess: false,
-    forecastDate: 'Kamis, 22 Oktober 2026',
-    forecasts: [
-        {
-            id: 1,
-            name: 'Paket Nasi Geprek Sambal Bawang',
-            category: 'Makanan Utama',
-            image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80',
-            lastWeekPortions: 24,
-            recommendedPortions: 30,
-            trendPercent: '+25%',
-            trendPositive: true,
-            confidence: '96%',
-            keyFactor: 'Ada perkuliahan luring gabungan 4 kelas di Gedung K4 Vokasi jam 11.00 - 13.00 WIB.'
-        },
-        {
-            id: 2,
-            name: 'Nasi Ayam Penyet Sambal Terasi',
-            category: 'Makanan Utama',
-            image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=300&q=80',
-            lastWeekPortions: 10,
-            recommendedPortions: 12,
-            trendPercent: '+20%',
-            trendPositive: true,
-            confidence: '92%',
-            keyFactor: 'Permintaan stabil saat makan siang mahasiswa tingkat akhir.'
-        },
-        {
-            id: 3,
-            name: 'Nasi Telur Krispi Pontianak',
-            category: 'Makanan Utama',
-            image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=300&q=80',
-            lastWeekPortions: 18,
-            recommendedPortions: 20,
-            trendPercent: '+11%',
-            trendPositive: true,
-            confidence: '94%',
-            keyFactor: 'Pilihan hemat favorit mahasiswa saat jeda praktikum pagi.'
-        },
-        {
-            id: 4,
-            name: 'Es Teh Manis Jumbo',
-            category: 'Minuman Segar',
-            image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=300&q=80',
-            lastWeekPortions: 38,
-            recommendedPortions: 48,
-            trendPercent: '+26%',
-            trendPositive: true,
-            confidence: '97%',
-            keyFactor: 'Perkiraan cuaca Surabaya cerah terik mencapai 33°C pada siang hari.'
-        },
-        {
-            id: 5,
-            name: 'Tempe Mendoan Hangat (Isi 3)',
-            category: 'Camilan',
-            image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=300&q=80',
-            lastWeekPortions: 14,
-            recommendedPortions: 16,
-            trendPercent: '+14%',
-            trendPositive: true,
-            confidence: '89%',
-            keyFactor: 'Paling sering dipesan mendampingi menu geprek saat jam istirahat.'
+    forecastDate: '{{ now()->addDay()->isoFormat('dddd, D MMMM Y') }}',
+    forecasts: {{ json_encode($forecasts) }},
+    async applyAllForecasts() {
+        try {
+            const payload = this.forecasts.map(f => ({ id: f.id, stock: f.recommendedPortions }));
+            await fetch('{{ route('seller.stock.update') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ stocks: payload })
+            });
+            this.appliedSuccess = true;
+            setTimeout(() => {
+                this.appliedSuccess = false;
+            }, 3500);
+        } catch(e) {
+            console.error(e);
         }
-    ],
-    applyAllForecasts() {
-        this.appliedSuccess = true;
-        setTimeout(() => {
-            this.appliedSuccess = false;
-        }, 3500);
     }
 }">
 

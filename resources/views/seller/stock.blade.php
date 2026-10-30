@@ -5,98 +5,7 @@
 @section('content')
 <div class="space-y-6" x-data="{
     saveSuccess: false,
-    items: [
-        {
-            id: 1,
-            name: 'Paket Nasi Geprek Sambal Bawang',
-            category: 'makanan',
-            categoryLabel: 'Makanan',
-            price: 15000,
-            stock: 14,
-            image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=400&q=80',
-            desc: 'Nasi putih pulen, ayam goreng krispi geprek pedas gurih level 1-5, lalapan timun segar.'
-        },
-        {
-            id: 2,
-            name: 'Nasi Ayam Penyet Sambal Terasi',
-            category: 'makanan',
-            categoryLabel: 'Makanan',
-            price: 16000,
-            stock: 8,
-            image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=400&q=80',
-            desc: 'Ayam goreng bumbu rempah kuning dipenyet dengan sambal terasi matang dan kemangi.'
-        },
-        {
-            id: 3,
-            name: 'Nasi Telur Krispi Pontianak',
-            category: 'makanan',
-            categoryLabel: 'Makanan',
-            price: 10000,
-            stock: 22,
-            image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=400&q=80',
-            desc: 'Dua butir telur ceplok krispi disiram kecap racik gurih manis daun bawang dan cabai rawit.'
-        },
-        {
-            id: 4,
-            name: 'Ayam Bakar Madu Solo + Nasi',
-            category: 'makanan',
-            categoryLabel: 'Makanan',
-            price: 18000,
-            stock: 0,
-            image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80',
-            desc: 'Ayam ungkep bumbu rempah manis legit dibakar arang wangi, disajikan bersama sambal korek.'
-        },
-        {
-            id: 5,
-            name: 'Es Teh Manis Jumbo',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            price: 3000,
-            stock: 45,
-            image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=400&q=80',
-            desc: 'Teh melati seduh pekat harum, gula tebu murni dengan porsi gelas ukuran 22oz.'
-        },
-        {
-            id: 6,
-            name: 'Es Jeruk Peras Asli',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            price: 5000,
-            stock: 19,
-            image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=400&q=80',
-            desc: 'Jeruk peras segar alami kaya vitamin C tanpa pemanis buatan, dingin dan menyegarkan.'
-        },
-        {
-            id: 7,
-            name: 'Kopi Susu Gula Aren Ketintang',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            price: 8000,
-            stock: 12,
-            image: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=400&q=80',
-            desc: 'Espresso robusta lokal dipadu susu kental dan sirup gula aren legit khas kantin kampus.'
-        },
-        {
-            id: 8,
-            name: 'Tempe Mendoan Hangat (Isi 3)',
-            category: 'camilan',
-            categoryLabel: 'Camilan',
-            price: 6000,
-            stock: 15,
-            image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
-            desc: 'Tempe daun kedelai digoreng setengah matang renyah lembut dengan cocolan kecap rawit.'
-        },
-        {
-            id: 9,
-            name: 'Tahu Bakso Goreng Krispi (Isi 4)',
-            category: 'camilan',
-            categoryLabel: 'Camilan',
-            price: 8000,
-            stock: 10,
-            image: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=400&q=80',
-            desc: 'Tahu pong isi adonan bakso sapi gurih digoreng garing renyah disajikan dengan cabai rawit.'
-        }
-    ],
+    items: {{ json_encode($items) }},
     increment(item, amount = 1) {
         item.stock = Math.max(0, item.stock + amount);
     },
@@ -110,11 +19,25 @@
             item.stock = 10;
         }
     },
-    saveAllStock() {
-        this.saveSuccess = true;
-        setTimeout(() => {
-            this.saveSuccess = false;
-        }, 3000);
+    async saveAllStock() {
+        try {
+            const payload = this.items.map(i => ({ id: i.id, stock: i.stock }));
+            const res = await fetch('{{ route('seller.stock.update') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ stocks: payload })
+            });
+            if (res.ok) {
+                this.saveSuccess = true;
+                setTimeout(() => { this.saveSuccess = false; }, 3000);
+            }
+        } catch(e) {
+            console.error(e);
+        }
     },
     resetStandard() {
         this.items.forEach(i => {

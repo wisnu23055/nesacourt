@@ -118,8 +118,8 @@
             <div class="p-4 mx-4 my-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
                 <div class="flex items-center justify-between">
                     <div class="min-w-0">
-                        <span class="text-xs font-bold text-slate-900 block truncate">Stan 01 - Barokah</span>
-                        <span class="text-[10px] text-slate-400 block truncate">Counter Barat No. 01</span>
+                        <span class="text-xs font-bold text-slate-900 block truncate">{{ auth()->user()->sellerProfile ? auth()->user()->sellerProfile->stall_name : 'Stan Kantin' }}</span>
+                        <span class="text-[10px] text-slate-400 block truncate">{{ auth()->user()->sellerProfile ? auth()->user()->sellerProfile->location : 'Counter UNESA' }}</span>
                     </div>
                     <span class="relative flex h-2.5 w-2.5 shrink-0">
                         <span x-show="isStoreOpen" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -212,8 +212,8 @@
                          alt="Foto Pemilik Stan" 
                          class="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
                     <div class="min-w-0">
-                        <span class="text-xs font-bold text-slate-900 block truncate">Pak Bambang</span>
-                        <span class="text-[10px] text-slate-400 block truncate">Pemilik Stan 01</span>
+                        <span class="text-xs font-bold text-slate-900 block truncate">{{ auth()->user()->name }}</span>
+                        <span class="text-[10px] text-slate-400 block truncate">{{ auth()->user()->sellerProfile ? auth()->user()->sellerProfile->stall_name : 'Pengelola Stan' }}</span>
                     </div>
                 </div>
                 <a href="{{ route('logout') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
@@ -289,8 +289,8 @@
                         <div class="p-3.5 mx-4 mt-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                             <div class="flex items-center justify-between">
                                 <div class="min-w-0">
-                                    <span class="text-xs font-bold text-slate-900 block truncate">Stan 01 - Barokah</span>
-                                    <span class="text-[10px] text-slate-400 block truncate">Counter Barat No. 01</span>
+                                    <span class="text-xs font-bold text-slate-900 block truncate">{{ auth()->user()->sellerProfile ? auth()->user()->sellerProfile->stall_name : 'Stan Kantin' }}</span>
+                                    <span class="text-[10px] text-slate-400 block truncate">{{ auth()->user()->sellerProfile ? auth()->user()->sellerProfile->location : 'Counter UNESA' }}</span>
                                 </div>
                                 <span class="relative flex h-2.5 w-2.5 shrink-0">
                                     <span x-show="isStoreOpen" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>

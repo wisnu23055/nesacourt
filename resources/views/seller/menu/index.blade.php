@@ -9,116 +9,25 @@
     selectedStatus: 'all',
     deleteModalOpen: false,
     menuToDelete: null,
-    menus: [
-        {
-            id: 1,
-            name: 'Paket Nasi Geprek Sambal Bawang',
-            category: 'makanan',
-            categoryLabel: 'Makanan',
-            price: 15000,
-            stock: 14,
-            isAvailable: true,
-            isTopSeller: true,
-            image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=400&q=80',
-            desc: 'Nasi putih pulen, ayam goreng krispi geprek pedas gurih level 1-5, lalapan timun segar.'
-        },
-        {
-            id: 2,
-            name: 'Nasi Ayam Penyet Sambal Terasi',
-            category: 'makanan',
-            categoryLabel: 'Makanan',
-            price: 16000,
-            stock: 8,
-            isAvailable: true,
-            isTopSeller: false,
-            image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=400&q=80',
-            desc: 'Ayam goreng bumbu rempah kuning dipenyet dengan sambal terasi matang dan kemangi.'
-        },
-        {
-            id: 3,
-            name: 'Nasi Telur Krispi Pontianak',
-            category: 'makanan',
-            categoryLabel: 'Makanan',
-            price: 10000,
-            stock: 22,
-            isAvailable: true,
-            isTopSeller: false,
-            image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=400&q=80',
-            desc: 'Dua butir telur ceplok krispi disiram kecap racik gurih manis daun bawang dan cabai rawit.'
-        },
-        {
-            id: 4,
-            name: 'Ayam Bakar Madu Solo + Nasi',
-            category: 'makanan',
-            categoryLabel: 'Makanan',
-            price: 18000,
-            stock: 0,
-            isAvailable: false,
-            isTopSeller: false,
-            image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80',
-            desc: 'Ayam ungkep bumbu rempah manis legit dibakar arang wangi, disajikan bersama sambal korek.'
-        },
-        {
-            id: 5,
-            name: 'Es Teh Manis Jumbo',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            price: 3000,
-            stock: 45,
-            isAvailable: true,
-            isTopSeller: true,
-            image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=400&q=80',
-            desc: 'Teh melati seduh pekat harum, gula tebu murni dengan porsi gelas ukuran 22oz.'
-        },
-        {
-            id: 6,
-            name: 'Es Jeruk Peras Asli',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            price: 5000,
-            stock: 19,
-            isAvailable: true,
-            isTopSeller: false,
-            image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=400&q=80',
-            desc: 'Jeruk peras segar alami kaya vitamin C tanpa pemanis buatan, dingin dan menyegarkan.'
-        },
-        {
-            id: 7,
-            name: 'Kopi Susu Gula Aren Ketintang',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            price: 8000,
-            stock: 12,
-            isAvailable: true,
-            isTopSeller: false,
-            image: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=400&q=80',
-            desc: 'Espresso robusta lokal dipadu susu kental dan sirup gula aren legit khas kantin kampus.'
-        },
-        {
-            id: 8,
-            name: 'Tempe Mendoan Hangat (Isi 3)',
-            category: 'camilan',
-            categoryLabel: 'Camilan',
-            price: 6000,
-            stock: 15,
-            isAvailable: true,
-            isTopSeller: false,
-            image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
-            desc: 'Tempe daun kedelai digoreng setengah matang renyah lembut dengan cocolan kecap rawit.'
-        },
-        {
-            id: 9,
-            name: 'Tahu Bakso Goreng Krispi (Isi 4)',
-            category: 'camilan',
-            categoryLabel: 'Camilan',
-            price: 8000,
-            stock: 10,
-            isAvailable: true,
-            isTopSeller: false,
-            image: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=400&q=80',
-            desc: 'Tahu pong isi adonan bakso sapi gurih digoreng garing renyah disajikan dengan cabai rawit.'
-        }
-    ],
+    menus: {{ json_encode($menus) }},
+    executeDelete() {
+        if (!this.menuToDelete) return;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url('/penjual/menu') }}/' + this.menuToDelete.id;
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = '_token';
+        csrf.value = '{{ csrf_token() }}';
+        const method = document.createElement('input');
+        method.type = 'hidden';
+        method.name = '_method';
+        method.value = 'DELETE';
+        form.appendChild(csrf);
+        form.appendChild(method);
+        document.body.appendChild(form);
+        form.submit();
+    },
     filteredMenus() {
         return this.menus.filter(item => {
             const matchesSearch = item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 

@@ -127,16 +127,56 @@ Seluruh fitur Sisi Pembeli (**F-05 s/d F-14**) telah terhubung penuh secara dina
 
 ---
 
-## 6. Rencana Kerja Selanjutnya
+## 6. Integrasi Sisi Penjual / Stan (Tahap 3 — SELESAI)
 
-### A. Tahap 3: Integrasi Sisi Penjual / Stan (F-15 s/d F-24)
-1. CRUD Menu masakan dan upload berkas foto menu ke `storage/app/public/menus`.
-2. Pengaturan stok porsi harian langsung update ke kolom `menus.stock`.
-3. Manajemen pesanan masuk dapur, transisi tahapan status (`dibuat` ➔ `diproses` ➔ `siap` ➔ `selesai`), dan pencatatan riwayat ke `order_status_logs`.
-4. Konfirmasi pembayaran QRIS ke tabel `payment_confirmations`.
-5. Rekap laporan omset penjualan dan modul prediksi kebutuhan porsi masakan.
+Seluruh fitur Sisi Penjual (**F-15 s/d F-24**) telah terhubung penuh secara dinamis antara `SellerController`, Eloquent model, skema database, dan tampilan Blade Alpine.js:
 
-### B. Tahap 4: Integrasi Sisi Admin / Pengelola Food Court (F-25 s/d F-31)
-1. Monitoring status stan kantin aktif/nonaktif.
-2. Rekapitulasi transaksi keseluruhan food court untuk evaluasi pengelola.
-3. Audit log aktivitas perubahan data sistem.
+### A. Capaian Fitur & Pengujian
+1. **F-15: Dashboard Stan Penjual (`/penjual/dashboard`)**:
+   - Menampilkan greeting pemilik stan dinamis sesuai akun sesi auth.
+   - Counter pesanan aktif (`Order::whereIn('order_status', ['diterima', 'diproses', 'siap'])`).
+   - Kartu metrik omset hari ini (`sum('total')`), pesanan selesai, dan estimasi waktu penyiapan.
+   - Tabel pesanan dapur dengan tombol transisi status instan.
+2. **F-16: Manajemen Menu CRUD & Upload Foto (`/penjual/menu`)**:
+   - Menampilkan daftar katalog menu spesifik stan penjual terkait.
+   - Form pembuatan dan pembaruan menu (`/penjual/menu/tambah` & `/penjual/menu/{id}/edit`).
+   - Dukungan unggah gambar menu (`multipart/form-data`) yang tersimpan di disk `public/menus`.
+   - Aksi hapus menu dengan konfirmasi modal Alpine.js.
+3. **F-17: Pengelolaan Stok Porsi Harian (`/penjual/stok`)**:
+   - Menampilkan inventaris stok porsi setiap menu masakan.
+   - Bulk update stok porsi harian via JSON API (`POST /penjual/stok`) dengan validasi angka non-negatif.
+   - Sinkronisasi otomatis status ketersediaan (`is_available`).
+4. **F-18 & F-19: Antrean Dapur & Rincian Pesanan (`/penjual/pesanan` & `/penjual/pesanan/detail`)**:
+   - Filter tab status pesanan dapur (*Semua*, *Menunggu Konfirmasi*, *Sedang Dimasak*, *Siap Diambil*, *Selesai*).
+   - Tampilan rincian pesanan mencakup identitas pelanggan, nomor antrean, rincian menu masakan, catatan khusus pesanan, dan subtotal tagihan.
+5. **F-20: Pembaruan Status Pesanan & Log Transisi (`POST /penjual/pesanan/{order_number}/status`)**:
+   - Penjual dapat memajukan tahapan pesanan dapur (`diterima` ➔ `diproses` ➔ `siap` ➔ `selesai` / `dibatalkan`).
+   - Setiap perubahan status otomatis tercatat pada `order_status_logs` dengan aktor penjual.
+   - Pemrosesan pesanan otomatis memverifikasi pembayaran QRIS dan mencatat bukti ke tabel `payment_confirmations`.
+6. **F-21: Pengaturan QRIS Stan (`/penjual/qris`)**:
+   - Menampilkan preview kode QRIS aktif stan dari tabel `seller_payment_qris`.
+   - Form pembaruan nama merchant dan upload berkas gambar QRIS baru (`POST /penjual/qris`).
+7. **F-22: Laporan Penjualan & Rekapitulasi Omset (`/penjual/laporan`)**:
+   - Filter periode dinamis (*Hari Ini*, *7 Hari Terakhir*, *Bulan Ini*).
+   - Indikator metrik ringkas: Total Omset Bersih, Jumlah Pesanan Selesai, Porsi Terjual, dan Rata-rata Nilai Nota.
+   - Tabel rincian transaksi selesai terhubung langsung dengan database.
+8. **F-23: Modul Prediksi Kebutuhan Porsi Masakan (`/penjual/prediksi`)**:
+   - Menampilkan kalkulasi rekomendasi porsi harian berdasarkan tren penjualan menu.
+   - Fitur penerapan rekomendasi instan ke stok riil basis data (`POST /penjual/prediksi/terapkan`).
+9. **F-24: Pengaturan Profil Stan (`/penjual/profil`)**:
+   - Form pembaruan nama stan resmi, nomor kontak WhatsApp, deskripsi, lokasi counter di food court, dan jam buka-tutup.
+   - Unggah logo stan kantin baru ke storage publik.
+   - Sinkronisasi header dan sidebar layout pengelola stan secara konsisten.
+
+### B. Otomasi Pengujian Unit / Feature
+- Dibuat pengujian end-to-end `tests/Feature/SellerTest.php` yang memvalidasi otorisasi peran penjual, pembaruan menu & stok porsi, transisi pesanan dapur, pencatatan foreign key `payment_confirmations` & status log, pembaruan QRIS, pembacaan laporan, hingga modul profil.
+- Hasil uji: **4 test suites, 45 assertions passed (exit 0)**.
+
+---
+
+## 7. Rencana Kerja Selanjutnya
+
+### Tahap 4: Integrasi Sisi Admin / Pengelola Food Court (F-25 s/d F-31)
+1. Monitoring status stan kantin aktif/nonaktif (`/admin/dashboard` & `/admin/stan`).
+2. Rekapitulasi transaksi keseluruhan food court untuk evaluasi pengelola (`/admin/laporan`).
+3. Audit log aktivitas perubahan data sistem dan pengelolaan akun pengguna (`/admin/pengguna`).

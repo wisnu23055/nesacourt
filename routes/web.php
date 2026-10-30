@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuyerController;
+use App\Http\Controllers\SellerController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -50,16 +51,22 @@ Route::middleware(['auth', 'role:buyer,admin'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:seller,admin'])->prefix('penjual')->name('seller.')->group(function () {
-    Route::view('/dashboard', 'seller.dashboard')->name('dashboard');
-    Route::view('/menu', 'seller.menu.index')->name('menu.index');
-    Route::view('/menu/create', 'seller.menu.form')->name('menu.create');
-    Route::view('/stok', 'seller.stock')->name('stock');
-    Route::view('/qris', 'seller.qris')->name('qris');
-    Route::view('/pesanan', 'seller.orders.index')->name('orders.index');
-    Route::view('/pesanan/detail', 'seller.orders.detail')->name('orders.detail');
-    Route::view('/laporan', 'seller.reports')->name('reports');
-    Route::view('/prediksi', 'seller.forecast')->name('forecast');
-    Route::view('/profil', 'seller.profile')->name('profile');
+    Route::get('/dashboard', [SellerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/menu', [SellerController::class, 'menuIndex'])->name('menu.index');
+    Route::get('/menu/create', [SellerController::class, 'menuForm'])->name('menu.create');
+    Route::post('/menu', [SellerController::class, 'menuStore'])->name('menu.store');
+    Route::delete('/menu/{id}', [SellerController::class, 'menuDestroy'])->name('menu.destroy');
+    Route::get('/stok', [SellerController::class, 'stockIndex'])->name('stock');
+    Route::post('/stok', [SellerController::class, 'stockUpdate'])->name('stock.update');
+    Route::get('/qris', [SellerController::class, 'qrisIndex'])->name('qris');
+    Route::post('/qris', [SellerController::class, 'qrisUpdate'])->name('qris.update');
+    Route::get('/pesanan', [SellerController::class, 'ordersIndex'])->name('orders.index');
+    Route::get('/pesanan/detail', [SellerController::class, 'ordersDetail'])->name('orders.detail');
+    Route::post('/pesanan/{order_number}/status', [SellerController::class, 'updateOrderStatus'])->name('orders.status');
+    Route::get('/laporan', [SellerController::class, 'reportsIndex'])->name('reports');
+    Route::get('/prediksi', [SellerController::class, 'forecastIndex'])->name('forecast');
+    Route::get('/profil', [SellerController::class, 'profileIndex'])->name('profile');
+    Route::post('/profil', [SellerController::class, 'profileUpdate'])->name('profile.update');
 });
 
 /*

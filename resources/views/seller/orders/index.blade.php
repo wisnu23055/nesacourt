@@ -8,118 +8,11 @@
     searchQuery: '',
     autoRefresh: true,
     soundEnabled: true,
-    orders: [
-        {
-            id: 'NC-20261021-8842',
-            queueNo: '08',
-            customerName: 'Dimas Prasetyo',
-            customerType: 'Mahasiswa D4 TI',
-            diningType: 'Makan di Tempat (Meja 14)',
-            time: '11:42 WIB',
-            status: 'menunggu_konfirmasi',
-            statusLabel: 'Menunggu Verifikasi',
-            paymentMethod: 'QRIS Bank Jatim',
-            isPaid: true,
-            totalPrice: 18000,
-            notes: 'Sambal bawang jangan terlalu pedas, es batu sedikit saja.',
-            items: [
-                { name: 'Paket Nasi Geprek Sambal Bawang', qty: 1, price: 15000, note: 'Level 2 pedas sedang' },
-                { name: 'Es Teh Manis Jumbo', qty: 1, price: 3000, note: 'Sedikit es' }
-            ]
-        },
-        {
-            id: 'NC-20261021-8845',
-            queueNo: '09',
-            customerName: 'Nadia Putri',
-            customerType: 'Mahasiswi FEB',
-            diningType: 'Bungkus / Bawa Pulang',
-            time: '11:46 WIB',
-            status: 'menunggu_konfirmasi',
-            statusLabel: 'Menunggu Verifikasi',
-            paymentMethod: 'QRIS GoPay',
-            isPaid: true,
-            totalPrice: 16000,
-            notes: 'Bungkus terpisah ya kak, kuah lalapan dipisah.',
-            items: [
-                { name: 'Nasi Ayam Penyet Sambal Terasi', qty: 1, price: 16000, note: 'Sambal dipisah' }
-            ]
-        },
-        {
-            id: 'NC-20261021-8839',
-            queueNo: '06',
-            customerName: 'Rian Pratama',
-            customerType: 'Mahasiswa Teknik Mesin',
-            diningType: 'Makan di Tempat (Meja 08)',
-            time: '11:30 WIB',
-            status: 'memasak',
-            statusLabel: 'Sedang Dimasak',
-            paymentMethod: 'QRIS Mandiri',
-            isPaid: true,
-            totalPrice: 21000,
-            notes: 'Ayam digoreng garing krispi ya pak.',
-            items: [
-                { name: 'Paket Nasi Geprek Sambal Bawang', qty: 1, price: 15000, note: 'Level 4 sangat pedas' },
-                { name: 'Tempe Mendoan Hangat (Isi 3)', qty: 1, price: 6000, note: 'Kecap rawit banyak' }
-            ]
-        },
-        {
-            id: 'NC-20261021-8840',
-            queueNo: '07',
-            customerName: 'Dewi Lestari',
-            customerType: 'Dosen Vokasi',
-            diningType: 'Makan di Tempat (Meja 02)',
-            time: '11:35 WIB',
-            status: 'memasak',
-            statusLabel: 'Sedang Dimasak',
-            paymentMethod: 'QRIS BCA',
-            isPaid: true,
-            totalPrice: 15000,
-            notes: 'Tanpa MSG, nasi setengah porsi saja.',
-            items: [
-                { name: 'Nasi Telur Krispi Pontianak', qty: 1, price: 10000, note: 'Kecap manis sedikit' },
-                { name: 'Es Jeruk Peras Asli', qty: 1, price: 5000, note: 'Murni tanpa gula tambahan' }
-            ]
-        },
-        {
-            id: 'NC-20261021-8835',
-            queueNo: '04',
-            customerName: 'Bima Santoso',
-            customerType: 'Mahasiswa FBS',
-            diningType: 'Makan di Tempat (Meja 11)',
-            time: '11:15 WIB',
-            status: 'siap_ambil',
-            statusLabel: 'Siap Diambil',
-            paymentMethod: 'QRIS OVO',
-            isPaid: true,
-            totalPrice: 23000,
-            notes: 'Sudah dipanggil di display kantin.',
-            items: [
-                { name: 'Paket Nasi Geprek Sambal Bawang', qty: 1, price: 15000, note: 'Pedas sedang' },
-                { name: 'Kopi Susu Gula Aren Ketintang', qty: 1, price: 8000, note: 'Dingin' }
-            ]
-        },
-        {
-            id: 'NC-20261021-8831',
-            queueNo: '02',
-            customerName: 'Farhan Hidayat',
-            customerType: 'Mahasiswa FIP',
-            diningType: 'Bungkus / Bawa Pulang',
-            time: '10:55 WIB',
-            status: 'selesai',
-            statusLabel: 'Pesanan Selesai',
-            paymentMethod: 'QRIS Dana',
-            isPaid: true,
-            totalPrice: 18000,
-            notes: 'Pesanan telah diambil pembeli.',
-            items: [
-                { name: 'Paket Nasi Geprek Sambal Bawang', qty: 1, price: 15000, note: 'Pedas' },
-                { name: 'Es Teh Manis Jumbo', qty: 1, price: 3000, note: 'Normal' }
-            ]
-        }
-    ],
+    orders: {{ json_encode($orders) }},
     filteredOrders() {
         return this.orders.filter(order => {
-            const matchesSearch = order.id.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+            const matchesSearch = !this.searchQuery || 
+                                  order.id.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
                                   order.customerName.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
                                   order.queueNo.includes(this.searchQuery);
             const matchesTab = this.activeTab === 'all' || order.status === this.activeTab;
@@ -130,9 +23,22 @@
         if (status === 'all') return this.orders.length;
         return this.orders.filter(o => o.status === status).length;
     },
-    advanceStatus(order, nextStatus, nextLabel) {
+    async advanceStatus(order, nextStatus, nextLabel) {
         order.status = nextStatus;
         order.statusLabel = nextLabel;
+        try {
+            await fetch('{{ url('/penjual/pesanan') }}/' + order.id + '/status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ order_status: nextStatus })
+            });
+        } catch(e) {
+            console.error(e);
+        }
     }
 }">
 

@@ -42,19 +42,19 @@
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-slate-100">
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Total Omset Bersih</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5" x-text="period === 'hari_ini' ? 'Rp 485.000' : (period === '7_hari' ? 'Rp 3.420.000' : 'Rp 14.850.000')">Rp 485.000</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp {{ number_format($omsetTotal, 0, ',', '.') }}</span>
             </div>
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Pesanan Berhasil</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5" x-text="period === 'hari_ini' ? '32 Pesanan' : (period === '7_hari' ? '228 Pesanan' : '990 Pesanan')">32 Pesanan</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">{{ $completedOrders }} Pesanan</span>
             </div>
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Porsi Masakan Laku</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5" x-text="period === 'hari_ini' ? '46 Porsi' : (period === '7_hari' ? '312 Porsi' : '1.340 Porsi')">46 Porsi</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">{{ $portionsSold }} Porsi</span>
             </div>
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Rata-rata Nilai Nota</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp 15.150</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp {{ number_format($avgOrderValue, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>
@@ -258,200 +258,54 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs">
-                    <!-- Transaksi 1 -->
-                    <tr class="hover:bg-slate-50/70 transition">
-                        <td class="py-3.5 px-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
-                                    DP
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-slate-900">Dimas Prasetyo</span>
-                                        <span class="text-slate-400">&bull;</span>
-                                        <span class="text-[11px] font-semibold text-slate-500">Antrean 08</span>
+                    @forelse($recentOrders as $order)
+                        <tr class="hover:bg-slate-50/70 transition">
+                            <td class="py-3.5 px-4 whitespace-nowrap">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 uppercase">
+                                        {{ strtoupper(substr($order->customer_name, 0, 2)) }}
                                     </div>
-                                    <span class="text-[11px] text-slate-400">11:42 WIB</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-600 whitespace-nowrap">NC-20261021-8842</td>
-                        <td class="py-3.5 px-4 text-slate-700 font-medium">Nasi Geprek, Es Teh Jumbo</td>
-                        <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">QRIS Bank Jatim</td>
-                        <td class="py-3.5 px-4 text-right font-extrabold text-slate-900 whitespace-nowrap">Rp 18.000</td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-semibold bg-emerald-600 text-white border border-emerald-600 shadow-2xs">
-                                <span class="relative flex h-1.5 w-1.5 shrink-0">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
-                                </span>
-                                <span>Lunas</span>
-                            </span>
-                        </td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <a href="{{ url('/penjual/pesanan/detail') }}?id=NC-20261021-8842" 
-                               class="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition inline-flex items-center" 
-                               title="Lihat Detail Transaksi">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </a>
-                        </td>
-                    </tr>
-
-                    <!-- Transaksi 2 -->
-                    <tr class="hover:bg-slate-50/70 transition">
-                        <td class="py-3.5 px-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
-                                    DL
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-slate-900">Dewi Lestari</span>
-                                        <span class="text-slate-400">&bull;</span>
-                                        <span class="text-[11px] font-semibold text-slate-500">Antrean 07</span>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-bold text-slate-900">{{ $order->customer_name }}</span>
+                                            <span class="text-slate-400">&bull;</span>
+                                            <span class="text-[11px] font-semibold text-slate-500">Antrean #{{ str_pad($order->id % 100, 2, '0', STR_PAD_LEFT) }}</span>
+                                        </div>
+                                        <span class="text-[11px] text-slate-400">{{ $order->created_at->format('H:i') }} WIB</span>
                                     </div>
-                                    <span class="text-[11px] text-slate-400">11:35 WIB</span>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-600 whitespace-nowrap">NC-20261021-8840</td>
-                        <td class="py-3.5 px-4 text-slate-700 font-medium">Nasi Telur Krispi, Es Jeruk Peras</td>
-                        <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">QRIS BCA</td>
-                        <td class="py-3.5 px-4 text-right font-extrabold text-slate-900 whitespace-nowrap">Rp 15.000</td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-semibold bg-emerald-600 text-white border border-emerald-600 shadow-2xs">
-                                <span class="relative flex h-1.5 w-1.5 shrink-0">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                            </td>
+                            <td class="py-3.5 px-4 font-semibold text-slate-600 whitespace-nowrap">{{ $order->order_number }}</td>
+                            <td class="py-3.5 px-4 text-slate-700 font-medium">
+                                {{ $order->items->pluck('menu_name_snapshot')->take(2)->join(', ') }}
+                                @if($order->items->count() > 2)
+                                    +{{ $order->items->count() - 2 }} item
+                                @endif
+                            </td>
+                            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">{{ strtoupper($order->payment_method) }}</td>
+                            <td class="py-3.5 px-4 text-right font-extrabold text-slate-900 whitespace-nowrap">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
+                            <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-semibold bg-emerald-600 text-white border border-emerald-600 shadow-2xs">
+                                    <span class="relative flex h-1.5 w-1.5 shrink-0">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                                    </span>
+                                    <span>Lunas</span>
                                 </span>
-                                <span>Lunas</span>
-                            </span>
-                        </td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <a href="{{ url('/penjual/pesanan/detail') }}?id=NC-20261021-8840" 
-                               class="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition inline-flex items-center" 
-                               title="Lihat Detail Transaksi">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </a>
-                        </td>
-                    </tr>
-
-                    <!-- Transaksi 3 -->
-                    <tr class="hover:bg-slate-50/70 transition">
-                        <td class="py-3.5 px-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
-                                    RP
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-slate-900">Rian Pratama</span>
-                                        <span class="text-slate-400">&bull;</span>
-                                        <span class="text-[11px] font-semibold text-slate-500">Antrean 06</span>
-                                    </div>
-                                    <span class="text-[11px] text-slate-400">11:30 WIB</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-600 whitespace-nowrap">NC-20261021-8839</td>
-                        <td class="py-3.5 px-4 text-slate-700 font-medium">Nasi Geprek, Tempe Mendoan</td>
-                        <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">QRIS Mandiri</td>
-                        <td class="py-3.5 px-4 text-right font-extrabold text-slate-900 whitespace-nowrap">Rp 21.000</td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-semibold bg-emerald-600 text-white border border-emerald-600 shadow-2xs">
-                                <span class="relative flex h-1.5 w-1.5 shrink-0">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
-                                </span>
-                                <span>Lunas</span>
-                            </span>
-                        </td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <a href="{{ url('/penjual/pesanan/detail') }}?id=NC-20261021-8839" 
-                               class="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition inline-flex items-center" 
-                               title="Lihat Detail Transaksi">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </a>
-                        </td>
-                    </tr>
-
-                    <!-- Transaksi 4 -->
-                    <tr class="hover:bg-slate-50/70 transition">
-                        <td class="py-3.5 px-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
-                                    BS
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-slate-900">Bima Santoso</span>
-                                        <span class="text-slate-400">&bull;</span>
-                                        <span class="text-[11px] font-semibold text-slate-500">Antrean 04</span>
-                                    </div>
-                                    <span class="text-[11px] text-slate-400">11:15 WIB</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-600 whitespace-nowrap">NC-20261021-8835</td>
-                        <td class="py-3.5 px-4 text-slate-700 font-medium">Nasi Geprek, Kopi Susu Aren</td>
-                        <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">QRIS OVO</td>
-                        <td class="py-3.5 px-4 text-right font-extrabold text-slate-900 whitespace-nowrap">Rp 23.000</td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-semibold bg-emerald-600 text-white border border-emerald-600 shadow-2xs">
-                                <span class="relative flex h-1.5 w-1.5 shrink-0">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
-                                </span>
-                                <span>Lunas</span>
-                            </span>
-                        </td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <a href="{{ url('/penjual/pesanan/detail') }}?id=NC-20261021-8835" 
-                               class="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition inline-flex items-center" 
-                               title="Lihat Detail Transaksi">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </a>
-                        </td>
-                    </tr>
-
-                    <!-- Transaksi 5 -->
-                    <tr class="hover:bg-slate-50/70 transition">
-                        <td class="py-3.5 px-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
-                                    FH
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-slate-900">Farhan Hidayat</span>
-                                        <span class="text-slate-400">&bull;</span>
-                                        <span class="text-[11px] font-semibold text-slate-500">Antrean 02</span>
-                                    </div>
-                                    <span class="text-[11px] text-slate-400">10:55 WIB</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-3.5 px-4 font-semibold text-slate-600 whitespace-nowrap">NC-20261021-8831</td>
-                        <td class="py-3.5 px-4 text-slate-700 font-medium">Nasi Geprek, Es Teh Jumbo</td>
-                        <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">QRIS Dana</td>
-                        <td class="py-3.5 px-4 text-right font-extrabold text-slate-900 whitespace-nowrap">Rp 18.000</td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-semibold bg-emerald-600 text-white border border-emerald-600 shadow-2xs">
-                                <span class="relative flex h-1.5 w-1.5 shrink-0">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
-                                </span>
-                                <span>Lunas</span>
-                            </span>
-                        </td>
-                        <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                            <a href="{{ url('/penjual/pesanan/detail') }}?id=NC-20261021-8831" 
-                               class="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition inline-flex items-center" 
-                               title="Lihat Detail Transaksi">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </a>
-                        </td>
-                    </tr>
+                            </td>
+                            <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                <a href="{{ url('/penjual/pesanan/detail') }}?id={{ $order->order_number }}" 
+                                   class="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition inline-flex items-center" 
+                                   title="Lihat Detail Transaksi">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="py-8 text-center text-slate-400">Belum ada riwayat pesanan selesai untuk stan ini.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

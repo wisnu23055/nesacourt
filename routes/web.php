@@ -54,6 +54,7 @@ Route::middleware(['auth', 'role:seller,admin'])->prefix('penjual')->name('selle
     Route::get('/dashboard', [SellerController::class, 'dashboard'])->name('dashboard');
     Route::get('/menu', [SellerController::class, 'menuIndex'])->name('menu.index');
     Route::get('/menu/create', [SellerController::class, 'menuForm'])->name('menu.create');
+    Route::get('/menu/{id}/edit', [SellerController::class, 'menuForm'])->name('menu.edit');
     Route::post('/menu', [SellerController::class, 'menuStore'])->name('menu.store');
     Route::delete('/menu/{id}', [SellerController::class, 'menuDestroy'])->name('menu.destroy');
     Route::get('/stok', [SellerController::class, 'stockIndex'])->name('stock');

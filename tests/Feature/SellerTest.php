@@ -46,6 +46,10 @@ class SellerTest extends TestCase
         $this->assertNotNull($createdMenu);
         $this->assertEquals(12500, $createdMenu->price);
 
+        // Verify Menu Edit Route
+        $response = $this->actingAs($sellerUser)->get('/penjual/menu/' . $createdMenu->id . '/edit');
+        $response->assertStatus(200);
+
         // 3. Stock Update
         $response = $this->actingAs($sellerUser)->postJson('/penjual/stok', [
             'stocks' => [

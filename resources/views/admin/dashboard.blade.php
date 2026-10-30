@@ -5,100 +5,8 @@
 @section('content')
 <div class="space-y-6" x-data="{
     dateFilter: 'hari_ini',
-    stalls: [
-        {
-            id: 1,
-            name: 'Stan 01 - Barokah Rasa',
-            owner: 'Pak Bambang',
-            ownerImage: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
-            location: 'Counter Barat No. 01',
-            stallImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
-            todayOrders: 52,
-            todayRevenue: 'Rp 890.000',
-            isOpen: true,
-            topMenu: 'Ayam Geprek Sambal Bawang'
-        },
-        {
-            id: 2,
-            name: 'Stan 02 - Soto Bu Siti',
-            owner: 'Bu Siti Rahayu',
-            ownerImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
-            location: 'Counter Barat No. 02',
-            stallImage: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80',
-            todayOrders: 38,
-            todayRevenue: 'Rp 570.000',
-            isOpen: true,
-            topMenu: 'Soto Ayam Lamongan Koya'
-        },
-        {
-            id: 3,
-            name: 'Stan 03 - Geprek Mas Bro',
-            owner: 'Mas Hendra',
-            ownerImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-            location: 'Counter Timur No. 01',
-            stallImage: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80',
-            todayOrders: 29,
-            todayRevenue: 'Rp 480.000',
-            isOpen: true,
-            topMenu: 'Ayam Geprek Keju Lumer'
-        },
-        {
-            id: 4,
-            name: 'Stan 04 - Aneka Jus Vokasi',
-            owner: 'Bu Dian Fitri',
-            ownerImage: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80',
-            location: 'Counter Timur No. 02',
-            stallImage: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-            todayOrders: 45,
-            todayRevenue: 'Rp 540.000',
-            isOpen: true,
-            topMenu: 'Es Teh Manis Jumbo Vokasi'
-        }
-    ],
-    liveOrders: [
-        {
-            id: 'NC-20261025-9921',
-            time: '2 Menit lalu',
-            buyerName: 'Ahmad Fauzi',
-            buyerNim: '23055310022',
-            buyerImage: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&q=80',
-            stallName: 'Stan 01 - Barokah Rasa',
-            menuName: 'Ayam Geprek Sambal Bawang Level 3',
-            menuImage: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80',
-            price: 13000,
-            status: 'Sedang Dimasak',
-            statusCode: 'proses',
-            table: 'Meja 08'
-        },
-        {
-            id: 'NC-20261025-9920',
-            time: '5 Menit lalu',
-            buyerName: 'Nadia Salsabila',
-            buyerNim: '23055310034',
-            buyerImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-            stallName: 'Stan 02 - Soto Bu Siti',
-            menuName: 'Soto Ayam Lamongan Lengkap Koya',
-            menuImage: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=300&q=80',
-            price: 14000,
-            status: 'Siap Diambil di Counter',
-            statusCode: 'siap',
-            table: 'Meja 12'
-        },
-        {
-            id: 'NC-20261025-9919',
-            time: '9 Menit lalu',
-            buyerName: 'Rizky Kurniawan',
-            buyerNim: '23055310018',
-            buyerImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-            stallName: 'Stan 04 - Aneka Jus Vokasi',
-            menuName: 'Jus Alpukat Kental Susu Cokelat',
-            menuImage: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=300&q=80',
-            price: 10000,
-            status: 'Pesanan Selesai',
-            statusCode: 'selesai',
-            table: 'Bungkus'
-        }
-    ]
+    stalls: {{ Js::from($stallsData ?? []) }},
+    liveOrders: {{ Js::from($recentOrdersData ?? []) }}
 }">
 
     <!-- Welcome & Operational Header Card (Identik dengan Tema Desain Dashboard Penjual) -->
@@ -110,7 +18,7 @@
                      class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Halo, Pak Eko Prasetyo</h1>
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Halo, {{ auth()->user()->name ?? 'Pengelola Food Court' }}</h1>
                         <span class="text-slate-300 font-normal">|</span>
                         <span class="text-xs font-semibold text-brand-600">Kepala Pengelola Food Court</span>
                     </div>
@@ -178,28 +86,28 @@
             <!-- Card 1: Total Omzet -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Total Omzet Hari Ini</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp 2.480.000</span>
-                <span class="text-[10px] text-slate-500 block mt-0.5">+14.8% dari kemarin</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp {{ number_format($omsetToday ?? 0, 0, ',', '.') }}</span>
+                <span class="text-[10px] text-slate-500 block mt-0.5">Akumulasi transaksi valid</span>
             </div>
 
             <!-- Card 2: Pesanan Selesai / Masuk -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
-                <span class="text-[11px] font-medium text-slate-500 block">Pesanan Selesai / Masuk</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">152 / 164</span>
-                <span class="text-[10px] text-slate-500 block mt-0.5">12 pesanan diproses</span>
+                <span class="text-[11px] font-medium text-slate-500 block">Pesanan Selesai / Total</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">{{ $ordersFinished ?? 0 }} / {{ $ordersTotal ?? 0 }}</span>
+                <span class="text-[10px] text-slate-500 block mt-0.5">{{ max(0, ($ordersTotal ?? 0) - ($ordersFinished ?? 0)) }} pesanan aktif</span>
             </div>
 
             <!-- Card 3: Stan Beroperasi Buka -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Stan Beroperasi Buka</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">4 dari 4 Stan</span>
-                <span class="text-[10px] text-slate-500 block mt-0.5">100% counter aktif</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">{{ $openStallsCount ?? 0 }} dari {{ $totalStallsCount ?? 0 }} Stan</span>
+                <span class="text-[10px] text-slate-500 block mt-0.5">{{ $totalStallsCount ? round(($openStallsCount / $totalStallsCount) * 100) : 0 }}% counter aktif</span>
             </div>
 
             <!-- Card 4: Rata-rata Waktu Saji -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Rata-rata Waktu Saji</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">~6.4 Menit</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">~{{ $avgPrepTime ?? 6 }} Menit</span>
                 <span class="text-[10px] text-slate-500 block mt-0.5">Layanan cepat & lancar</span>
             </div>
         </div>

@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
-    orderId: 'NC-20261021-8842',
-    queueNo: 'A-09',
-    auditStatus: 'Terverifikasi Sesuai',
+    orderId: '{{ $order?->order_number ?? 'Belum ada pesanan' }}',
+    queueNo: '{{ $order?->queue_number ?? 'A-01' }}',
+    auditStatus: '{{ $order && $order->payment_status === 'terkonfirmasi' ? 'Terverifikasi Sesuai' : 'Dalam Proses' }}',
     isVerifying: false,
 
     printAudit() {
@@ -29,7 +29,7 @@
                     <i data-lucide="file-check" class="w-6 h-6 text-slate-900 shrink-0"></i>
                     <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Detail Pesanan & Audit Transaksi</h1>
                 </div>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1">Audit rincian transaksi nomor NC-20261021-8842, validasi pembayaran QRIS statis kantin, dan kepatuhan waktu pelayanan.</p>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Audit rincian transaksi nomor {{ $order?->order_number ?? '-' }}, validasi pembayaran QRIS statis kantin, dan kepatuhan waktu pelayanan.</p>
             </div>
 
             <!-- Tombol Cetak: Di Mobile di Bawah Deskripsi, di Desktop di Kanan Atas -->
@@ -44,30 +44,38 @@
         </div>
     </div>
 
+    @if(!$order)
+        <div class="p-8 text-center bg-white rounded-2xl border border-slate-200">
+            <p class="text-sm font-semibold text-slate-600">Tidak ada data pesanan yang dipilih untuk diaudit.</p>
+            <a href="{{ route('admin.orders') }}" class="mt-3 inline-block px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold">Kembali ke Daftar Pesanan</a>
+        </div>
+    @else
     <!-- 4 Center Metadata Cards (Identik dengan Desain Status Pesanan) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
         <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs text-center flex flex-col justify-center">
             <span class="text-[11px] text-slate-400 font-medium">Nomor ID Pesanan</span>
             <span class="text-sm sm:text-base font-bold text-slate-900 tracking-tight mt-0.5" x-text="orderId"></span>
-            <span class="text-[10px] font-semibold text-emerald-600 mt-0.5">QRIS Lunas Terverifikasi</span>
+            <span class="text-[10px] font-semibold {{ $order->payment_status === 'terkonfirmasi' ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5">
+                {{ $order->payment_status === 'terkonfirmasi' ? 'QRIS Lunas Terverifikasi' : 'Menunggu / Dicek' }}
+            </span>
         </div>
 
         <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs text-center flex flex-col justify-center">
-            <span class="text-[11px] text-slate-400 font-medium">Stan Kantin & Lokasi</span>
-            <span class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight mt-0.5">Stan 01 - Barokah Rasa</span>
-            <span class="text-[10px] text-slate-500 mt-0.5">Counter Barat No. 01</span>
+            <span class="text-[11px] text-slate-400 font-medium">Stan & Lokasi</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-900 tracking-tight mt-0.5">{{ $order->seller?->stall_name ?? 'Stan Kantin' }}</span>
+            <span class="text-[10px] text-slate-500 mt-0.5">{{ $order->seller?->location ?? 'Counter Food Court' }}</span>
         </div>
 
         <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs text-center flex flex-col justify-center">
             <span class="text-[11px] text-slate-400 font-medium">Nomor Antrean Pesanan</span>
-            <span class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mt-0.5" x-text="queueNo"></span>
-            <span class="text-[10px] text-slate-500 mt-0.5">Makan di Tempat (Meja 08)</span>
+            <span class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mt-0.5">{{ $order->queue_number ?? ('A-' . str_pad($order->id, 2, '0', STR_PAD_LEFT)) }}</span>
+            <span class="text-[10px] text-slate-500 mt-0.5">{{ $order->table_number ? 'Makan di Tempat (Meja ' . $order->table_number . ')' : 'Bawa Pulang (Takeaway)' }}</span>
         </div>
 
         <div class="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs text-center flex flex-col justify-center">
-            <span class="text-[11px] text-slate-400 font-medium">Durasi Pelayanan Dapur</span>
-            <span class="text-sm sm:text-base font-bold text-slate-900 tracking-tight mt-0.5">~7 Menit</span>
-            <span class="text-[10px] text-emerald-600 font-semibold mt-0.5">Tepat Waktu & Standar</span>
+            <span class="text-[11px] text-slate-400 font-medium">Status Pesanan</span>
+            <span class="text-sm sm:text-base font-bold text-slate-900 tracking-tight mt-0.5">{{ ucfirst($order->order_status) }}</span>
+            <span class="text-[10px] text-emerald-600 font-semibold mt-0.5">{{ $order->created_at ? $order->created_at->format('d M Y, H:i') : '' }}</span>
         </div>
     </div>
 
@@ -85,10 +93,10 @@
                      alt="Foto Mahasiswa" 
                      class="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-200 shrink-0">
                 <div class="space-y-0.5">
-                    <h4 class="text-sm font-bold text-slate-900">Aditya Pratama</h4>
-                    <p class="text-xs text-slate-500">NIM: 23055310001 (Mahasiswa Aktif UNESA)</p>
-                    <p class="text-xs text-slate-500">Program Studi: D4 Manajemen Informatika</p>
-                    <p class="text-xs font-semibold text-brand-700 pt-0.5">WhatsApp: 081234567890</p>
+                    <h4 class="text-sm font-bold text-slate-900">{{ $order->buyer?->name ?? 'Mahasiswa UNESA' }}</h4>
+                    <p class="text-xs text-slate-500">NIM/Kontak: {{ $order->buyer?->phone ?? '-' }}</p>
+                    <p class="text-xs text-slate-500">Email: {{ $order->buyer?->email ?? '-' }}</p>
+                    <p class="text-xs font-semibold text-brand-700 pt-0.5">Layanan: {{ $order->table_number ? 'Dine In (Meja ' . $order->table_number . ')' : 'Takeaway' }}</p>
                 </div>
             </div>
         </div>
@@ -101,14 +109,14 @@
             </div>
 
             <div class="flex items-center gap-3.5">
-                <img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80" 
+                <img src="{{ $order->seller?->logo_path ? asset('storage/' . $order->seller->logo_path) : 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80' }}" 
                      alt="Foto Pemilik Stan" 
                      class="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-200 shrink-0">
                 <div class="space-y-0.5">
-                    <h4 class="text-sm font-bold text-slate-900">Pak Bambang</h4>
-                    <p class="text-xs text-slate-500">Pengelola Stan 01 - Barokah Rasa</p>
-                    <p class="text-xs text-slate-500">Lokasi: Counter Barat No. 01 | Food Court Ketintang</p>
-                    <p class="text-xs font-semibold text-emerald-700 pt-0.5">Status Sewa: Lunas Terdaftar</p>
+                    <h4 class="text-sm font-bold text-slate-900">{{ $order->seller?->user?->name ?? 'Pengelola Stan' }}</h4>
+                    <p class="text-xs text-slate-500">{{ $order->seller?->stall_name ?? 'Stan Kantin' }}</p>
+                    <p class="text-xs text-slate-500">Lokasi: {{ $order->seller?->location ?? 'Food Court Ketintang' }}</p>
+                    <p class="text-xs font-semibold text-emerald-700 pt-0.5">Status Stan: {{ $order->seller?->is_active ? 'Buka Aktif' : 'Tutup' }}</p>
                 </div>
             </div>
         </div>
@@ -121,44 +129,33 @@
                 <i data-lucide="receipt" class="w-4 h-4 text-slate-900"></i>
                 <h3 class="text-sm font-bold text-slate-900">Rincian Menu Yang Dipesan & Tera Harga</h3>
             </div>
-            <span class="text-xs font-semibold text-slate-500">2 Jenis Menu</span>
+            <span class="text-xs font-semibold text-slate-500">{{ $order->items->count() }} Jenis Menu</span>
         </div>
 
         <div class="divide-y divide-slate-100">
-            <!-- Item 1 -->
+            @forelse($order->items as $item)
             <div class="py-3 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3 min-w-0">
-                    <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80" 
-                         alt="Ayam Geprek Sambal Korek" 
+                    <img src="{{ $item->menu?->image_path ? asset('storage/' . $item->menu->image_path) : 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80' }}" 
+                         alt="{{ $item->menu_name_snapshot }}" 
                          class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
                     <div>
-                        <span class="text-xs sm:text-sm font-bold text-slate-900 block truncate">1x Ayam Geprek Sambal Korek</span>
-                        <p class="text-[11px] text-slate-400">Catatan Pembeli: Sambal pedas dipisah</p>
+                        <span class="text-xs sm:text-sm font-bold text-slate-900 block truncate">{{ $item->quantity }}x {{ $item->menu_name_snapshot }}</span>
+                        <p class="text-[11px] text-slate-400">@ Rp {{ number_format($item->menu_price_snapshot, 0, ',', '.') }}</p>
                     </div>
                 </div>
-                <span class="text-xs sm:text-sm font-bold text-slate-900">Rp 13.000</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
             </div>
-
-            <!-- Item 2 -->
-            <div class="py-3 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3 min-w-0">
-                    <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=300&q=80" 
-                         alt="Es Teh Manis Jumbo Vokasi" 
-                         class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
-                    <div>
-                        <span class="text-xs sm:text-sm font-bold text-slate-900 block truncate">1x Es Teh Manis Jumbo Vokasi</span>
-                        <p class="text-[11px] text-slate-400">Catatan Pembeli: Sedikit gula</p>
-                    </div>
-                </div>
-                <span class="text-xs sm:text-sm font-bold text-slate-900">Rp 4.000</span>
-            </div>
+            @empty
+            <p class="text-xs text-slate-400 py-3">Tidak ada rincian item.</p>
+            @endforelse
         </div>
 
         <!-- Totals & Payment Summary -->
         <div class="pt-4 border-t border-slate-100 space-y-2 text-xs">
             <div class="flex justify-between text-slate-600">
                 <span>Subtotal Menu</span>
-                <span class="font-bold text-slate-800">Rp 17.000</span>
+                <span class="font-bold text-slate-800">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
             </div>
             <div class="flex justify-between text-slate-600">
                 <span>Biaya Layanan Kampus</span>
@@ -166,7 +163,7 @@
             </div>
             <div class="flex justify-between text-slate-900 font-bold text-sm pt-2 border-t border-slate-100">
                 <span>Total Audit Pembayaran</span>
-                <span class="text-base text-brand-700">Rp 17.000 (Lunas)</span>
+                <span class="text-base text-brand-700">Rp {{ number_format($order->total, 0, ',', '.') }} ({{ ucfirst($order->payment_status) }})</span>
             </div>
         </div>
     </div>
@@ -178,21 +175,22 @@
             <span>Verifikasi Pembayaran QRIS Statis Valid</span>
         </div>
         <p class="text-xs text-emerald-800 leading-relaxed">
-            Transaksi ini telah tervalidasi menggunakan QRIS Statis resmi Stan 01 - Barokah Rasa. Dana masuk langsung ke rekening pedagang tanpa potongan biaya admin, dan diverifikasi langsung oleh kasir stan pada saat penyerahan pesanan di meja counter.
+            Transaksi ini telah tervalidasi menggunakan QRIS Statis resmi {{ $order->seller?->stall_name ?? 'Stan Kantin' }}. Dana masuk langsung ke rekening pedagang tanpa potongan biaya admin, dan diverifikasi langsung oleh kasir stan pada saat penyerahan pesanan di meja counter.
         </p>
     </div>
 
     <!-- Actions Row -->
     <div class="flex items-center justify-between pt-2">
-        <a href="{{ url('/admin/pesanan') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition shadow-2xs">
+        <a href="{{ url('/admin/pesanan') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition">
             <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-slate-900"></i>
-            <span>Kembali ke Monitoring Pesanan</span>
+            <span>Kembali ke Arus Pesanan</span>
         </a>
-        <a href="{{ url('/admin/laporan') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition shadow-sm">
+
+        <a href="{{ url('/admin/laporan') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 shadow-sm transition">
             <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-white"></i>
-            <span>Lihat Rekap Keuangan</span>
+            <span>Laporan Keuangan</span>
         </a>
     </div>
-
+    @endif
 </div>
 @endsection

@@ -14,64 +14,7 @@
         location: 'Counter Barat',
         number: '05'
     },
-    stalls: [
-        {
-            id: 1,
-            number: '01',
-            name: 'Stan 01 - Barokah Rasa',
-            locationArea: 'barat',
-            location: 'Counter Barat No. 01',
-            owner: 'Pak Bambang',
-            phone: '081234567891',
-            ownerImage: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
-            stallImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
-            menuCount: 8,
-            rentStatus: 'Lunas (Okt 2026)',
-            isOpen: true
-        },
-        {
-            id: 2,
-            number: '02',
-            name: 'Stan 02 - Soto Bu Siti',
-            locationArea: 'barat',
-            location: 'Counter Barat No. 02',
-            owner: 'Bu Siti Rahayu',
-            phone: '081234567892',
-            ownerImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
-            stallImage: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80',
-            menuCount: 6,
-            rentStatus: 'Lunas (Okt 2026)',
-            isOpen: true
-        },
-        {
-            id: 3,
-            number: '03',
-            name: 'Stan 03 - Geprek Mas Bro',
-            locationArea: 'timur',
-            location: 'Counter Timur No. 01',
-            owner: 'Mas Hendra',
-            phone: '081234567893',
-            ownerImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-            stallImage: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80',
-            menuCount: 7,
-            rentStatus: 'Lunas (Okt 2026)',
-            isOpen: true
-        },
-        {
-            id: 4,
-            number: '04',
-            name: 'Stan 04 - Aneka Jus Vokasi',
-            locationArea: 'timur',
-            location: 'Counter Timur No. 02',
-            owner: 'Bu Dian Fitri',
-            phone: '081234567894',
-            ownerImage: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80',
-            stallImage: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-            menuCount: 9,
-            rentStatus: 'Lunas (Okt 2026)',
-            isOpen: true
-        }
-    ],
+    stalls: {{ Js::from($stallsData ?? []) }},
 
     get filteredStalls() {
         return this.stalls.filter(s => {
@@ -239,44 +182,46 @@
                 </button>
             </div>
 
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Stan Kantin</label>
-                    <input type="text" x-model="newStall.name" placeholder="Contoh: Stan 05 - Nasi Goreng Juara" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
-                </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Pemilik Stan</label>
-                    <input type="text" x-model="newStall.owner" placeholder="Contoh: Bu Sri Mulyani" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
+            <form method="POST" action="{{ route('admin.stalls.store') }}" class="space-y-4">
+                @csrf
+                <div class="space-y-3 text-xs">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Area Counter</label>
-                        <select x-model="newStall.location" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
-                            <option value="Counter Barat">Counter Barat</option>
-                            <option value="Counter Timur">Counter Timur</option>
-                        </select>
+                        <label class="block font-semibold text-slate-700 mb-1">Nama Stan Kantin</label>
+                        <input type="text" name="name" x-model="newStall.name" required placeholder="Contoh: Stan 05 - Nasi Goreng Juara" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Nomor Counter</label>
-                        <input type="text" x-model="newStall.number" placeholder="Contoh: 03" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
+                        <label class="block font-semibold text-slate-700 mb-1">Nama Pemilik Stan</label>
+                        <input type="text" name="owner" x-model="newStall.owner" required placeholder="Contoh: Bu Sri Mulyani" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Area Counter</label>
+                            <select name="location" x-model="newStall.location" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
+                                <option value="Counter Barat">Counter Barat</option>
+                                <option value="Counter Timur">Counter Timur</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Nomor Counter</label>
+                            <input type="text" name="number" x-model="newStall.number" placeholder="Contoh: 03" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Nomor WhatsApp Aktif</label>
+                        <input type="text" name="phone" x-model="newStall.phone" required placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
                     </div>
                 </div>
-                <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nomor WhatsApp Aktif</label>
-                    <input type="text" x-model="newStall.phone" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white">
-                </div>
-            </div>
 
-            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-                <button type="button" @click="modalOpen = false" class="whitespace-nowrap px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">
-                    Batal
-                </button>
-                <button type="button" 
-                        @click="modalOpen = false; alert('Data pendaftaran stan berhasil disimpan ke sistem.')" 
-                        class="whitespace-nowrap px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800">
-                    Simpan Stan
-                </button>
-            </div>
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" @click="modalOpen = false" class="whitespace-nowrap px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            class="whitespace-nowrap px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800">
+                        Simpan Stan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

@@ -5,90 +5,9 @@
 @section('content')
 <div class="space-y-6" x-data="{
     activeTab: 'semua',
-    stallFilter: 'semua',
+    stallFilter: '{{ request('stan') ? 'stan_' . str_pad(request('stan'), 2, '0', STR_PAD_LEFT) : 'semua' }}',
     searchQuery: '',
-    orders: [
-        {
-            id: 'NC-20261025-9921',
-            queueNo: 'A-09',
-            date: '25 Okt 2026, 12:45 WIB',
-            buyerName: 'Aditya Pratama',
-            buyerNim: '23055310001',
-            buyerPhone: '081234567890',
-            buyerImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-            stallName: 'Stan 01 - Barokah Rasa',
-            stallKey: 'stan_01',
-            menuName: 'Ayam Geprek Sambal Bawang Level 3',
-            menuImage: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80',
-            portions: 1,
-            total: 13000,
-            table: 'Meja 08',
-            serviceType: 'Makan di Tempat',
-            paymentMethod: 'QRIS Statis (Terverifikasi Lunas)',
-            status: 'Sedang Dimasak',
-            statusCode: 'proses'
-        },
-        {
-            id: 'NC-20261025-9920',
-            queueNo: 'B-04',
-            date: '25 Okt 2026, 12:42 WIB',
-            buyerName: 'Nadia Salsabila',
-            buyerNim: '23055310034',
-            buyerPhone: '081234567895',
-            buyerImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-            stallName: 'Stan 02 - Soto Bu Siti',
-            stallKey: 'stan_02',
-            menuName: 'Soto Ayam Lamongan Lengkap Koya',
-            menuImage: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=300&q=80',
-            portions: 1,
-            total: 14000,
-            table: 'Meja 12',
-            serviceType: 'Makan di Tempat',
-            paymentMethod: 'QRIS Statis (Terverifikasi Lunas)',
-            status: 'Siap Diambil di Counter',
-            statusCode: 'siap'
-        },
-        {
-            id: 'NC-20261025-9919',
-            queueNo: 'D-12',
-            date: '25 Okt 2026, 12:35 WIB',
-            buyerName: 'Rizky Kurniawan',
-            buyerNim: '23055310018',
-            buyerPhone: '081234567896',
-            buyerImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-            stallName: 'Stan 04 - Aneka Jus Vokasi',
-            stallKey: 'stan_04',
-            menuName: 'Jus Alpukat Kental Susu Cokelat',
-            menuImage: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=300&q=80',
-            portions: 2,
-            total: 20000,
-            table: 'Bawa Pulang',
-            serviceType: 'Bungkus',
-            paymentMethod: 'QRIS Statis (Terverifikasi Lunas)',
-            status: 'Pesanan Selesai',
-            statusCode: 'selesai'
-        },
-        {
-            id: 'NC-20261025-9918',
-            queueNo: 'C-07',
-            date: '25 Okt 2026, 12:28 WIB',
-            buyerName: 'Dewi Lestari',
-            buyerNim: '23055310045',
-            buyerPhone: '081234567897',
-            buyerImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-            stallName: 'Stan 03 - Geprek Mas Bro',
-            stallKey: 'stan_03',
-            menuName: 'Kentang Goreng Krispi French Fries',
-            menuImage: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=300&q=80',
-            portions: 1,
-            total: 8000,
-            table: 'Meja 04',
-            serviceType: 'Makan di Tempat',
-            paymentMethod: 'QRIS Statis (Terverifikasi Lunas)',
-            status: 'Pesanan Selesai',
-            statusCode: 'selesai'
-        }
-    ],
+    orders: {{ Js::from($ordersData ?? []) }},
 
     formatRupiah(num) {
         return 'Rp ' + Number(num).toLocaleString('id-ID');
@@ -132,38 +51,37 @@
             <div class="flex items-center gap-2 overflow-x-auto pb-1.5 sm:pb-0 thin-scrollbar text-xs">
                 <button type="button" 
                         @click="activeTab = 'semua'" 
-                        :class="activeTab === 'semua' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'"
+                        :class="activeTab === 'semua' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'" 
                         class="whitespace-nowrap px-3.5 py-1.5 rounded-xl transition">
-                    Semua Pesanan (164)
+                    Semua Pesanan (<span x-text="orders.length"></span>)
                 </button>
                 <button type="button" 
-                        @click="activeTab = 'proses'" 
-                        :class="activeTab === 'proses' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'"
+                        @click="activeTab = 'diproses'" 
+                        :class="activeTab === 'diproses' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'" 
                         class="whitespace-nowrap px-3.5 py-1.5 rounded-xl transition">
-                    Sedang Dimasak (8)
+                    Sedang Dimasak (<span x-text="orders.filter(o => o.statusCode === 'diproses' || o.statusCode === 'proses').length"></span>)
                 </button>
                 <button type="button" 
                         @click="activeTab = 'siap'" 
-                        :class="activeTab === 'siap' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'"
+                        :class="activeTab === 'siap' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'" 
                         class="whitespace-nowrap px-3.5 py-1.5 rounded-xl transition">
-                    Siap Diambil (4)
+                    Siap Diambil (<span x-text="orders.filter(o => o.statusCode === 'siap').length"></span>)
                 </button>
                 <button type="button" 
                         @click="activeTab = 'selesai'" 
-                        :class="activeTab === 'selesai' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'"
+                        :class="activeTab === 'selesai' ? 'bg-slate-900 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'" 
                         class="whitespace-nowrap px-3.5 py-1.5 rounded-xl transition">
-                    Pesanan Selesai (152)
+                    Pesanan Selesai (<span x-text="orders.filter(o => o.statusCode === 'selesai').length"></span>)
                 </button>
             </div>
 
             <!-- Stan Filter Dropdown -->
             <div class="relative">
-                <select x-model="stallFilter" class="appearance-none text-[11px] sm:text-xs font-semibold py-1.5 pl-3 pr-8 sm:pl-3.5 sm:pr-10 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 cursor-pointer w-full sm:w-auto">
+                <select x-model="stallFilter" class="appearance-none text-xs font-semibold py-1.5 pl-3 pr-8 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 cursor-pointer">
                     <option value="semua">Semua Stan</option>
-                    <option value="stan_01">Stan 01 - Barokah</option>
-                    <option value="stan_02">Stan 02 - Soto Bu Siti</option>
-                    <option value="stan_03">Stan 03 - Geprek Mas Bro</option>
-                    <option value="stan_04">Stan 04 - Jus Vokasi</option>
+                    @foreach($stalls ?? [] as $stall)
+                        <option value="stan_{{ str_pad($stall->id, 2, '0', STR_PAD_LEFT) }}">{{ $stall->stall_name }}</option>
+                    @endforeach
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-2.5 sm:right-3 flex items-center text-slate-400">
                     <i data-lucide="chevron-down" class="w-3 h-3 sm:w-3.5 sm:h-3.5" stroke-width="1.5"></i>

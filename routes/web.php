@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -76,11 +77,15 @@ Route::middleware(['auth', 'role:seller,admin'])->prefix('penjual')->name('selle
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
-    Route::view('/stan', 'admin.stalls')->name('stalls');
-    Route::view('/menu', 'admin.menu')->name('menu');
-    Route::view('/pesanan', 'admin.orders')->name('orders');
-    Route::view('/pesanan/detail', 'admin.order-detail')->name('order-detail');
-    Route::view('/laporan', 'admin.reports')->name('reports');
-    Route::view('/log', 'admin.logs')->name('logs');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/stan', [AdminController::class, 'stallsIndex'])->name('stalls');
+    Route::post('/stan', [AdminController::class, 'stallStore'])->name('stalls.store');
+    Route::post('/stan/{id}/toggle', [AdminController::class, 'stallToggleStatus'])->name('stalls.toggle');
+    Route::get('/menu', [AdminController::class, 'menuIndex'])->name('menu');
+    Route::post('/menu/{id}/toggle', [AdminController::class, 'menuToggleStatus'])->name('menu.toggle');
+    Route::get('/pesanan', [AdminController::class, 'ordersIndex'])->name('orders');
+    Route::get('/pesanan/detail', [AdminController::class, 'orderDetail'])->name('order-detail');
+    Route::get('/pesanan/{id}', [AdminController::class, 'orderDetail'])->name('orders.detail');
+    Route::get('/laporan', [AdminController::class, 'reportsIndex'])->name('reports');
+    Route::get('/log', [AdminController::class, 'logsIndex'])->name('logs');
 });

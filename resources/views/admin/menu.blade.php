@@ -4,107 +4,10 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
-    selectedStall: 'semua',
+    selectedStall: '{{ request('stan') ? 'stan_' . str_pad(request('stan'), 2, '0', STR_PAD_LEFT) : 'semua' }}',
     selectedCategory: 'semua',
     searchQuery: '',
-    menus: [
-        {
-            id: 1,
-            name: 'Ayam Geprek Sambal Bawang Level 3',
-            category: 'makanan',
-            categoryLabel: 'Makanan Berat',
-            stall: 'Stan 01 - Barokah Rasa',
-            stallKey: 'stan_01',
-            price: 13000,
-            stock: 14,
-            prepTime: '7 Menit',
-            image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 2,
-            name: 'Ayam Penyet Sambal Ijo Padang',
-            category: 'makanan',
-            categoryLabel: 'Makanan Berat',
-            stall: 'Stan 01 - Barokah Rasa',
-            stallKey: 'stan_01',
-            price: 14000,
-            stock: 9,
-            prepTime: '8 Menit',
-            image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 3,
-            name: 'Soto Ayam Lamongan Lengkap Koya',
-            category: 'makanan',
-            categoryLabel: 'Makanan Berat',
-            stall: 'Stan 02 - Soto Bu Siti',
-            stallKey: 'stan_02',
-            price: 14000,
-            stock: 11,
-            prepTime: '5 Menit',
-            image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 4,
-            name: 'Kentang Goreng Krispi French Fries',
-            category: 'camilan',
-            categoryLabel: 'Camilan',
-            stall: 'Stan 03 - Geprek Mas Bro',
-            stallKey: 'stan_03',
-            price: 8000,
-            stock: 15,
-            prepTime: '4 Menit',
-            image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 5,
-            name: 'Es Teh Manis Jumbo Vokasi',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            stall: 'Stan 04 - Aneka Jus Vokasi',
-            stallKey: 'stan_04',
-            price: 4000,
-            stock: 40,
-            prepTime: '2 Menit',
-            image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 6,
-            name: 'Jus Alpukat Kental Susu Cokelat',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            stall: 'Stan 04 - Aneka Jus Vokasi',
-            stallKey: 'stan_04',
-            price: 10000,
-            stock: 8,
-            prepTime: '4 Menit',
-            image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 7,
-            name: 'Kopi Susu Gula Aren Ketintang',
-            category: 'minuman',
-            categoryLabel: 'Minuman',
-            stall: 'Stan 04 - Aneka Jus Vokasi',
-            stallKey: 'stan_04',
-            price: 9000,
-            stock: 0,
-            prepTime: '3 Menit',
-            image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80'
-        },
-        {
-            id: 8,
-            name: 'Paket Kenyang Hemat: Nasi Ayam + Es Teh',
-            category: 'makanan',
-            categoryLabel: 'Paket Hemat',
-            stall: 'Stan 01 - Barokah Rasa',
-            stallKey: 'stan_01',
-            price: 15000,
-            stock: 12,
-            prepTime: '6 Menit',
-            image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=600&q=80'
-        }
-    ],
+    menus: {{ Js::from($menusData ?? []) }},
 
     formatRupiah(num) {
         return 'Rp ' + Number(num).toLocaleString('id-ID');
@@ -146,11 +49,10 @@
                 <label class="block text-[11px] font-semibold text-slate-600 mb-1">Filter Stan Kantin</label>
                 <div class="relative">
                     <select x-model="selectedStall" class="appearance-none w-full text-xs font-semibold py-2 pl-3.5 pr-11 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 cursor-pointer">
-                        <option value="semua">Semua Stan Kantin (4)</option>
-                        <option value="stan_01">Stan 01 - Barokah Rasa</option>
-                        <option value="stan_02">Stan 02 - Soto Bu Siti</option>
-                        <option value="stan_03">Stan 03 - Geprek Mas Bro</option>
-                        <option value="stan_04">Stan 04 - Aneka Jus Vokasi</option>
+                        <option value="semua">Semua Stan Kantin ({{ count($stalls ?? []) }})</option>
+                        @foreach($stalls ?? [] as $stall)
+                            <option value="stan_{{ str_pad($stall->id, 2, '0', STR_PAD_LEFT) }}">{{ $stall->stall_name }}</option>
+                        @endforeach
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-3.5 sm:right-4 flex items-center text-slate-400">
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5" stroke-width="1.5"></i>
@@ -164,9 +66,9 @@
                 <div class="relative">
                     <select x-model="selectedCategory" class="appearance-none w-full text-xs font-semibold py-2 pl-3.5 pr-11 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 cursor-pointer">
                         <option value="semua">Semua Kategori</option>
-                        <option value="makanan">Makanan Berat</option>
-                        <option value="camilan">Camilan</option>
-                        <option value="minuman">Minuman Dingin / Hangat</option>
+                        @foreach($categories ?? [] as $cat)
+                            <option value="{{ $cat->slug }}">{{ $cat->name }}</option>
+                        @endforeach
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-3.5 sm:right-4 flex items-center text-slate-400">
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5" stroke-width="1.5"></i>

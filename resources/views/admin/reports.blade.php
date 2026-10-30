@@ -6,56 +6,7 @@
 <div class="space-y-6" x-data="{
     periodFilter: 'oktober_2026',
     stallFilter: 'semua',
-    stallsRevenue: [
-        {
-            id: 1,
-            name: 'Stan 01 - Barokah Rasa',
-            location: 'Counter Barat No. 01',
-            stallImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
-            owner: 'Pak Bambang',
-            ownerImage: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
-            transactions: 1040,
-            grossRevenue: 15600000,
-            feeRent: 1000000,
-            rentStatus: 'Lunas Terverifikasi'
-        },
-        {
-            id: 2,
-            name: 'Stan 02 - Soto Bu Siti',
-            location: 'Counter Barat No. 02',
-            stallImage: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80',
-            owner: 'Bu Siti Rahayu',
-            ownerImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
-            transactions: 780,
-            grossRevenue: 11700000,
-            feeRent: 1000000,
-            rentStatus: 'Lunas Terverifikasi'
-        },
-        {
-            id: 3,
-            name: 'Stan 03 - Geprek Mas Bro',
-            location: 'Counter Timur No. 01',
-            stallImage: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80',
-            owner: 'Mas Hendra',
-            ownerImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-            transactions: 620,
-            grossRevenue: 9920000,
-            feeRent: 1000000,
-            rentStatus: 'Lunas Terverifikasi'
-        },
-        {
-            id: 4,
-            name: 'Stan 04 - Aneka Jus Vokasi',
-            location: 'Counter Timur No. 02',
-            stallImage: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-            owner: 'Bu Dian Fitri',
-            ownerImage: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80',
-            transactions: 800,
-            grossRevenue: 11530000,
-            feeRent: 1000000,
-            rentStatus: 'Lunas Terverifikasi'
-        }
-    ],
+    stallsRevenue: {{ Js::from($stallsRevenue ?? []) }},
 
     formatRupiah(num) {
         return 'Rp ' + Number(num).toLocaleString('id-ID');
@@ -98,28 +49,28 @@
             <!-- Card 1: Omzet Bruto Keseluruhan -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Omzet Bruto Keseluruhan</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp 48.750.000</span>
-                <span class="text-[10px] text-slate-500 block mt-0.5">+8.2% dari September 2026</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp {{ number_format($totalOmset ?? 0, 0, ',', '.') }}</span>
+                <span class="text-[10px] text-slate-500 block mt-0.5">Akumulasi seluruh stan</span>
             </div>
 
             <!-- Card 2: Total Transaksi Selesai -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Total Transaksi Selesai</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">3.240 Pesanan</span>
-                <span class="text-[10px] text-slate-500 block mt-0.5">108 transaksi / hari</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">{{ number_format($totalTransactions ?? 0, 0, ',', '.') }} Pesanan</span>
+                <span class="text-[10px] text-slate-500 block mt-0.5">Volume pesanan valid</span>
             </div>
 
             <!-- Card 3: Penerimaan Sewa Counter -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Penerimaan Sewa Counter</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp 4.000.000</span>
-                <span class="text-[10px] text-slate-500 block mt-0.5">100% Lunas (4 Stan)</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp {{ number_format($totalFee ?? 0, 0, ',', '.') }}</span>
+                <span class="text-[10px] text-slate-500 block mt-0.5">100% Lunas ({{ count($stallsRevenue ?? []) }} Stan)</span>
             </div>
 
             <!-- Card 4: Rata-rata Nilai Belanja -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
                 <span class="text-[11px] font-medium text-slate-500 block">Rata-rata Nilai Belanja</span>
-                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp 15.046</span>
+                <span class="text-lg font-semibold text-slate-900 block mt-0.5">Rp {{ number_format($totalTransactions ? round(($totalOmset ?? 0) / $totalTransactions) : 0, 0, ',', '.') }}</span>
                 <span class="text-[10px] text-slate-500 block mt-0.5">Ramah kantong mahasiswa</span>
             </div>
         </div>

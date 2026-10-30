@@ -4,155 +4,16 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
-    searchQuery: '',
-    selectedCategory: 'semua',
+    searchQuery: '{{ $initialSearch }}',
+    selectedCategory: '{{ $initialCategory }}',
     selectedStall: 'semua',
     detailModalOpen: false,
     selectedMenu: null,
     itemNotes: '',
     detailQty: 1,
 
-    categories: [
-        { id: 'semua', label: 'Semua Menu' },
-        { id: 'makanan', label: 'Makanan Berat' },
-        { id: 'camilan', label: 'Camilan & Gorengan' },
-        { id: 'minuman', label: 'Minuman Dingin' },
-        { id: 'kopi', label: 'Kopi & Teh' },
-        { id: 'paket', label: 'Paket Hemat Mahasiswa' }
-    ],
-
-    menus: [
-        {
-            id: 101,
-            name: 'Ayam Geprek Sambal Bawang Level 3',
-            category: 'makanan',
-            seller: 'Stan 01 - Barokah Rasa',
-            sellerKey: 'barokah',
-            price: 13000,
-            stock: 14,
-            prepTime: '7 Menit',
-            image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80',
-            description: 'Daging ayam segar renyah dengan balutan tepung bumbu khas, diulek langsung bersama cabai rawit merah dan bawang putih segar.',
-            tags: ['Pedas', 'Gurih', 'Nasi Putih']
-        },
-        {
-            id: 102,
-            name: 'Ayam Penyet Sambal Ijo Padang',
-            category: 'makanan',
-            seller: 'Stan 01 - Barokah Rasa',
-            sellerKey: 'barokah',
-            price: 14000,
-            stock: 9,
-            prepTime: '8 Menit',
-            image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80',
-            description: 'Ayam ungkep bumbu rempah kuning digoreng garing dengan siraman sambal cabe ijo khas Minang yang gurih pedas nikmat.',
-            tags: ['Pedas Segar', 'Ayam Ungkep']
-        },
-        {
-            id: 103,
-            name: 'Soto Ayam Lamongan Lengkap Koya',
-            category: 'makanan',
-            seller: 'Stan 02 - Soto Bu Siti',
-            sellerKey: 'soto',
-            price: 14000,
-            stock: 11,
-            prepTime: '5 Menit',
-            image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80',
-            description: 'Kuah soto kuning gurih beraroma kaldu ayam kampung, suwiran daging ayam, soun lembut, tauge, daun seledri, dan bubuk koya gurih.',
-            tags: ['Berkuah Hangat', 'Koya Gurih']
-        },
-        {
-            id: 104,
-            name: 'Rawon Daging Sapi Kuah Hitam',
-            category: 'makanan',
-            seller: 'Stan 02 - Soto Bu Siti',
-            sellerKey: 'soto',
-            price: 18000,
-            stock: 6,
-            prepTime: '6 Menit',
-            image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
-            description: 'Potongan daging sapi empuk dalam kuah kluwek hitam gurih khas Jawa Timur, disajikan lengkap bersama tauge pendek segar dan sambal terasi.',
-            tags: ['Daging Sapi', 'Khas Jatim']
-        },
-        {
-            id: 105,
-            name: 'Nasi Goreng Spesial Telur Ceplok',
-            category: 'makanan',
-            seller: 'Stan 03 - Geprek Mas Bro',
-            sellerKey: 'geprek',
-            price: 12000,
-            stock: 18,
-            prepTime: '7 Menit',
-            image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=600&q=80',
-            description: 'Nasi goreng harum beraroma wok dengan kecap manis bango, bumbu bawang, irisan baso, suwiran ayam, dan telur ceplok setengah matang.',
-            tags: ['Wok Aroma', 'Porsi Pas']
-        },
-        {
-            id: 106,
-            name: 'Kentang Goreng Krispi French Fries',
-            category: 'camilan',
-            seller: 'Stan 03 - Geprek Mas Bro',
-            sellerKey: 'geprek',
-            price: 8000,
-            stock: 15,
-            prepTime: '4 Menit',
-            image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80',
-            description: 'Kentang potong garing bertabur bumbu keju manis atau balado gurih, cocok untuk camilan santai saat menunggu jadwal kuliah.',
-            tags: ['Camilan Garing', 'Tabur Bumbu']
-        },
-        {
-            id: 107,
-            name: 'Es Teh Manis Jumbo Vokasi',
-            category: 'minuman',
-            seller: 'Stan 04 - Aneka Jus Vokasi',
-            sellerKey: 'minuman',
-            price: 4000,
-            stock: 40,
-            prepTime: '2 Menit',
-            image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-            description: 'Teh melati seduh segar dengan gula asli dan es batu melimpah. Ukuran cup jumbo 22 oz yang bikin dahaga langsung hilang.',
-            tags: ['Dingin Segar', 'Paling Murah']
-        },
-        {
-            id: 108,
-            name: 'Jus Alpukat Kental Susu Cokelat',
-            category: 'minuman',
-            seller: 'Stan 04 - Aneka Jus Vokasi',
-            sellerKey: 'minuman',
-            price: 10000,
-            stock: 8,
-            prepTime: '4 Menit',
-            image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=600&q=80',
-            description: 'Alpukat mentega matang pilihan diblender lembut dengan kental manis cokelat di sekeliling gelas.',
-            tags: ['Kental', 'Buah Segar']
-        },
-        {
-            id: 109,
-            name: 'Kopi Susu Gula Aren Ketintang',
-            category: 'kopi',
-            seller: 'Stan 04 - Aneka Jus Vokasi',
-            sellerKey: 'minuman',
-            price: 9000,
-            stock: 0,
-            prepTime: '3 Menit',
-            image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80',
-            description: 'Perpaduan biji kopi robusta nusantara, susu segar creamy, dan manisnya sirup aren murni asli Tuban.',
-            tags: ['Kopi Hits', 'Stok Habis']
-        },
-        {
-            id: 110,
-            name: 'Paket Kenyang Hemat: Nasi Ayam + Es Teh',
-            category: 'paket',
-            seller: 'Stan 01 - Barokah Rasa',
-            sellerKey: 'barokah',
-            price: 15000,
-            stock: 12,
-            prepTime: '6 Menit',
-            image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=600&q=80',
-            description: 'Solusi tanggal tua mahasiswa: 1 porsi Nasi Ayam Geprek / Penyet komplit dengan 1 cup Es Teh Manis Jumbo.',
-            tags: ['Paling Hemat', 'Komplit']
-        }
-    ],
+    categories: {{ json_encode($categories) }},
+    menus: {{ json_encode($menus) }},
 
     openDetail(menu) {
         this.selectedMenu = menu;
@@ -163,8 +24,8 @@
 
     get filteredMenus() {
         return this.menus.filter(m => {
-            const matchSearch = this.searchQuery === '' || 
-                m.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+            const matchSearch = this.searchQuery === '' ||
+                m.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                 m.seller.toLowerCase().includes(this.searchQuery.toLowerCase());
             const matchCat = this.selectedCategory === 'semua' || m.category === this.selectedCategory;
             const matchStall = this.selectedStall === 'semua' || m.sellerKey === this.selectedStall;
@@ -184,10 +45,9 @@
             <div class="relative inline-block">
                 <select x-model="selectedStall" class="appearance-none text-xs font-semibold py-2 pl-3.5 pr-9 rounded-xl border border-slate-200 bg-white text-slate-700 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 shadow-2xs cursor-pointer transition">
                     <option value="semua">Semua Stan Kantin</option>
-                    <option value="barokah">Stan 01 - Barokah Rasa</option>
-                    <option value="soto">Stan 02 - Soto Bu Siti</option>
-                    <option value="geprek">Stan 03 - Geprek Mas Bro</option>
-                    <option value="minuman">Stan 04 - Aneka Jus Vokasi</option>
+                    @foreach($stalls as $stall)
+                        <option value="{{ $stall->slug }}">{{ $stall->stall_name }}</option>
+                    @endforeach
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
                     <i data-lucide="chevron-down" class="w-4 h-4"></i>

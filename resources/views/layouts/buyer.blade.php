@@ -510,7 +510,7 @@
                     if (!this.items || this.items.length === 0) {
                         this.items = [
                             {
-                                id: 101,
+                                id: 1,
                                 name: 'Ayam Geprek Sambal Bawang Level 3',
                                 price: 13000,
                                 seller: 'Stan 01 - Barokah Rasa',
@@ -518,12 +518,12 @@
                                 qty: 1
                             },
                             {
-                                id: 107,
-                                name: 'Es Teh Manis Jumbo Vokasi',
-                                price: 4000,
+                                id: 10,
+                                name: 'Paket Kenyang Hemat: Nasi Ayam + Es Teh',
+                                price: 15000,
                                 seller: 'Stan 01 - Barokah Rasa',
-                                image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-                                qty: 2
+                                image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=600&q=80',
+                                qty: 1
                             }
                         ];
                         this.currentSeller = 'Stan 01 - Barokah Rasa';

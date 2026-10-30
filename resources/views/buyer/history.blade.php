@@ -8,71 +8,7 @@
     receiptModalOpen: false,
     selectedOrder: null,
 
-    orders: [
-        {
-            id: 'NC-20261021-8842',
-            date: '21 Okt 2026, 12:30 WIB',
-            stall: 'Stan 01 - Barokah Rasa',
-            stallImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=120&q=80',
-            status: 'Sedang Dimasak di Dapur',
-            statusCode: 'diproses',
-            total: 17000,
-            table: 'Meja 08',
-            type: 'Makan di Tempat',
-            paymentMethod: 'QRIS Statis Stan (Lunas)',
-            items: [
-                { name: 'Ayam Geprek Sambal Korek', qty: 1, price: 13000 },
-                { name: 'Es Teh Manis Jumbo Vokasi', qty: 1, price: 4000 }
-            ]
-        },
-        {
-            id: 'NC-20261020-4412',
-            date: '20 Okt 2026, 13:15 WIB',
-            stall: 'Stan 02 - Soto Bu Siti',
-            stallImage: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=120&q=80',
-            status: 'Pesanan Selesai',
-            statusCode: 'selesai',
-            total: 18000,
-            table: 'Meja 14',
-            type: 'Makan di Tempat',
-            paymentMethod: 'QRIS Statis Stan (Lunas)',
-            items: [
-                { name: 'Soto Ayam Lamongan Lengkap Koya', qty: 1, price: 14000 },
-                { name: 'Es Teh Manis Jumbo Vokasi', qty: 1, price: 4000 }
-            ]
-        },
-        {
-            id: 'NC-20261019-1092',
-            date: '19 Okt 2026, 11:45 WIB',
-            stall: 'Stan 03 - Geprek Mas Bro',
-            stallImage: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=120&q=80',
-            status: 'Pesanan Selesai',
-            statusCode: 'selesai',
-            total: 20000,
-            table: '-',
-            type: 'Bawa Pulang (Takeaway)',
-            paymentMethod: 'QRIS Statis Stan (Lunas)',
-            items: [
-                { name: 'Nasi Goreng Spesial Telur Ceplok', qty: 1, price: 12000 },
-                { name: 'Kentang Goreng Krispi French Fries', qty: 1, price: 8000 }
-            ]
-        },
-        {
-            id: 'NC-20261017-0841',
-            date: '17 Okt 2026, 09:10 WIB',
-            stall: 'Stan 04 - Aneka Jus Vokasi',
-            stallImage: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=120&q=80',
-            status: 'Pesanan Selesai',
-            statusCode: 'selesai',
-            total: 10000,
-            table: 'Meja 03',
-            type: 'Makan di Tempat',
-            paymentMethod: 'QRIS Statis Stan (Lunas)',
-            items: [
-                { name: 'Jus Alpukat Kental Susu Cokelat', qty: 1, price: 10000 }
-            ]
-        }
-    ],
+    orders: {{ json_encode($orders) }},
 
     openReceipt(order) {
         this.selectedOrder = order;

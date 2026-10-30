@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto space-y-6" x-data="{
-    orderId: 'NC-20261021-8842',
-    nominal: 17000,
-    merchantName: 'Stan 01 - Barokah Rasa',
+    orderId: '{{ $order->order_number }}',
+    nominal: {{ (int) $order->total }},
+    merchantName: '{{ addslashes($order->seller->stall_name ?? 'Stan Kantin') }}',
     copiedOrder: false,
     copiedNominal: false,
 
@@ -82,7 +82,7 @@
         <!-- Full QRIS Image Container -->
         <div class="max-w-md mx-auto p-3 sm:p-4 rounded-2xl border border-slate-200 bg-slate-50/40">
             <div class="bg-white p-2 sm:p-3 rounded-xl border border-slate-200/80 shadow-xs">
-                <img src="{{ asset('images/qris.jpeg') }}" 
+                <img src="{{ $order->seller->qris?->image_path ? asset($order->seller->qris->image_path) : asset('images/qris.jpeg') }}" 
                      alt="Kode QRIS Pembayaran NesaCourt" 
                      class="w-full h-auto object-contain mx-auto rounded-lg">
             </div>
@@ -90,8 +90,8 @@
 
         <!-- Download Action -->
         <div class="flex justify-center">
-            <a href="{{ asset('images/qris.jpeg') }}" 
-               download="qris-stan-nesacourt.jpeg" 
+            <a href="{{ $order->seller->qris?->image_path ? asset($order->seller->qris->image_path) : asset('images/qris.jpeg') }}" 
+               download="qris-stan-{{ $order->order_number }}.jpeg" 
                class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
                 <span>Unduh Gambar QRIS</span>
@@ -105,21 +105,24 @@
                 <span>Cara Pembayaran QRIS:</span>
             </h4>
             <ol class="text-xs text-slate-600 space-y-2 list-decimal list-inside leading-relaxed">
-                <li>Buka aplikasi m-Banking (BCA, Mandiri, BRI, BNI) atau E-Wallet (GoPay, OVO, ShopeePay, DANA).</li>
-                <li>Pilih fitur <strong>Scan / Bayar QRIS</strong> lalu arahkan kamera ponsel ke gambar QRIS di atas.</li>
-                <li>Periksa nama stan penerima pada aplikasi perbankan Anda dan pastikan telah sesuai.</li>
-                <li>Ketik nominal transfer pas sebesar <strong class="text-brand-700" x-text="formatRupiah(nominal)">Rp 17.000</strong> dan selesaikan transaksi.</li>
-                <li>Simpan bukti bayar digital Anda, kemudian klik tombol konfirmasi di bawah.</li>
+                <li>Buka aplikasi Mobile Banking (BCA, BRI, BNI) atau E-Wallet (GoPay, OVO, ShopeePay, DANA).</li>
+                <li>Pilih menu <strong>Pindai / Scan QRIS</strong> dan arahkan kamera ke barcode QRIS di atas.</li>
+                <li>Pastikan nama merchant penerima dana sesuai.</li>
+                <li>Masukkan nominal transfer persis sebesar <strong class="text-brand-700" x-text="formatRupiah(nominal)">Rp 17.000</strong> tanpa biaya transaksi.</li>
+                <li>Setelah berhasil mentransfer, klik tombol konfirmasi di bawah.</li>
             </ol>
         </div>
 
-        <!-- Action Confirmation Button (Height matching addToCart) -->
+        <!-- CTA Action Buttons -->
         <div class="space-y-3 pt-2">
-            <a href="{{ url('/pesanan/status') }}" 
-               class="whitespace-nowrap w-full h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 shadow-sm transition">
-                <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                <span>Saya Sudah Membayar</span>
-            </a>
+            <form action="{{ route('buyer.payment.confirm', ['order_number' => $order->order_number]) }}" method="POST">
+                @csrf
+                <button type="submit" 
+                        class="whitespace-nowrap w-full h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 shadow-sm transition">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>Saya Sudah Membayar</span>
+                </button>
+            </form>
 
             <div class="flex items-center justify-center gap-3 text-xs text-slate-500">
                 <a href="{{ url('/checkout') }}" class="hover:text-slate-800 transition">

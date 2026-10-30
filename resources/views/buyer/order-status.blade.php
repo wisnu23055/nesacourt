@@ -4,13 +4,13 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
-    currentStep: 4, // 1: Dibuat, 2: Bayar, 3: Dikonfirmasi, 4: Dimasak, 5: Siap Diambil, 6: Selesai
-    orderId: 'NC-20261021-8842',
-    queueNo: 'A-09',
-    stallName: 'Stan 01 - Barokah Rasa',
-    stallLocation: 'Counter Barat No. 01 | Food Court Ketintang',
-    etaMinutes: 7,
-    stallImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=120&q=80',
+    currentStep: {{ $currentStep }},
+    orderId: '{{ $order?->order_number ?? 'NC-20261021-8842' }}',
+    queueNo: '{{ $order ? 'A-' . str_pad($order->id % 100, 2, '0', STR_PAD_LEFT) : 'A-09' }}',
+    stallName: '{{ addslashes($order?->seller?->stall_name ?? 'Stan 01 - Barokah Rasa') }}',
+    stallLocation: '{{ addslashes($order?->seller?->location ?? 'Counter Barat No. 01 | Food Court Ketintang') }}',
+    etaMinutes: {{ $order?->items?->first()?->menu?->estimated_time_minutes ?? 7 }},
+    stallImage: '{{ $order?->seller?->logo_path ?: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=120&q=80' }}',
 
     steps: [
         { id: 1, title: 'Pesanan Dibuat', desc: 'Data pesanan berhasil dicatat sistem' },
@@ -35,7 +35,7 @@
                         <span class="text-slate-300 font-normal">|</span>
                         <span class="text-xs font-semibold text-brand-600">Pelacakan Langsung</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: 23055310001)</p>
+                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: {{ auth()->user()->phone ?? '23055310001' }})</p>
                 </div>
             </div>
 
@@ -206,27 +206,48 @@
             <span class="text-xs font-semibold text-slate-500" x-text="stallName">Stan 01 - Barokah Rasa</span>
         </h3>
 
-        <div class="divide-y divide-slate-100 text-xs">
-            <div class="py-2.5 flex items-center justify-between">
-                <div>
-                    <span class="font-bold text-slate-800">1x Ayam Geprek Sambal Korek</span>
-                    <p class="text-[11px] text-slate-400">Catatan: Sambal pedas dipisah</p>
-                </div>
-                <span class="font-bold text-slate-900">Rp 13.000</span>
+        @if($order && $order->items->isNotEmpty())
+            <div class="divide-y divide-slate-100 text-xs">
+                @foreach($order->items as $item)
+                    <div class="py-2.5 flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-slate-800">{{ $item->quantity }}x {{ $item->menu_name_snapshot }}</span>
+                            @if($item->note)
+                                <p class="text-[11px] text-slate-400">Catatan: {{ $item->note }}</p>
+                            @endif
+                        </div>
+                        <span class="font-bold text-slate-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                    </div>
+                @endforeach
             </div>
-            <div class="py-2.5 flex items-center justify-between">
-                <div>
-                    <span class="font-bold text-slate-800">1x Es Teh Manis Jumbo Vokasi</span>
-                    <p class="text-[11px] text-slate-400">Catatan: Sedikit gula</p>
-                </div>
-                <span class="font-bold text-slate-900">Rp 4.000</span>
-            </div>
-        </div>
 
-        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
-            <span>Total Pembayaran (Lunas via QRIS)</span>
-            <span class="text-sm text-brand-700">Rp 17.000</span>
-        </div>
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
+                <span>Total Pembayaran ({{ ucfirst($order->payment_status) }} via QRIS)</span>
+                <span class="text-sm text-brand-700">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+            </div>
+        @else
+            <div class="divide-y divide-slate-100 text-xs">
+                <div class="py-2.5 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-slate-800">1x Ayam Geprek Sambal Korek</span>
+                        <p class="text-[11px] text-slate-400">Catatan: Sambal pedas dipisah</p>
+                    </div>
+                    <span class="font-bold text-slate-900">Rp 13.000</span>
+                </div>
+                <div class="py-2.5 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-slate-800">1x Es Teh Manis Jumbo Vokasi</span>
+                        <p class="text-[11px] text-slate-400">Catatan: Sedikit gula</p>
+                    </div>
+                    <span class="font-bold text-slate-900">Rp 4.000</span>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
+                <span>Total Pembayaran (Lunas via QRIS)</span>
+                <span class="text-sm text-brand-700">Rp 17.000</span>
+            </div>
+        @endif
     </div>
 
     <!-- Bottom Actions (Unified Height Matching Add to Cart) -->

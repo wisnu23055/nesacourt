@@ -4,78 +4,9 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
-    activeOrder: {
-        id: 'NC-20261021-8842',
-        stall: 'Stan 01 - Barokah Rasa',
-        status: 'Sedang Dimasak di Dapur',
-        statusDesc: 'Pesanan nomor antrean A-09 sedang disiapkan penjual',
-        progress: 65,
-        eta: '~7 Menit',
-        image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=150&q=80'
-    },
+    activeOrder: {{ $activeOrder ? json_encode($activeOrder) : 'null' }},
     budgetFilter: 'semua',
-    popularMenus: [
-        {
-            id: 1,
-            name: 'Ayam Geprek Sambal Korek',
-            price: 13000,
-            stall: 'Stan 01 Barokah',
-            sellerName: 'Stan 01 - Barokah Rasa',
-            prepTime: 'Masak ~7 menit',
-            image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80',
-            desc: 'Ayam krispi gurih digeprek sambal pedas segar disajikan dengan nasi hangat dan lalapan mentimun.'
-        },
-        {
-            id: 2,
-            name: 'Soto Ayam Lamongan Koya',
-            price: 14000,
-            stall: 'Stan 02 Soto Bu Siti',
-            sellerName: 'Stan 02 - Soto Bu Siti',
-            prepTime: 'Masak ~5 menit',
-            image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=600&q=80',
-            desc: 'Soto ayam kuah kuning hangat dengan taburan koya gurih melimpah, bihun, irisan telur, dan jeruk nipis.'
-        },
-        {
-            id: 3,
-            name: 'Es Teh Manis Jumbo Vokasi',
-            price: 4000,
-            stall: 'Stan 04 Jus Vokasi',
-            sellerName: 'Stan 04 - Jus Vokasi',
-            prepTime: 'Siap ~2 menit',
-            image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80',
-            desc: 'Teh melati racikan khas disajikan dingin dengan gelas jumbo, sangat menyegarkan saat cuaca panas.'
-        },
-        {
-            id: 4,
-            name: 'Kentang Goreng Krispi Keju',
-            price: 8000,
-            stall: 'Stan 03 Geprek Mas Bro',
-            sellerName: 'Stan 03 - Geprek Mas Bro',
-            prepTime: 'Masak ~4 menit',
-            image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80',
-            desc: 'Kentang goreng renyah bertabur bumbu keju manis gurih untuk teman nugas santai.'
-        },
-        {
-            id: 5,
-            name: 'Jus Alpukat Kental Susu Cokelat',
-            price: 10000,
-            stall: 'Stan 04 Jus Vokasi',
-            sellerName: 'Stan 04 - Jus Vokasi',
-            prepTime: 'Siap ~3 menit',
-            image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=600&q=80',
-            desc: 'Kaya nutrisi buah alpukat segar dengan susu cokelat manis, pengganjal lapar praktis di kampus.'
-        },
-        {
-            id: 6,
-            name: 'Paket Nasi Penyet + Es Teh',
-            price: 15000,
-            stall: 'Stan 01 Barokah',
-            sellerName: 'Stan 01 - Barokah Rasa',
-            prepTime: 'Masak ~6 menit',
-            image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=600&q=80',
-            desc: 'Paket komplit hemat mahasiswa: Nasi hangat, ayam goreng penyet sambal terasi dan segelas es teh manis.'
-        }
-    ],
+    popularMenus: {{ json_encode($popularMenus) }},
     get filteredMenus() {
         if (this.budgetFilter === 'semua') return this.popularMenus;
         const maxPrice = parseInt(this.budgetFilter);
@@ -92,11 +23,11 @@
                      class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Halo, Aditya Pratama</h1>
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Halo, {{ auth()->user()->name }}</h1>
                         <span class="text-slate-300 font-normal">|</span>
                         <span class="text-xs font-semibold text-brand-600">Mahasiswa</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: 23055310001)</p>
+                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: {{ auth()->user()->phone ?? '23055310001' }})</p>
                 </div>
             </div>
 
@@ -188,7 +119,7 @@
     </div>
 
     <!-- Active Ongoing Order Tracker Card (Dengan Foto Pesanan) -->
-    <div class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+    <div x-show="activeOrder" class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4">
         <!-- Section Title & Description -->
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div class="flex items-center gap-2">

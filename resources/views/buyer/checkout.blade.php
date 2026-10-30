@@ -6,21 +6,59 @@
 <div class="space-y-6" x-data="{
     serviceType: 'dine_in', // dine_in | takeaway
     tableNumber: 'Meja 08',
-    customerName: 'Aditya',
-    customerNim: '23055310001',
-    customerPhone: '081234567890',
+    customerName: '{{ addslashes(auth()->user()->name) }}',
+    customerNim: '{{ addslashes(auth()->user()->phone ?? '23055310001') }}',
+    customerPhone: '{{ addslashes(auth()->user()->phone ?? '081234567890') }}',
     orderNotes: '',
     isSubmitting: false,
 
-    submitOrder() {
+    async submitOrder() {
         if (this.serviceType === 'dine_in' && !this.tableNumber.trim()) {
             alert('Silakan masukkan nomor meja Anda di Food Court Ketintang');
             return;
         }
+        if (!this.customerName.trim()) {
+            alert('Silakan masukkan nama pemesan');
+            return;
+        }
+        if (!this.items || this.items.length === 0) {
+            alert('Keranjang belanja Anda masih kosong.');
+            return;
+        }
+
         this.isSubmitting = true;
-        setTimeout(() => {
-            window.location.href = '{{ url('/pesanan/bayar') }}';
-        }, 400);
+
+        try {
+            const payload = {
+                service_type: this.serviceType,
+                table_number: this.tableNumber,
+                customer_name: this.customerName,
+                customer_phone: this.customerPhone,
+                order_notes: this.orderNotes,
+                items: this.items.map(i => ({ id: i.id, qty: i.qty }))
+            };
+
+            const res = await fetch('{{ route('buyer.checkout.store') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                throw new Error(data.message || 'Terjadi kesalahan saat memproses pesanan.');
+            }
+
+            this.clearCart();
+            window.location.href = data.redirect;
+        } catch (err) {
+            this.isSubmitting = false;
+            alert(err.message);
+        }
     }
 }">
 

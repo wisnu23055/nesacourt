@@ -125,13 +125,16 @@
             </form>
 
             <div class="flex items-center justify-center gap-3 text-xs text-slate-500">
-                <a href="{{ url('/checkout') }}" class="hover:text-slate-800 transition">
-                    Ubah Data Pesanan
+                <a href="{{ url('/katalog') }}" class="hover:text-slate-800 transition">
+                    Kembali ke Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <a href="{{ url('/dashboard') }}" class="text-rose-600 hover:text-rose-700 transition">
-                    Batalkan Transaksi
-                </a>
+                <form action="{{ route('buyer.order.cancel', ['order_number' => $order->order_number]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini? Stok porsi menu akan dikembalikan.')" class="inline">
+                    @csrf
+                    <button type="submit" class="text-rose-600 hover:text-rose-700 font-semibold transition cursor-pointer">
+                        Batalkan Pesanan
+                    </button>
+                </form>
             </div>
         </div>
 

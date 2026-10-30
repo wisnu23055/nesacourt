@@ -39,6 +39,7 @@ Route::middleware(['auth', 'role:buyer,admin'])->group(function () {
     Route::post('/checkout', [BuyerController::class, 'storeOrder'])->name('buyer.checkout.store');
     Route::get('/pesanan/bayar', [BuyerController::class, 'payment'])->name('buyer.payment');
     Route::post('/pesanan/{order_number}/konfirmasi-bayar', [BuyerController::class, 'confirmPayment'])->name('buyer.payment.confirm');
+    Route::post('/pesanan/{order_number}/batal', [BuyerController::class, 'cancelOrder'])->name('buyer.order.cancel');
     Route::get('/pesanan/status', [BuyerController::class, 'orderStatus'])->name('buyer.order-status');
     Route::get('/riwayat', [BuyerController::class, 'history'])->name('buyer.history');
     Route::get('/profil', [BuyerController::class, 'profile'])->name('buyer.profile');

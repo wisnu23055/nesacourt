@@ -64,4 +64,40 @@ class BuyerTest extends TestCase
         $this->actingAs($buyer)->get('/riwayat')->assertStatus(200);
         $this->actingAs($buyer)->get('/profil')->assertStatus(200);
     }
+
+    // ponytail: test pembatalan dan rollback kuantitas stok menu (Blueprint B-15)
+    public function test_buyer_order_cancel_restores_stock(): void
+    {
+        $buyer = User::where('role', 'buyer')->first();
+        $menu = Menu::where('is_active', true)->where('stock', '>=', 2)->first();
+        $initialStock = $menu->stock;
+
+        // 1. Checkout 1 item
+        $response = $this->actingAs($buyer)->postJson('/checkout', [
+            'service_type' => 'dine_in',
+            'table_number' => 'Meja 12',
+            'customer_name' => $buyer->name,
+            'customer_phone' => $buyer->phone,
+            'items' => [
+                ['id' => $menu->id, 'qty' => 1],
+            ],
+        ]);
+        $orderNumber = $response->json('order_number');
+        $this->assertEquals($initialStock - 1, $menu->fresh()->stock);
+
+        // 2. Batalkan pesanan
+        $cancelResponse = $this->actingAs($buyer)->post("/pesanan/{$orderNumber}/batal");
+        $cancelResponse->assertRedirect(route('buyer.history'));
+
+        // 3. Verifikasi stok porsi kembali utuh
+        $this->assertEquals($initialStock, $menu->fresh()->stock);
+
+        $order = Order::where('order_number', $orderNumber)->first();
+        $this->assertEquals('dibatalkan', $order->order_status);
+        $this->assertEquals('dibatalkan', $order->payment_status);
+
+        // 4. Verifikasi proteksi rollback ganda
+        $this->assertFalse($order->cancelAndRestoreStock());
+        $this->assertEquals($initialStock, $menu->fresh()->stock);
+    }
 }

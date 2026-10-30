@@ -1,6 +1,6 @@
 @extends('layouts.buyer')
 
-@section('title', 'Status Pesanan — NesaCourt')
+@section('title', 'Status Pesanan - NesaCourt')
 
 @section('content')
 <div class="space-y-6" x-data="{
@@ -19,10 +19,36 @@
         { id: 4, title: 'Sedang Dimasak', desc: 'Dapur stan menyiapkan porsi pesanan' },
         { id: 5, title: 'Siap Diambil', desc: 'Pesanan siap di counter stan' },
         { id: 6, title: 'Selesai', desc: 'Pesanan telah diterima mahasiswa' }
-    ]
-}">
+    ],
+
+    initPolling() {
+        @if($order && !in_array($order->order_status, ['selesai', 'dibatalkan']))
+        setInterval(() => {
+            window.location.reload();
+        }, 12000);
+        @endif
+    }
+}" x-init="initPolling()">
 
     <!-- Top Identity Card (Identik dengan Tema Dashboard & Halaman Buyer Lainnya) -->
+    @if($order && $order->order_status === 'dibatalkan')
+    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <i data-lucide="x-circle" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <span class="text-sm font-bold text-rose-900 block">Pesanan Telah Dibatalkan</span>
+                <p class="text-xs text-rose-700 mt-0.5">Transaksi ini dibatalkan dan seluruh stok porsi menu telah otomatis dikembalikan ke etalase stan.</p>
+            </div>
+        </div>
+        <a href="{{ url('/katalog') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-xl bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition">
+            <span>Pesan Menu Baru</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+    </div>
+    @endif
+
     <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-5">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div class="flex items-center gap-3.5">
@@ -252,18 +278,28 @@
 
     <!-- Bottom Actions (Unified Height Matching Add to Cart) -->
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-        <a href="{{ url('/riwayat') }}" class="whitespace-nowrap w-full sm:w-auto h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition shadow-2xs">
+        <a href="{{ url('/riwayat') }}" 
+           class="whitespace-nowrap w-full sm:w-auto h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition shadow-2xs">
             <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
-            <span>Lihat Struk Digital</span>
+            <span>Buka Riwayat & Struk Digital</span>
         </a>
 
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-            <a href="{{ url('/katalog') }}" class="whitespace-nowrap w-full sm:w-auto h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 shadow-sm transition">
+        <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+            @if($order && $order->order_status === 'dibuat' && $order->payment_status === 'menunggu')
+            <form action="{{ route('buyer.order.cancel', ['order_number' => $order->order_number]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini? Stok menu akan dikembalikan.')" class="w-full sm:w-auto">
+                @csrf
+                <button type="submit" class="whitespace-nowrap w-full sm:w-auto h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs font-semibold hover:bg-rose-100 transition cursor-pointer">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
+                    <span>Batalkan Pesanan</span>
+                </button>
+            </form>
+            @endif
+
+            <a href="{{ url('/katalog') }}" 
+               class="whitespace-nowrap w-full sm:w-auto h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 shadow-sm transition">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                 <span>Pesan Menu Lain</span>
             </a>
         </div>
     </div>
-
-</div>
 @endsection

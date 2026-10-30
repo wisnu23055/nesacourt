@@ -24,13 +24,20 @@ class AdminTest extends TestCase
             ]);
         }
 
-        $buyerUser = User::where('role', 'pembeli')->first();
+        $buyerUser = User::where('role', 'buyer')->first();
+        if (!$buyerUser) {
+            $buyerUser = User::create([
+                'name' => 'Mahasiswa Test Admin Auth',
+                'email' => 'mhs.adminauth@nesacourt.ac.id',
+                'phone' => '08999999993',
+                'role' => 'buyer',
+                'password' => bcrypt('password123'),
+            ]);
+        }
 
         // 1. Authorization check: buyer cannot access admin dashboard
-        if ($buyerUser) {
-            $response = $this->actingAs($buyerUser)->get('/admin/dashboard');
-            $response->assertStatus(403);
-        }
+        $response = $this->actingAs($buyerUser)->get('/admin/dashboard');
+        $response->assertStatus(403);
 
         // 2. Admin Dashboard (F-25)
         $response = $this->actingAs($adminUser)->get('/admin/dashboard');

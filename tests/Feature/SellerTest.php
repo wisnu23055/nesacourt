@@ -149,4 +149,51 @@ class SellerTest extends TestCase
         $order->delete();
         $createdMenu->delete();
     }
+
+    // ponytail: test pembatalan oleh penjual dan rollback stok porsi (Blueprint B-15)
+    public function test_seller_cancel_order_restores_stock(): void
+    {
+        $sellerUser = User::where('email', 'barokah@nesacourt.ac.id')->firstOrFail();
+        $seller = $sellerUser->sellerProfile;
+        $menu = Menu::where('seller_id', $seller->id)->where('stock', '>=', 2)->firstOrFail();
+        $initialStock = $menu->stock;
+
+        $buyerUser = User::where('role', 'buyer')->first() ?? $sellerUser;
+        $order = Order::create([
+            'order_number' => 'NC-TEST-' . strtoupper(substr(uniqid(), -6)),
+            'seller_id' => $seller->id,
+            'buyer_id' => $buyerUser->id,
+            'customer_name' => 'Test Pembeli Batal Seller',
+            'order_status' => 'diterima',
+            'payment_status' => 'menunggu',
+            'subtotal' => $menu->price,
+            'total' => $menu->price,
+        ]);
+        OrderItem::create([
+            'order_id' => $order->id,
+            'menu_id' => $menu->id,
+            'menu_name_snapshot' => $menu->name,
+            'menu_price_snapshot' => $menu->price,
+            'quantity' => 1,
+            'subtotal' => $menu->price,
+        ]);
+        $menu->decrement('stock', 1);
+        $this->assertEquals($initialStock - 1, $menu->fresh()->stock);
+
+        // Seller membatalkan pesanan
+        $response = $this->actingAs($sellerUser)->postJson('/penjual/pesanan/' . $order->order_number . '/status', [
+            'order_status' => 'dibatalkan',
+        ]);
+        $response->assertStatus(200);
+
+        // Verifikasi stok kembali dan status dibatalkan
+        $this->assertEquals($initialStock, $menu->fresh()->stock);
+        $this->assertEquals('dibatalkan', $order->fresh()->order_status);
+        $this->assertEquals('dibatalkan', $order->fresh()->payment_status);
+
+        // Cleanup
+        $order->items()->delete();
+        $order->statusLogs()->delete();
+        $order->delete();
+    }
 }

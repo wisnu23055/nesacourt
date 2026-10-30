@@ -422,6 +422,17 @@ class SellerController extends Controller
         $oldStatus = $order->order_status;
         $newStatus = $validated['order_status'];
 
+        // ponytail: jika dibatalkan oleh penjual, rollback stok via method atomik model Order
+        if ($newStatus === 'dibatalkan') {
+            $order->cancelAndRestoreStock(Auth::id(), 'seller', 'Pesanan dibatalkan oleh pihak stan kantin.');
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => true, 'order_status' => 'dibatalkan']);
+            }
+
+            return back()->with('success', 'Pesanan dibatalkan dan stok porsi telah dikembalikan.');
+        }
+
         $updateData = ['order_status' => $newStatus];
         if ($newStatus === 'selesai' || $newStatus === 'diproses') {
             if ($order->payment_status === 'perlu_pemeriksaan') {

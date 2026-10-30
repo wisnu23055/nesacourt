@@ -355,6 +355,13 @@ class BuyerController extends Controller
             return redirect()->route('buyer.catalog');
         }
 
+        // ponytail: periksa kedaluwarsa batas waktu pembayaran (Blueprint B-15)
+        if ($order->payment_deadline && now()->greaterThan($order->payment_deadline) && $order->order_status === 'dibuat' && $order->payment_status === 'menunggu') {
+            $order->cancelAndRestoreStock(null, 'system', 'Batas waktu pembayaran QRIS 15 menit telah habis.');
+
+            return redirect()->route('buyer.history')->with('error', 'Batas waktu pembayaran 15 menit telah habis. Pesanan otomatis dibatalkan.');
+        }
+
         return view('buyer.payment', [
             'order' => $order,
         ]);
@@ -392,6 +399,26 @@ class BuyerController extends Controller
     }
 
     /**
+     * Pembatalan Pesanan oleh Pembeli (Blueprint B-15 & Keputusan Terbuka No. 3-4)
+     */
+    public function cancelOrder(Request $request, string $order_number): RedirectResponse
+    {
+        $user = Auth::user();
+        $order = Order::where('order_number', $order_number)
+            ->where('buyer_id', $user->id)
+            ->firstOrFail();
+
+        // Pembeli hanya boleh membatalkan jika pesanan baru dibuat dan belum diverifikasi/dibayar
+        if ($order->order_status !== 'dibuat' || $order->payment_status !== 'menunggu') {
+            return back()->with('error', 'Pesanan yang sedang diproses atau sudah dibayar tidak dapat dibatalkan.');
+        }
+
+        $order->cancelAndRestoreStock($user->id, 'buyer', 'Dibatalkan oleh pembeli sebelum pembayaran.');
+
+        return redirect()->route('buyer.history')->with('success', 'Pesanan berhasil dibatalkan dan kuantitas stok telah dikembalikan.');
+    }
+
+    /**
      * F-12: Pelacakan Status Real-time
      */
     public function orderStatus(Request $request): View
@@ -412,6 +439,12 @@ class BuyerController extends Controller
                 ->where('buyer_id', $user->id)
                 ->latest()
                 ->first();
+        }
+
+        // ponytail: periksa kedaluwarsa batas waktu pembayaran pada halaman status (Blueprint B-15)
+        if ($order && $order->payment_deadline && now()->greaterThan($order->payment_deadline) && $order->order_status === 'dibuat' && $order->payment_status === 'menunggu') {
+            $order->cancelAndRestoreStock(null, 'system', 'Batas waktu pembayaran QRIS 15 menit telah habis.');
+            $order->refresh();
         }
 
         $currentStep = 1;

@@ -80,10 +80,6 @@
                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs relative"
                          :class="step >= 1 ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'">
                         <i data-lucide="check" class="w-4 h-4 text-white"></i>
-                        <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5" x-show="step === 1">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-500"></span>
-                        </span>
                     </div>
                     <span class="text-xs font-bold mt-2 text-slate-900">Menunggu Verifikasi</span>
                     <span class="text-[10px] text-slate-400">11:42 WIB</span>
@@ -94,10 +90,6 @@
                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs relative"
                          :class="step >= 2 ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'">
                         <i data-lucide="flame" class="w-4 h-4" :class="step >= 2 ? 'text-white' : 'text-slate-400'"></i>
-                        <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5" x-show="step === 2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-500"></span>
-                        </span>
                     </div>
                     <span class="text-xs font-bold mt-2" :class="step >= 2 ? 'text-slate-900' : 'text-slate-400'">Sedang Dimasak</span>
                     <span class="text-[10px] text-slate-400">11:43 WIB</span>
@@ -108,10 +100,6 @@
                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs relative"
                          :class="step >= 3 ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'">
                         <i data-lucide="bell" class="w-4 h-4" :class="step >= 3 ? 'text-white' : 'text-slate-400'"></i>
-                        <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5" x-show="step === 3">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-500"></span>
-                        </span>
                     </div>
                     <span class="text-xs font-bold mt-2" :class="step >= 3 ? 'text-slate-900' : 'text-slate-400'">Siap Diambil</span>
                     <span class="text-[10px] text-slate-400">Estimasi 11:53 WIB</span>
@@ -122,10 +110,6 @@
                     <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs relative"
                          :class="step >= 4 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'">
                         <i data-lucide="check-check" class="w-4 h-4" :class="step >= 4 ? 'text-white' : 'text-slate-400'"></i>
-                        <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5" x-show="step === 4">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                        </span>
                     </div>
                     <span class="text-xs font-bold mt-2" :class="step >= 4 ? 'text-emerald-700' : 'text-slate-400'">Pesanan Selesai</span>
                     <span class="text-[10px] text-slate-400">Diserahkan</span>
@@ -239,11 +223,8 @@
                         <h2 class="text-sm font-bold text-slate-900">Verifikasi Pembayaran QRIS</h2>
                     </div>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold {{ $order->payment_status === 'terkonfirmasi' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200' }} border">
-                        <span class="relative flex h-1.5 w-1.5">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $order->payment_status === 'terkonfirmasi' ? 'bg-emerald-400' : 'bg-amber-400' }} opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 {{ $order->payment_status === 'terkonfirmasi' ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
-                        </span>
-                        {{ ucfirst($order->payment_status) }}
+                        <span class="inline-block h-1.5 w-1.5 rounded-full {{ $order->payment_status === 'terkonfirmasi' ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
+                        {{ ucwords(str_replace('_', ' ', $order->payment_status)) }}
                     </span>
                 </div>
 

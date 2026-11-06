@@ -23,24 +23,12 @@
             <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
             <span class="text-slate-900 font-semibold">Audit Transaksi</span>
         </div>
-        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-            <div>
-                <div class="flex items-center gap-2.5">
-                    <i data-lucide="file-check" class="w-6 h-6 text-slate-900 shrink-0"></i>
-                    <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Detail Pesanan & Audit Transaksi</h1>
-                </div>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1">Audit rincian transaksi nomor {{ $order?->order_number ?? '-' }}, validasi pembayaran QRIS statis kantin, dan kepatuhan waktu pelayanan.</p>
+        <div>
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="file-check" class="w-6 h-6 text-slate-900 shrink-0"></i>
+                <h1 class="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">Detail Pesanan & Audit Transaksi</h1>
             </div>
-
-            <!-- Tombol Cetak: Di Mobile di Bawah Deskripsi, di Desktop di Kanan Atas -->
-            <div class="pt-1 sm:pt-0 shrink-0">
-                <button type="button" 
-                        @click="printAudit()" 
-                        class="w-full sm:w-auto whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition shadow-2xs">
-                    <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-900"></i>
-                    <span>Cetak Lembar Audit</span>
-                </button>
-            </div>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Audit rincian transaksi nomor {{ $order?->order_number ?? '-' }}, validasi pembayaran QRIS statis kantin, dan kepatuhan waktu pelayanan.</p>
         </div>
     </div>
 
@@ -89,9 +77,15 @@
             </div>
 
             <div class="flex items-center gap-3.5">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
-                     alt="Foto Mahasiswa" 
-                     class="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-200 shrink-0">
+                @if($order->buyer?->avatar_url)
+                    <img src="{{ $order->buyer->avatar_url }}" 
+                         alt="{{ $order->buyer?->name ?? 'Foto Mahasiswa' }}" 
+                         class="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
+                @else
+                    <div class="w-14 h-14 rounded-2xl bg-slate-200 text-slate-700 font-bold text-base flex items-center justify-center shrink-0 ring-1 ring-slate-200 shadow-2xs">
+                        {{ $order->buyer?->initials ?? 'M' }}
+                    </div>
+                @endif
                 <div class="space-y-0.5">
                     <h4 class="text-sm font-bold text-slate-900">{{ $order->buyer?->name ?? 'Mahasiswa UNESA' }}</h4>
                     <p class="text-xs text-slate-500">NIM/Kontak: {{ $order->buyer?->phone ?? '-' }}</p>
@@ -109,9 +103,19 @@
             </div>
 
             <div class="flex items-center gap-3.5">
-                <img src="{{ $order->seller?->logo_path ? asset('storage/' . $order->seller->logo_path) : 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80' }}" 
-                     alt="Foto Pemilik Stan" 
-                     class="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-200 shrink-0">
+                @if($order->seller?->logo_url)
+                    <img src="{{ $order->seller->logo_url }}" 
+                         alt="{{ $order->seller?->stall_name ?? 'Foto Stan' }}" 
+                         class="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
+                @elseif($order->seller?->user?->avatar_url)
+                    <img src="{{ $order->seller->user->avatar_url }}" 
+                         alt="{{ $order->seller?->user?->name ?? 'Foto Pemilik' }}" 
+                         class="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
+                @else
+                    <div class="w-14 h-14 rounded-2xl bg-slate-200 text-slate-700 font-bold text-base flex items-center justify-center shrink-0 ring-1 ring-slate-200 shadow-2xs">
+                        {{ $order->seller?->initials ?? 'ST' }}
+                    </div>
+                @endif
                 <div class="space-y-0.5">
                     <h4 class="text-sm font-bold text-slate-900">{{ $order->seller?->user?->name ?? 'Pengelola Stan' }}</h4>
                     <p class="text-xs text-slate-500">{{ $order->seller?->stall_name ?? 'Stan Kantin' }}</p>
@@ -136,7 +140,7 @@
             @forelse($order->items as $item)
             <div class="py-3 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3 min-w-0">
-                    <img src="{{ $item->menu?->image_path ? asset('storage/' . $item->menu->image_path) : 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80' }}" 
+                    <img src="{{ $item->menu?->image_url ?? 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80' }}" 
                          alt="{{ $item->menu_name_snapshot }}" 
                          class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
                     <div>
@@ -162,8 +166,8 @@
                 <span class="font-semibold text-emerald-600">Gratis (Rp 0)</span>
             </div>
             <div class="flex justify-between text-slate-900 font-bold text-sm pt-2 border-t border-slate-100">
-                <span>Total Audit Pembayaran</span>
-                <span class="text-base text-brand-700">Rp {{ number_format($order->total, 0, ',', '.') }} ({{ ucfirst($order->payment_status) }})</span>
+                <span>Total Pembayaran</span>
+                <span class="text-base text-brand-700">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>
@@ -177,19 +181,6 @@
         <p class="text-xs text-emerald-800 leading-relaxed">
             Transaksi ini telah tervalidasi menggunakan QRIS Statis resmi {{ $order->seller?->stall_name ?? 'Stan Kantin' }}. Dana masuk langsung ke rekening pedagang tanpa potongan biaya admin, dan diverifikasi langsung oleh kasir stan pada saat penyerahan pesanan di meja counter.
         </p>
-    </div>
-
-    <!-- Actions Row -->
-    <div class="flex items-center justify-between pt-2">
-        <a href="{{ url('/admin/pesanan') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition">
-            <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-slate-900"></i>
-            <span>Kembali ke Arus Pesanan</span>
-        </a>
-
-        <a href="{{ url('/admin/laporan') }}" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 shadow-sm transition">
-            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-white"></i>
-            <span>Laporan Keuangan</span>
-        </a>
     </div>
     @endif
 </div>

@@ -109,8 +109,13 @@
                         </p>
                         <p class="text-xs text-slate-500 line-clamp-2 pt-0.5" x-text="item.description"></p>
                         <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                            <span class="text-sm font-extrabold text-brand-700" x-text="formatRupiah(item.price)"></span>
-                            <span class="text-[11px] text-slate-400" x-text="'Masak ' + item.prepTime"></span>
+                            <div>
+                                <span class="text-sm font-extrabold text-brand-700 block" x-text="formatRupiah(item.price)"></span>
+                                <span class="text-[10px] text-slate-400" x-text="'Masak ' + item.prepTime"></span>
+                            </div>
+                            <span class="text-[11px] font-semibold"
+                                  :class="item.stock > 5 ? 'text-slate-500' : (item.stock > 0 ? 'text-amber-600' : 'text-rose-600')"
+                                  x-text="item.stock > 0 ? 'Sisa ' + item.stock + ' porsi' : 'Porsi Habis'"></span>
                         </div>
                     </div>
                 </div>
@@ -119,7 +124,7 @@
                 <div class="p-4 pt-0">
                     <button type="button" 
                             :disabled="item.stock === 0"
-                            @click="addToCart({ id: item.id, name: item.name, price: item.price, seller: item.seller })" 
+                            @click="addToCart({ id: item.id, name: item.name, price: item.price, seller: item.seller, image: item.image })" 
                             :class="item.stock === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm'"
                             class="whitespace-nowrap w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -202,7 +207,7 @@
 
                     <button type="button" 
                             :disabled="selectedMenu?.stock === 0"
-                            @click="for(let i=0; i<detailQty; i++) { addToCart({ id: selectedMenu.id, name: selectedMenu.name, price: selectedMenu.price, seller: selectedMenu.seller }); } detailModalOpen = false;" 
+                            @click="for(let i=0; i<detailQty; i++) { addToCart({ id: selectedMenu.id, name: selectedMenu.name, price: selectedMenu.price, seller: selectedMenu.seller, image: selectedMenu.image }); } detailModalOpen = false;" 
                             :class="selectedMenu?.stock === 0 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm'"
                             class="whitespace-nowrap flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold transition">
                         <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>

@@ -32,9 +32,10 @@ class AdminController extends Controller
                 'id' => $s->id,
                 'name' => $s->stall_name,
                 'owner' => $s->user?->name ?? 'Pemilik Stan',
-                'ownerImage' => 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
+                'ownerImage' => $s->user?->avatar_url ?: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
                 'location' => $s->location ?? 'Counter Food Court',
-                'stallImage' => $s->logo_path ? asset('storage/' . $s->logo_path) : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+                'stallImage' => $s->logo_url ?: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+                'stallInitials' => $s->initials,
                 'todayOrders' => $todayOrders->count(),
                 'todayRevenue' => 'Rp ' . number_format($todayOrders->sum('total'), 0, ',', '.'),
                 'isOpen' => (bool)$s->is_active,
@@ -51,16 +52,23 @@ class AdminController extends Controller
                 'time' => $o->created_at ? $o->created_at->diffForHumans() : 'Baru saja',
                 'buyerName' => $o->buyer?->name ?? 'Mahasiswa',
                 'buyerNim' => $o->buyer?->phone ?? '-',
-                'buyerImage' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+                'buyerImage' => $o->buyer?->avatar_url ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+                'buyerInitials' => $o->buyer?->initials ?? 'M',
                 'stallName' => $o->seller?->stall_name ?? 'Stan',
                 'menuName' => $firstItem?->menu_name_snapshot ?? 'Menu Pesanan',
-                'menuImage' => $firstItem?->menu?->image_path ? asset('storage/' . $firstItem->menu->image_path) : 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80',
+                'menuImage' => $firstItem?->menu?->image_url ?? 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80',
                 'price' => (int)$o->total,
                 'status' => ucfirst(str_replace('_', ' ', $o->order_status)),
                 'statusCode' => $o->order_status,
                 'table' => $o->table_number ? 'Meja ' . $o->table_number : 'Takeaway',
             ];
         });
+
+        $topSellingMenus = Menu::with('seller')
+            ->where('is_active', true)
+            ->orderByDesc('stock')
+            ->take(5)
+            ->get();
 
         $omsetToday = Order::whereDate('created_at', today())->whereIn('order_status', ['selesai', 'siap', 'diproses'])->sum('total');
         if ($omsetToday == 0) {
@@ -76,6 +84,7 @@ class AdminController extends Controller
         return view('admin.dashboard', [
             'stallsData' => $stallsData,
             'recentOrdersData' => $recentOrdersData,
+            'topSellingMenus' => $topSellingMenus,
             'omsetToday' => $omsetToday,
             'ordersFinished' => $ordersFinished,
             'ordersTotal' => $ordersTotal,
@@ -101,8 +110,10 @@ class AdminController extends Controller
                 'location' => $s->location ?? 'Counter Barat No. 01',
                 'owner' => $s->user?->name ?? 'Pemilik Stan',
                 'phone' => $s->user?->phone ?? '08123456789',
-                'ownerImage' => 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
-                'stallImage' => $s->logo_path ? asset('storage/' . $s->logo_path) : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+                'ownerImage' => $s->user?->avatar_url ?: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
+                'ownerInitials' => $s->user?->initials ?? 'PS',
+                'stallImage' => $s->logo_url ?: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+                'stallInitials' => $s->initials,
                 'menuCount' => $s->menus->count(),
                 'rentStatus' => 'Lunas (' . now()->translatedFormat('M Y') . ')',
                 'isOpen' => (bool)$s->is_active,
@@ -177,7 +188,7 @@ class AdminController extends Controller
                 'price' => (int)$m->price,
                 'stock' => (int)$m->stock,
                 'prepTime' => ($m->estimated_time_minutes ?? 10) . ' Menit',
-                'image' => $m->image_path ? asset('storage/' . $m->image_path) : 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80',
+                'image' => $m->image_url,
             ];
         });
 
@@ -218,16 +229,17 @@ class AdminController extends Controller
                 'buyerName' => $o->buyer?->name ?? 'Mahasiswa',
                 'buyerNim' => $o->buyer?->phone ?? '-',
                 'buyerPhone' => $o->buyer?->phone ?? '-',
-                'buyerImage' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+                'buyerImage' => $o->buyer?->avatar_url ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+                'buyerInitials' => $o->buyer?->initials ?? 'M',
                 'stallName' => $o->seller?->stall_name ?? 'Stan Kantin',
                 'stallKey' => 'stan_' . str_pad($o->seller_id, 2, '0', STR_PAD_LEFT),
                 'menuName' => $firstItem?->menu_name_snapshot ?? 'Pesanan',
-                'menuImage' => $firstItem?->menu?->image_path ? asset('storage/' . $firstItem->menu->image_path) : 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80',
+                'menuImage' => $firstItem?->menu?->image_url ?? 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=300&q=80',
                 'portions' => (int)($o->items->sum('quantity') ?: 1),
                 'total' => (int)$o->total,
                 'table' => $o->table_number ? 'Meja ' . $o->table_number : 'Takeaway',
                 'serviceType' => $o->table_number ? 'Makan di Tempat' : 'Bawa Pulang',
-                'paymentMethod' => 'QRIS Statis (' . ($o->payment_status === 'terkonfirmasi' ? 'Terverifikasi Lunas' : ucfirst(str_replace('_', ' ', $o->payment_status))) . ')',
+                'paymentMethod' => 'QRIS Statis',
                 'status' => ucfirst(str_replace('_', ' ', $o->order_status)),
                 'statusCode' => $o->order_status,
             ];
@@ -268,7 +280,7 @@ class AdminController extends Controller
     /**
      * F-30: Rekapitulasi Laporan Keuangan Platform
      */
-    public function reportsIndex(Request $request): View
+    public function reportsIndex(Request $request): View|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         $stallsRevenue = SellerProfile::with(['user', 'orders'])->get()->map(function ($s) {
             $validOrders = $s->orders()->whereIn('order_status', ['selesai', 'siap', 'diproses'])->get();
@@ -278,9 +290,9 @@ class AdminController extends Controller
                 'id' => $s->id,
                 'name' => $s->stall_name,
                 'location' => $s->location ?? 'Counter Barat No. 01',
-                'stallImage' => $s->logo_path ? asset('storage/' . $s->logo_path) : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+                'stallImage' => $s->logo_url ?: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
                 'owner' => $s->user?->name ?? 'Pemilik Stan',
-                'ownerImage' => 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
+                'ownerImage' => $s->user?->avatar_url ?: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80',
                 'transactions' => $validOrders->count(),
                 'grossRevenue' => (int)$grossRevenue,
                 'feeRent' => 1000000,
@@ -291,6 +303,43 @@ class AdminController extends Controller
         $totalOmset = $stallsRevenue->sum('grossRevenue');
         $totalTransactions = $stallsRevenue->sum('transactions');
         $totalFee = $stallsRevenue->sum('feeRent');
+
+        if ($request->query('export') === 'excel' || $request->query('export') === 'csv') {
+            $filename = 'Laporan_Keuangan_Kantin_UNESA_' . now()->format('Ymd_His') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            ];
+
+            return response()->stream(function () use ($stallsRevenue, $totalOmset, $totalTransactions, $totalFee) {
+                $handle = fopen('php://output', 'w');
+                fputs($handle, "\xEF\xBB\xBF"); // UTF-8 BOM
+                fputcsv($handle, ['REKAPITULASI LAPORAN KEUANGAN KANTIN FOOD COURT UNESA']);
+                fputcsv($handle, ['Waktu Cetak', now()->translatedFormat('d F Y, H:i') . ' WIB']);
+                fputcsv($handle, ['Pengelola', auth()->user()->name ?? 'Kepala Pengelola Food Court UNESA']);
+                fputcsv($handle, ['Lokasi', 'Food Court Ketintang UNESA']);
+                fputcsv($handle, ['Periode', now()->translatedFormat('F Y')]);
+                fputcsv($handle, []);
+                fputcsv($handle, ['No', 'Stan Kantin', 'Lokasi Counter', 'Pemilik Stan', 'Volume Pesanan', 'Omzet Bruto (Rp)', 'Sewa Bulanan (Rp)', 'Status Retribusi']);
+
+                foreach ($stallsRevenue as $idx => $item) {
+                    fputcsv($handle, [
+                        $idx + 1,
+                        $item['name'],
+                        $item['location'],
+                        $item['owner'],
+                        $item['transactions'] . ' Porsi',
+                        $item['grossRevenue'],
+                        $item['feeRent'],
+                        $item['rentStatus'],
+                    ]);
+                }
+
+                fputcsv($handle, []);
+                fputcsv($handle, ['TOTAL KESELURUHAN', '', '', '', $totalTransactions . ' Porsi', $totalOmset, $totalFee, '100% Lunas']);
+                fclose($handle);
+            }, 200, $headers);
+        }
 
         return view('admin.reports', [
             'stallsRevenue' => $stallsRevenue,

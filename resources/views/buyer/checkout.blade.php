@@ -186,7 +186,7 @@
                 <!-- Stan Name -->
                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 flex items-center gap-2">
                     <i data-lucide="store" class="w-4 h-4 text-slate-900 shrink-0"></i>
-                    <span class="truncate">Stan: <strong x-text="currentSeller || 'Stan 01 - Barokah Rasa'"></strong></span>
+                    <span class="truncate">Stan: <strong x-text="currentSeller || 'Belum ada stan dipilih'"></strong></span>
                 </div>
 
                 <!-- Items Preview -->
@@ -202,17 +202,10 @@
                         </div>
                     </template>
 
-                    <!-- Mock fallback if visited directly without cart -->
+                    <!-- Fallback if visited directly without cart -->
                     <template x-if="items.length === 0">
-                        <div class="space-y-2 text-slate-600">
-                            <div class="flex justify-between">
-                                <span>1x Ayam Geprek Sambal Korek</span>
-                                <span class="font-semibold">Rp 13.000</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>1x Es Teh Manis Jumbo Vokasi</span>
-                                <span class="font-semibold">Rp 4.000</span>
-                            </div>
+                        <div class="py-3 text-center text-xs text-slate-400 italic">
+                            Keranjang belanja kosong. Silakan pilih menu di katalog.
                         </div>
                     </template>
                 </div>
@@ -224,16 +217,17 @@
                     </div>
                     <div class="flex justify-between font-bold text-slate-900 text-sm pt-1 border-t border-slate-100">
                         <span>Total yang Harus Dibayar</span>
-                        <span class="text-base text-brand-700" x-text="items.length > 0 ? formatRupiah(subtotal) : 'Rp 17.000'"></span>
+                        <span class="text-base text-brand-700" x-text="formatRupiah(subtotal)"></span>
                     </div>
                 </div>
 
                 <button type="button" 
                         @click="submitOrder()" 
-                        :disabled="isSubmitting"
-                        class="whitespace-nowrap w-full h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 shadow-sm transition">
+                        :disabled="isSubmitting || items.length === 0"
+                        :class="items.length === 0 ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm'"
+                        class="whitespace-nowrap w-full h-10 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-semibold transition">
                     <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
-                    <span x-text="isSubmitting ? 'Memproses Pesanan...' : 'Buat Pesanan & Bayar QRIS'"></span>
+                    <span x-text="isSubmitting ? 'Memproses Pesanan...' : (items.length === 0 ? 'Keranjang Kosong' : 'Buat Pesanan & Bayar QRIS')"></span>
                 </button>
 
                 <a href="{{ url('/keranjang') }}" class="whitespace-nowrap w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition">

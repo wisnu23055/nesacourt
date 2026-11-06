@@ -126,10 +126,10 @@
                     </div>
                 </div>
 
-                <!-- Main Content: Food Photo, Buyer, Stall, Amount -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                <!-- Main Content: Food Photo, Buyer, Stall, Amount & Centered Action -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                     <!-- Column 1: Food Photo & Menu -->
-                    <div class="flex items-center gap-3.5 min-w-0">
+                    <div class="md:col-span-4 flex items-center gap-3.5 min-w-0">
                         <img :src="order.menuImage" :alt="order.menuName" class="w-14 h-14 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
                         <div class="min-w-0">
                             <h4 class="text-xs sm:text-sm font-bold text-slate-900 truncate" x-text="order.portions + 'x ' + order.menuName"></h4>
@@ -139,20 +139,28 @@
                     </div>
 
                     <!-- Column 2: Buyer Profile Info (Hanya Foto dan Nama Pemesan) -->
-                    <div class="flex items-center gap-2.5 border-y md:border-y-0 md:border-x border-slate-100 py-2 md:py-0 md:px-4">
-                        <img :src="order.buyerImage" :alt="order.buyerName" class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200 shrink-0">
+                    <div class="md:col-span-3 flex items-center gap-2.5 border-y md:border-y-0 md:border-x border-slate-100 py-2 md:py-0 md:px-4">
+                        <div class="w-8 h-8 rounded-full overflow-hidden bg-slate-200 ring-1 ring-slate-200 shrink-0 flex items-center justify-center shadow-2xs">
+                            <template x-if="order.buyerImage">
+                                <img :src="order.buyerImage" :alt="order.buyerName" class="w-full h-full object-cover">
+                            </template>
+                            <template x-if="!order.buyerImage">
+                                <span class="text-slate-700 font-bold text-xs" x-text="order.buyerInitials || 'M'"></span>
+                            </template>
+                        </div>
                         <span class="text-xs sm:text-sm font-semibold text-slate-900 truncate" x-text="order.buyerName"></span>
                     </div>
 
-                    <!-- Column 3: Payment & Action -->
-                    <div class="flex items-center justify-between md:justify-end gap-4 text-xs">
-                        <div class="text-left md:text-right">
-                            <span class="text-[11px] text-slate-400 block">Total Tagihan</span>
-                            <span class="text-sm font-bold text-slate-900 block" x-text="formatRupiah(order.total)"></span>
-                            <span class="text-[10px] text-emerald-600 font-semibold" x-text="order.paymentMethod"></span>
-                        </div>
+                    <!-- Column 3: Payment Total -->
+                    <div class="md:col-span-2 text-left md:text-center">
+                        <span class="text-[11px] text-slate-400 block">Total Tagihan</span>
+                        <span class="text-sm font-bold text-slate-900 block" x-text="formatRupiah(order.total)"></span>
+                        <span class="text-[10px] text-emerald-600 font-semibold" x-text="order.paymentMethod"></span>
+                    </div>
 
-                        <a :href="'{{ url('/admin/pesanan/detail') }}?id=' + order.id" class="whitespace-nowrap inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition shadow-2xs">
+                    <!-- Column 4: Action Button Center Tengah -->
+                    <div class="md:col-span-3 flex items-center justify-center">
+                        <a :href="'{{ url('/admin/pesanan/detail') }}?id=' + order.id" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition shadow-2xs">
                             <i data-lucide="file-check" class="w-3.5 h-3.5 text-white"></i>
                             <span>Audit Detail</span>
                         </a>

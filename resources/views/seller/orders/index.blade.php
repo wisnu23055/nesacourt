@@ -9,13 +9,17 @@
     autoRefresh: true,
     soundEnabled: true,
     orders: {{ json_encode($orders) }},
+    setTab(tab) {
+        this.activeTab = tab;
+        this.orders.forEach(o => { delete o._keepInView; });
+    },
     filteredOrders() {
         return this.orders.filter(order => {
             const matchesSearch = !this.searchQuery || 
                                   order.id.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
                                   order.customerName.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
                                   order.queueNo.includes(this.searchQuery);
-            const matchesTab = this.activeTab === 'all' || order.status === this.activeTab;
+            const matchesTab = this.activeTab === 'all' || order.status === this.activeTab || order._keepInView === this.activeTab;
             return matchesSearch && matchesTab;
         });
     },
@@ -24,6 +28,7 @@
         return this.orders.filter(o => o.status === status).length;
     },
     async advanceStatus(order, nextStatus, nextLabel) {
+        order._keepInView = this.activeTab;
         order.status = nextStatus;
         order.statusLabel = nextLabel;
         try {
@@ -57,7 +62,7 @@
         <!-- Filter Tabs Toolbar (Angka Tanpa Container) -->
         <div class="flex items-center gap-2 overflow-x-auto thin-scrollbar pt-6 mt-6 border-t border-slate-100 pb-1">
             <button type="button" 
-                    @click="activeTab = 'all'" 
+                    @click="setTab('all')" 
                     class="h-9 px-3.5 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center gap-2 transition"
                     :class="activeTab === 'all' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 <span>Semua Pesanan</span>
@@ -65,15 +70,15 @@
             </button>
 
             <button type="button" 
-                    @click="activeTab = 'menunggu_konfirmasi'" 
+                    @click="setTab('menunggu_konfirmasi')" 
                     class="h-9 px-3.5 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center gap-2 transition"
                     :class="activeTab === 'menunggu_konfirmasi' ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
-                <span>Perlu Verifikasi</span>
+                <span>Menunggu Verifikasi</span>
                 <span class="font-bold text-xs" :class="activeTab === 'menunggu_konfirmasi' ? 'text-white' : 'text-amber-600'" x-text="countByStatus('menunggu_konfirmasi')"></span>
             </button>
 
             <button type="button" 
-                    @click="activeTab = 'memasak'" 
+                    @click="setTab('memasak')" 
                     class="h-9 px-3.5 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center gap-2 transition"
                     :class="activeTab === 'memasak' ? 'bg-brand-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 <span>Sedang Dimasak</span>
@@ -81,7 +86,7 @@
             </button>
 
             <button type="button" 
-                    @click="activeTab = 'siap_ambil'" 
+                    @click="setTab('siap_ambil')" 
                     class="h-9 px-3.5 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center gap-2 transition"
                     :class="activeTab === 'siap_ambil' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                 <span>Siap Diambil</span>
@@ -89,10 +94,10 @@
             </button>
 
             <button type="button" 
-                    @click="activeTab = 'selesai'" 
+                    @click="setTab('selesai')" 
                     class="h-9 px-3.5 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center gap-2 transition"
                     :class="activeTab === 'selesai' ? 'bg-slate-800 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
-                <span>Selesai</span>
+                <span>Pesanan Selesai</span>
                 <span class="font-bold text-xs" :class="activeTab === 'selesai' ? 'text-white' : 'text-slate-400'" x-text="countByStatus('selesai')"></span>
             </button>
         </div>
@@ -141,7 +146,7 @@
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                             </span>
-                            <span>Verifikasi Bayar</span>
+                            <span>Menunggu Verifikasi</span>
                         </div>
 
                         <div x-show="order.status === 'memasak'" class="flex items-center gap-1.5 text-xs font-bold text-brand-600">
@@ -162,7 +167,7 @@
 
                         <div x-show="order.status === 'selesai'" class="flex items-center gap-1.5 text-xs font-bold text-slate-500">
                             <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                            <span>Selesai</span>
+                            <span>Pesanan Selesai</span>
                         </div>
                     </div>
                 </div>
@@ -216,7 +221,7 @@
 
                     <!-- Stage Step Action Buttons (Tombol Detail Teks Center) -->
                     <div class="flex items-center gap-2 pt-1">
-                        <!-- If Menunggu Konfirmasi -->
+                        <!-- If Menunggu Verifikasi -->
                         <template x-if="order.status === 'menunggu_konfirmasi'">
                             <div class="flex items-center gap-2 w-full">
                                 <a :href="'{{ url('/penjual/pesanan/detail') }}?id=' + order.id" 
@@ -225,9 +230,9 @@
                                 </a>
                                 <button type="button" 
                                         @click="advanceStatus(order, 'memasak', 'Sedang Dimasak')"
-                                        class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition">
-                                    <i data-lucide="flame" class="w-4 h-4"></i>
-                                    <span>Verifikasi & Mulai Masak</span>
+                                        class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition cursor-pointer">
+                                    <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                                    <span>Lanjut Masak</span>
                                 </button>
                             </div>
                         </template>
@@ -241,9 +246,9 @@
                                 </a>
                                 <button type="button" 
                                         @click="advanceStatus(order, 'siap_ambil', 'Siap Diambil')"
-                                        class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-500/20 transition">
-                                    <i data-lucide="bell" class="w-4 h-4"></i>
-                                    <span>Tandai Siap Diambil</span>
+                                        class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-500/20 transition cursor-pointer">
+                                    <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                    <span>Lanjut Siap Diambil</span>
                                 </button>
                             </div>
                         </template>
@@ -257,9 +262,9 @@
                                 </a>
                                 <button type="button" 
                                         @click="advanceStatus(order, 'selesai', 'Pesanan Selesai')"
-                                        class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition">
-                                    <i data-lucide="check" class="w-4 h-4"></i>
-                                    <span>Serahkan & Selesaikan</span>
+                                        class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition cursor-pointer">
+                                    <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Lanjut Selesai</span>
                                 </button>
                             </div>
                         </template>
@@ -267,7 +272,10 @@
                         <!-- If Selesai -->
                         <template x-if="order.status === 'selesai'">
                             <div class="flex items-center justify-between w-full">
-                                <span class="text-xs text-slate-400 font-medium">Pesanan telah diserahkan</span>
+                                <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <span>Pesanan Selesai</span>
+                                </span>
                                 <a :href="'{{ url('/penjual/pesanan/detail') }}?id=' + order.id" 
                                    class="h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center text-center bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
                                     <span>Lihat Bukti Transaksi</span>

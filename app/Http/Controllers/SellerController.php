@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SellerController extends Controller
 {
@@ -70,6 +71,42 @@ class SellerController extends Controller
             ->take(5)
             ->get();
 
+        $activeOrdersData = $activeOrders->map(function (Order $o) {
+            $statusKey = match ($o->order_status) {
+                'dibuat' => 'menunggu_konfirmasi',
+                'diterima', 'diproses' => 'memasak',
+                'siap' => 'siap_ambil',
+                'selesai' => 'selesai',
+                default => 'menunggu_konfirmasi',
+            };
+
+            $statusLabel = match ($statusKey) {
+                'menunggu_konfirmasi' => 'Menunggu Verifikasi',
+                'memasak' => 'Sedang Dimasak',
+                'siap_ambil' => 'Siap Diambil',
+                'selesai' => 'Pesanan Selesai',
+            };
+
+            return [
+                'id' => $o->order_number,
+                'queueNo' => str_pad($o->id % 100, 2, '0', STR_PAD_LEFT),
+                'customerName' => $o->customer_name,
+                'initials' => strtoupper(substr($o->customer_name, 0, 2)),
+                'time' => $o->created_at->format('H:i').' WIB',
+                'status' => $statusKey,
+                'statusLabel' => $statusLabel,
+                'totalPrice' => (int) $o->total,
+                'paymentMethod' => 'QRIS',
+                'items' => $o->items->map(fn (OrderItem $it) => [
+                    'name' => $it->menu_name_snapshot,
+                    'qty' => $it->quantity,
+                    'price' => (int) $it->menu_price_snapshot,
+                    'subtotal' => (int) $it->subtotal,
+                    'note' => $it->note ?? '',
+                ])->values()->all(),
+            ];
+        })->values();
+
         $popularMenus = Menu::where('seller_id', $seller->id)
             ->where('is_active', true)
             ->orderByDesc('stock')
@@ -84,6 +121,7 @@ class SellerController extends Controller
             'portionsSoldToday' => $portionsSoldToday,
             'lowStockCount' => $lowStockCount,
             'activeOrders' => $activeOrders,
+            'activeOrdersData' => $activeOrdersData,
             'popularMenus' => $popularMenus,
         ]);
     }
@@ -96,6 +134,7 @@ class SellerController extends Controller
         $seller = $this->getSeller();
         $menus = Menu::with('category')
             ->where('seller_id', $seller->id)
+            ->where('is_active', true)
             ->latest()
             ->get()
             ->map(fn (Menu $m) => [
@@ -107,7 +146,7 @@ class SellerController extends Controller
                 'stock' => (int) ($m->stock ?? 0),
                 'isAvailable' => (bool) $m->is_available,
                 'isTopSeller' => (bool) ($m->stock > 10),
-                'image' => $m->image_path ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80',
+                'image' => $m->image_url,
                 'desc' => $m->description ?? '',
             ])
             ->values();
@@ -219,13 +258,21 @@ class SellerController extends Controller
         $seller = $this->getSeller();
         $menu = Menu::where('seller_id', $seller->id)->findOrFail($id);
 
-        $menu->update(['is_active' => false]);
+        if ($menu->orderItems()->count() === 0) {
+            if ($menu->image_path && !str_starts_with($menu->image_path, 'http')) {
+                $filePath = str_replace('/storage/', '', $menu->image_path);
+                Storage::disk('public')->delete($filePath);
+            }
+            $menu->delete();
+        } else {
+            $menu->update(['is_active' => false]);
+        }
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('seller.menu.index')->with('success', 'Menu dinonaktifkan.');
+        return redirect()->route('seller.menu.index')->with('success', 'Menu berhasil dihapus.');
     }
 
     /**
@@ -245,7 +292,7 @@ class SellerController extends Controller
                 'categoryLabel' => $m->category->name ?? 'Makanan',
                 'price' => (int) $m->price,
                 'stock' => (int) ($m->stock ?? 0),
-                'image' => $m->image_path ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80',
+                'image' => $m->image_url,
                 'desc' => $m->description ?? '',
             ])
             ->values();
@@ -328,7 +375,7 @@ class SellerController extends Controller
                     'status' => $statusKey,
                     'rawStatus' => $o->order_status,
                     'statusLabel' => $statusLabel,
-                    'paymentMethod' => 'QRIS ('.ucfirst($o->payment_status).')',
+                    'paymentMethod' => 'QRIS',
                     'isPaid' => in_array($o->payment_status, ['terkonfirmasi', 'perlu_pemeriksaan'], true),
                     'totalPrice' => (int) $o->total,
                     'notes' => $o->note ?? '',
@@ -414,6 +461,13 @@ class SellerController extends Controller
         $order = Order::where('order_number', $order_number)
             ->where('seller_id', $seller->id)
             ->firstOrFail();
+
+        $statusInput = $request->input('order_status');
+        if ($statusInput === 'memasak') {
+            $request->merge(['order_status' => 'diproses']);
+        } elseif ($statusInput === 'siap_ambil') {
+            $request->merge(['order_status' => 'siap']);
+        }
 
         $validated = $request->validate([
             'order_status' => ['required', 'in:diterima,diproses,siap,selesai,dibatalkan'],
@@ -520,12 +574,12 @@ class SellerController extends Controller
     /**
      * F-22: Laporan Penjualan & Omset
      */
-    public function reportsIndex(Request $request): View
+    public function reportsIndex(Request $request): View|StreamedResponse
     {
         $seller = $this->getSeller();
 
         $period = $request->query('period', 'hari_ini');
-        $query = Order::where('seller_id', $seller->id)->where('order_status', 'selesai');
+        $query = Order::with(['buyer', 'items'])->where('seller_id', $seller->id)->where('order_status', 'selesai');
 
         if ($period === 'hari_ini') {
             $query->where('created_at', '>=', now()->startOfDay());
@@ -533,6 +587,8 @@ class SellerController extends Controller
             $query->where('created_at', '>=', now()->subDays(7));
         } elseif ($period === 'bulan_ini') {
             $query->where('created_at', '>=', now()->startOfMonth());
+        } elseif ($period === 'semester') {
+            $query->where('created_at', '>=', now()->subMonths(6));
         }
 
         $completedOrders = $query->latest()->get();
@@ -544,6 +600,76 @@ class SellerController extends Controller
 
         $topMenus = Menu::where('seller_id', $seller->id)->orderByDesc('stock')->take(3)->get();
         $recentTransactions = $completedOrders->take(10);
+
+        if ($request->query('export') === 'excel' || $request->query('export') === 'csv') {
+            $stallName = str_replace(' ', '_', $seller->stall_name ?? 'Stan');
+            $filename = 'Laporan_Penjualan_' . $stallName . '_' . now()->format('Ymd_His') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            ];
+
+            $periodLabel = match($period) {
+                'hari_ini' => 'Hari Ini (' . now()->translatedFormat('d F Y') . ')',
+                '7_hari' => '7 Hari Terakhir',
+                'bulan_ini' => 'Bulan Ini (' . now()->translatedFormat('F Y') . ')',
+                'semester' => 'Semester Ganjil 2026/2027',
+                default => 'Semua Periode',
+            };
+
+            return response()->stream(function () use ($completedOrders, $seller, $periodLabel, $totalRevenue, $ordersCount, $portionsCount, $avgTicket) {
+                $handle = fopen('php://output', 'w');
+                fputs($handle, "\xEF\xBB\xBF"); // UTF-8 BOM agar rapi saat dibuka di Microsoft Excel
+                fputcsv($handle, ['REKAPITULASI LAPORAN PENJUALAN KASIR STAN KANTIN']);
+                fputcsv($handle, ['Nama Stan', $seller->stall_name ?? 'Stan Kantin']);
+                fputcsv($handle, ['Pemilik / Kasir', $seller->user?->name ?? '-']);
+                fputcsv($handle, ['Lokasi Counter', $seller->location ?? 'Food Court UNESA']);
+                fputcsv($handle, ['Periode Laporan', $periodLabel]);
+                fputcsv($handle, ['Waktu Unduh', now()->translatedFormat('d F Y, H:i') . ' WIB']);
+                fputcsv($handle, []);
+                fputcsv($handle, ['RINGKASAN KINERJA KASIR']);
+                fputcsv($handle, ['Total Omset Bersih (Rp)', $totalRevenue]);
+                fputcsv($handle, ['Total Pesanan Berhasil', $ordersCount . ' Pesanan']);
+                fputcsv($handle, ['Total Porsi Masakan Laku', $portionsCount . ' Porsi']);
+                fputcsv($handle, ['Rata-rata Nilai Nota (Rp)', $avgTicket]);
+                fputcsv($handle, []);
+                fputcsv($handle, [
+                    'No',
+                    'Waktu Transaksi',
+                    'Kode Pesanan',
+                    'Nomor Antrean',
+                    'Nama Pemesan',
+                    'Menu Dipesan',
+                    'Jumlah Item',
+                    'Metode Pembayaran',
+                    'Total Bersih (Rp)',
+                    'Status',
+                ]);
+
+                foreach ($completedOrders as $index => $order) {
+                    $menuNames = $order->items->pluck('menu_name_snapshot')->join(', ');
+                    $itemCount = $order->items->sum('quantity');
+                    $queueNum = $order->queue_number ?? ('#' . str_pad($order->id % 100, 2, '0', STR_PAD_LEFT));
+
+                    fputcsv($handle, [
+                        $index + 1,
+                        $order->created_at ? $order->created_at->format('d/m/Y H:i') . ' WIB' : '-',
+                        $order->order_number,
+                        $queueNum,
+                        $order->customer_name,
+                        $menuNames,
+                        $itemCount . ' Porsi',
+                        strtoupper($order->payment_method),
+                        (int) $order->total,
+                        'Lunas',
+                    ]);
+                }
+
+                fputcsv($handle, []);
+                fputcsv($handle, ['TOTAL PENERIMAAN BERSIH KASIR', '', '', '', '', '', $portionsCount . ' Porsi', '', $totalRevenue, '100% Lunas']);
+                fclose($handle);
+            }, 200, $headers);
+        }
 
         return view('seller.reports', [
             'seller' => $seller,
@@ -580,7 +706,7 @@ class SellerController extends Controller
                     'id' => $m->id,
                     'name' => $m->name,
                     'category' => $m->category->name ?? 'Makanan Utama',
-                    'image' => $m->image_path ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80',
+                    'image' => $m->image_url,
                     'lastWeekPortions' => $base,
                     'recommendedPortions' => $recommended,
                     'trendPercent' => '+20%',

@@ -23,10 +23,7 @@
 
     <!-- Empty State -->
     <template x-if="items.length === 0">
-        <div class="text-center py-20 bg-white rounded-2xl border border-slate-200/80 p-8 space-y-4">
-            <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-900 flex items-center justify-center mx-auto">
-                <i data-lucide="shopping-bag" class="w-8 h-8 text-slate-900"></i>
-            </div>
+        <div class="text-center py-16 bg-white rounded-2xl border border-slate-200/80 p-8 space-y-3">
             <h3 class="text-base font-bold text-slate-900">Keranjang Belanja Anda Masih Kosong</h3>
             <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
                 Anda belum memilih menu makanan atau minuman dari kantin UNESA Ketintang. Silakan telusuri katalog atau gunakan rekomendasi AI.

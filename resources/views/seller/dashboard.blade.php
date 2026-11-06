@@ -4,7 +4,25 @@
 
 @section('content')
 <div class="space-y-6" x-data="{
-    filterPeriod: 'hari_ini'
+    filterPeriod: 'hari_ini',
+    orders: {{ json_encode($activeOrdersData) }},
+    async advanceStatus(order, nextStatus, nextLabel) {
+        order.status = nextStatus;
+        order.statusLabel = nextLabel;
+        try {
+            await fetch('{{ url('/penjual/pesanan') }}/' + order.id + '/status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ order_status: nextStatus })
+            });
+        } catch(e) {
+            console.error(e);
+        }
+    }
 }">
 
     <!-- Welcome & Operational Header Card -->
@@ -111,147 +129,174 @@
         </div>
     </div>
 
-    <!-- Active Kitchen Orders & Popular Menu Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Col 1 & 2: Pesanan Masuk Dapur Real-time -->
-        <div class="lg:col-span-2 space-y-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-base sm:text-lg font-bold text-slate-900">Pesanan Masuk Perlu Diproses</h2>
-                    <p class="text-xs text-slate-500">Antrean pesanan mahasiswa yang siap dimasak atau diserahkan</p>
-                </div>
-                <a href="{{ url('/penjual/pesanan') }}" class="whitespace-nowrap text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
-                    <span>Lihat Semua</span>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                </a>
+    <!-- Pesanan Masuk Dapur Real-time (Format Dua-Dua Grid) -->
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-base sm:text-lg font-bold text-slate-900">Pesanan Masuk Perlu Diproses</h2>
+                <p class="text-xs text-slate-500">Antrean pesanan mahasiswa yang siap dimasak atau diserahkan</p>
             </div>
-
-            <div class="space-y-3">
-                @forelse($activeOrders as $order)
-                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 uppercase">
-                                    {{ strtoupper(substr($order->customer_name, 0, 2)) }}
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-bold text-slate-900 text-sm">{{ $order->customer_name }}</span>
-                                        <span class="text-slate-300">|</span>
-                                        <span class="text-[11px] text-slate-500">Antrean #{{ str_pad($order->id % 100, 2, '0', STR_PAD_LEFT) }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                                        <span class="text-[11px] font-semibold text-slate-600">{{ $order->order_number }}</span>
-                                        <span class="text-slate-300">&bull;</span>
-                                        <span>{{ $order->created_at->format('H:i') }} WIB</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="shrink-0 pt-0.5">
-                                <div class="flex items-center gap-1.5 text-xs font-bold text-amber-600">
-                                    <span class="relative flex h-2 w-2 shrink-0">
-                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                                    </span>
-                                    <span>{{ ucfirst($order->order_status) }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-1.5 text-xs">
-                            <span class="text-xs font-semibold text-slate-500 block">Item Masakan Dapur:</span>
-                            <div class="space-y-1">
-                                @foreach($order->items as $it)
-                                    <div class="flex items-start justify-between">
-                                        <div>
-                                            <span class="font-medium text-slate-500">{{ $it->quantity }}x {{ $it->menu_name_snapshot }}</span>
-                                            @if($it->note)
-                                                <span class="text-[10px] text-slate-400 block">({{ $it->note }})</span>
-                                            @endif
-                                        </div>
-                                        <span class="font-medium text-slate-500 shrink-0">Rp {{ number_format($it->subtotal, 0, ',', '.') }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <div class="pt-3 border-t border-slate-100 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] text-slate-400 block">Total Tagihan</span>
-                                    <span class="text-sm font-bold text-slate-700">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-[10px] text-slate-400 block">Metode Pembayaran</span>
-                                    <span class="text-xs font-semibold text-emerald-700 flex items-center gap-1 justify-end">
-                                        <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i>
-                                        <span>QRIS ({{ ucfirst($order->payment_status) }})</span>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-2 pt-1">
-                                <a href="{{ route('seller.orders.detail', ['id' => $order->order_number]) }}" 
-                                   class="h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center text-center bg-slate-100 hover:bg-slate-200 text-slate-700 transition w-24">
-                                    <span>Detail</span>
-                                </a>
-                                <form action="{{ route('seller.orders.status', ['order_number' => $order->order_number]) }}" method="POST" class="flex-1">
-                                    @csrf
-                                    <input type="hidden" name="order_status" value="{{ $order->order_status === 'dibuat' ? 'diproses' : ($order->order_status === 'diproses' ? 'siap' : 'selesai') }}">
-                                    <button type="submit" 
-                                            class="w-full h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white shadow-sm transition">
-                                        <i data-lucide="{{ $order->order_status === 'dibuat' ? 'flame' : ($order->order_status === 'diproses' ? 'bell' : 'check') }}" class="w-4 h-4"></i>
-                                        <span>{{ $order->order_status === 'dibuat' ? 'Mulai Masak' : ($order->order_status === 'diproses' ? 'Tandai Siap Diambil' : 'Selesaikan') }}</span>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-slate-500 text-xs">
-                        Tidak ada antrean pesanan yang memerlukan proses saat ini.
-                    </div>
-                @endforelse
-            </div>
+            <a href="{{ url('/penjual/pesanan') }}" class="whitespace-nowrap text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                <span>Lihat Semua</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </a>
         </div>
 
-        <!-- Col 3: Menu Terlaris Stan Hari Ini -->
-        <div class="space-y-4">
-            <div>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900">Menu Terlaris Stan</h2>
-                <p class="text-xs text-slate-500">Pantau performa penjualan produk stan Anda</p>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4 shadow-xs">
-                <div class="space-y-3">
-                    @forelse($popularMenus as $pm)
-                        <div class="space-y-1.5 {{ !$loop->first ? 'pt-2 border-t border-slate-100' : '' }}">
-                            <div class="flex justify-between text-xs">
-                                <span class="font-bold text-slate-800 truncate">{{ $pm['name'] }}</span>
-                                <span class="font-bold text-slate-900">{{ $pm['sales'] }} Terjual</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <template x-for="order in orders" :key="order.id">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 uppercase"
+                                 x-text="order.initials">
                             </div>
-                            <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                                <div class="h-full bg-brand-600 rounded-full" style="width: {{ min(100, max(15, $pm['sales'] * 10)) }}%"></div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-slate-900 text-sm" x-text="order.customerName"></span>
+                                    <span class="text-slate-300">|</span>
+                                    <span class="text-[11px] text-slate-500" x-text="'Antrean #' + order.queueNo"></span>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                                    <span class="text-[11px] font-semibold text-slate-600" x-text="order.id"></span>
+                                    <span class="text-slate-300">&bull;</span>
+                                    <span x-text="order.time"></span>
+                                </div>
                             </div>
-                            <span class="text-[10px] {{ $pm['stock'] <= 3 ? 'text-rose-500 font-semibold' : 'text-slate-400' }} block">
-                                Sisa porsi: {{ $pm['stock'] }} porsi
-                            </span>
                         </div>
-                    @empty
-                        <div class="text-center text-slate-400 text-xs py-4">
-                            Belum ada riwayat pesanan menu hari ini.
-                        </div>
-                    @endforelse
-                </div>
 
-                <div class="pt-3 border-t border-slate-100">
-                    <a href="{{ url('/penjual/stok') }}" class="whitespace-nowrap w-full h-10 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition shadow-2xs">
-                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-                        <span>Perbarui Stok Porsi Stan</span>
-                    </a>
+                        <div class="shrink-0 pt-0.5">
+                            <div x-show="order.status === 'menunggu_konfirmasi'" class="flex items-center gap-1.5 text-xs font-bold text-amber-600">
+                                <span class="relative flex h-2 w-2 shrink-0">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                </span>
+                                <span>Menunggu Verifikasi</span>
+                            </div>
+
+                            <div x-show="order.status === 'memasak'" class="flex items-center gap-1.5 text-xs font-bold text-brand-600">
+                                <span class="relative flex h-2 w-2 shrink-0">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                                </span>
+                                <span>Sedang Dimasak</span>
+                            </div>
+
+                            <div x-show="order.status === 'siap_ambil'" class="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                                <span class="relative flex h-2 w-2 shrink-0">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                <span>Siap Diambil</span>
+                            </div>
+
+                            <div x-show="order.status === 'selesai'" class="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                                <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                                <span>Pesanan Selesai</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 text-xs">
+                        <span class="text-xs font-semibold text-slate-500 block">Item Masakan Dapur:</span>
+                        <div class="space-y-1">
+                            <template x-for="it in order.items" :key="it.name">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <span class="font-medium text-slate-600" x-text="it.qty + 'x ' + it.name"></span>
+                                        <span x-show="it.note" class="text-[10px] text-slate-400 block" x-text="'(' + it.note + ')'"></span>
+                                    </div>
+                                    <span class="font-medium text-slate-500 shrink-0" x-text="'Rp ' + it.subtotal.toLocaleString('id-ID')"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block">Total Tagihan</span>
+                                <span class="text-sm font-bold text-slate-700" x-text="'Rp ' + order.totalPrice.toLocaleString('id-ID')"></span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] text-slate-400 block">Metode Pembayaran</span>
+                                <span class="text-xs font-semibold text-emerald-700 flex items-center gap-1 justify-end">
+                                    <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i>
+                                    <span x-text="order.paymentMethod"></span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Berantai Interaktif -->
+                        <div class="flex items-center gap-2 pt-1">
+                            <!-- If Menunggu Verifikasi -->
+                            <template x-if="order.status === 'menunggu_konfirmasi'">
+                                <div class="flex items-center gap-2 w-full">
+                                    <a :href="'{{ url('/penjual/pesanan/detail') }}?id=' + order.id" 
+                                       class="h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center text-center bg-slate-100 hover:bg-slate-200 text-slate-700 transition w-24">
+                                        <span>Detail</span>
+                                    </a>
+                                    <button type="button" 
+                                            @click="advanceStatus(order, 'memasak', 'Sedang Dimasak')"
+                                            class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition cursor-pointer active:scale-95">
+                                        <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                                        <span>Lanjut Masak</span>
+                                    </button>
+                                </div>
+                            </template>
+
+                            <!-- If Memasak -->
+                            <template x-if="order.status === 'memasak'">
+                                <div class="flex items-center gap-2 w-full">
+                                    <a :href="'{{ url('/penjual/pesanan/detail') }}?id=' + order.id" 
+                                       class="h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center text-center bg-slate-100 hover:bg-slate-200 text-slate-700 transition w-24">
+                                        <span>Detail</span>
+                                    </a>
+                                    <button type="button" 
+                                            @click="advanceStatus(order, 'siap_ambil', 'Siap Diambil')"
+                                            class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-500/20 transition cursor-pointer active:scale-95">
+                                        <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                        <span>Lanjut Siap Diambil</span>
+                                    </button>
+                                </div>
+                            </template>
+
+                            <!-- If Siap Diambil -->
+                            <template x-if="order.status === 'siap_ambil'">
+                                <div class="flex items-center gap-2 w-full">
+                                    <a :href="'{{ url('/penjual/pesanan/detail') }}?id=' + order.id" 
+                                       class="h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center text-center bg-slate-100 hover:bg-slate-200 text-slate-700 transition w-24">
+                                        <span>Detail</span>
+                                    </a>
+                                    <button type="button" 
+                                            @click="advanceStatus(order, 'selesai', 'Pesanan Selesai')"
+                                            class="flex-1 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition cursor-pointer active:scale-95">
+                                        <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                        <span>Lanjut Selesai</span>
+                                    </button>
+                                </div>
+                            </template>
+
+                            <!-- If Selesai -->
+                            <template x-if="order.status === 'selesai'">
+                                <div class="flex items-center justify-between w-full">
+                                    <span class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                        <span>Pesanan Selesai</span>
+                                    </span>
+                                    <a :href="'{{ url('/penjual/pesanan/detail') }}?id=' + order.id" 
+                                       class="h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center text-center bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                                        <span>Lihat Bukti Transaksi</span>
+                                    </a>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </template>
+        </div>
+
+        <div x-show="orders.length === 0" class="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-slate-500 text-xs">
+            Tidak ada antrean pesanan yang memerlukan proses saat ini.
         </div>
     </div>
 

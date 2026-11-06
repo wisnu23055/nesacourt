@@ -26,7 +26,33 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
+        'avatar_path',
     ];
+
+    protected $appends = [
+        'avatar_url',
+        'initials',
+    ];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (empty($this->avatar_path)) {
+            return null;
+        }
+        if (str_starts_with($this->avatar_path, 'http://') || str_starts_with($this->avatar_path, 'https://')) {
+            return $this->avatar_path;
+        }
+        return '/' . ltrim($this->avatar_path, '/');
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $words = preg_split('/\s+/', trim($this->name));
+        if (count($words) >= 2) {
+            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+        }
+        return strtoupper(substr($this->name, 0, 2));
+    }
 
     /**
      * The attributes that should be hidden for serialization.

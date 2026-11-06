@@ -38,14 +38,6 @@
         } catch(e) {
             console.error(e);
         }
-    },
-    resetStandard() {
-        this.items.forEach(i => {
-            if (i.category === 'minuman') i.stock = 40;
-            else if (i.category === 'makanan') i.stock = 25;
-            else i.stock = 20;
-        });
-        this.saveAllStock();
     }
 }">
 
@@ -64,12 +56,6 @@
 
             <!-- Buttons: On mobile displayed below description, on desktop aligned to the right -->
             <div class="flex items-center gap-2.5 shrink-0 pt-1 sm:pt-0">
-                <button type="button" 
-                        @click="resetStandard()" 
-                        class="flex-1 sm:flex-none h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-500"></i>
-                    <span>Set Standar Pagi</span>
-                </button>
                 <button type="button" 
                         @click="saveAllStock()" 
                         class="flex-1 sm:flex-none h-10 py-2.5 px-4 rounded-xl text-xs font-semibold whitespace-nowrap inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition">

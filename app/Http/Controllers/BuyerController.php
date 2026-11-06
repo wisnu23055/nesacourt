@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -43,10 +44,12 @@ class BuyerController extends Controller
                 'id' => $m->id,
                 'name' => $m->name,
                 'price' => (int) $m->price,
+                'stock' => (int) ($m->stock ?? 0),
+                'isAvailable' => (bool) ($m->is_available && ($m->stock ?? 0) > 0),
                 'stall' => $m->seller->stall_name ?? 'Stan Kantin',
                 'sellerName' => $m->seller->stall_name ?? 'Stan Kantin',
                 'prepTime' => 'Masak ~'.($m->estimated_time_minutes ?? 5).' menit',
-                'image' => $m->image_path ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+                'image' => $m->image_url,
                 'desc' => $m->description ?? '',
             ])
             ->values();
@@ -73,7 +76,7 @@ class BuyerController extends Controller
                 'statusDesc' => 'Pesanan sedang diproses oleh pihak stan',
                 'progress' => $progressMap[$activeOrder->order_status] ?? 50,
                 'eta' => '~7 Menit',
-                'image' => $activeOrder->items->first()?->menu?->image_path ?: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=150&q=80',
+                'image' => $activeOrder->items->first()?->menu?->image_url ?: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=150&q=80',
             ];
         }
 
@@ -115,7 +118,7 @@ class BuyerController extends Controller
                 'price' => (int) $m->price,
                 'stock' => (int) ($m->stock ?? 0),
                 'prepTime' => ($m->estimated_time_minutes ?? 5).' Menit',
-                'image' => $m->image_path ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+                'image' => $m->image_url,
                 'description' => $m->description ?? '',
                 'tags' => is_array($m->taste_tags) ? $m->taste_tags : ['Lezat', 'Halal'],
             ])
@@ -158,7 +161,7 @@ class BuyerController extends Controller
                     'taste' => $taste,
                     'category' => $m->category->slug ?? 'makanan',
                     'stock' => (int) ($m->stock ?? 0),
-                    'image' => $m->image_path ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+                    'image' => $m->image_url,
                     'aiReason' => $m->description ?: 'Menu porsi pas, lezat, dan cepat disajikan di kantin UNESA.',
                 ];
             })
@@ -243,10 +246,11 @@ class BuyerController extends Controller
                         if ($menu->stock < $qty) {
                             throw new \RuntimeException("Stok untuk menu '{$menu->name}' tidak mencukupi (sisa: {$menu->stock} porsi).");
                         }
-                        $menu->decrement('stock', $qty);
-                        if ($menu->stock <= 0) {
-                            $menu->update(['is_available' => false]);
-                        }
+                        $newStock = max(0, $menu->stock - $qty);
+                        $menu->update([
+                            'stock' => $newStock,
+                            'is_available' => $newStock > 0,
+                        ]);
                     }
 
                     $itemSubtotal = $menu->price * $qty;
@@ -426,19 +430,65 @@ class BuyerController extends Controller
         $user = Auth::user();
         $orderNumber = $request->query('order');
 
+        $allOrders = Order::with(['seller.qris', 'items.menu'])
+            ->where('buyer_id', $user->id)
+            ->latest()
+            ->get();
+
+        $buyerOrders = $allOrders->map(function (Order $o) {
+            // Status disamakan dengan detail pesanan: Pesanan Dibuat, Menunggu Bayar, Dikonfirmasi, Sedang Dimasak, Siap Diambil, Selesai
+            if ($o->order_status === 'dibatalkan') {
+                $statusKey = 'dibatalkan';
+                $statusLabel = 'Dibatalkan';
+            } elseif ($o->order_status === 'selesai') {
+                $statusKey = 'selesai';
+                $statusLabel = 'Selesai';
+            } elseif ($o->order_status === 'siap') {
+                $statusKey = 'siap_ambil';
+                $statusLabel = 'Siap Diambil';
+            } elseif ($o->order_status === 'diproses') {
+                $statusKey = 'memasak';
+                $statusLabel = 'Sedang Dimasak';
+            } elseif (in_array($o->payment_status, ['terkonfirmasi', 'perlu_pemeriksaan'], true)) {
+                $statusKey = 'dikonfirmasi';
+                $statusLabel = 'Dikonfirmasi';
+            } elseif ($o->payment_status === 'menunggu') {
+                $statusKey = 'menunggu_bayar';
+                $statusLabel = 'Menunggu Bayar';
+            } else {
+                $statusKey = 'pesanan_dibuat';
+                $statusLabel = 'Pesanan Dibuat';
+            }
+
+            $diningType = str_contains($o->note ?? '', 'Bawa Pulang') ? 'Bawa Pulang (Takeaway)' : 'Makan di Tempat';
+
+            return [
+                'id' => $o->order_number,
+                'queueNo' => 'A-' . str_pad($o->id % 100, 2, '0', STR_PAD_LEFT),
+                'stallName' => $o->seller->stall_name ?? 'Stan Kantin',
+                'stallImage' => $o->seller->logo_url ?: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=120&q=80',
+                'stallInitials' => $o->seller->initials ?? 'ST',
+                'status' => $statusKey,
+                'statusLabel' => $statusLabel,
+                'orderStatus' => $o->order_status,
+                'paymentStatus' => $o->payment_status,
+                'paymentMethod' => 'QRIS',
+                'time' => $o->created_at->format('H:i') . ' WIB',
+                'diningType' => $diningType,
+                'notes' => $o->note,
+                'totalPrice' => (int) $o->total,
+                'items' => $o->items->map(fn (OrderItem $it) => [
+                    'name' => $it->menu_name_snapshot,
+                    'qty' => $it->quantity,
+                    'price' => (int) $it->menu_price_snapshot,
+                    'note' => '',
+                ])->values()->all(),
+            ];
+        })->values();
+
         $order = null;
         if ($orderNumber) {
-            $order = Order::with(['seller.qris', 'items.menu'])
-                ->where('order_number', $orderNumber)
-                ->where('buyer_id', $user->id)
-                ->first();
-        }
-
-        if (! $order) {
-            $order = Order::with(['seller.qris', 'items.menu'])
-                ->where('buyer_id', $user->id)
-                ->latest()
-                ->first();
+            $order = $allOrders->firstWhere('order_number', $orderNumber);
         }
 
         // ponytail: periksa kedaluwarsa batas waktu pembayaran pada halaman status (Blueprint B-15)
@@ -467,6 +517,8 @@ class BuyerController extends Controller
         return view('buyer.order-status', [
             'order' => $order,
             'currentStep' => $currentStep,
+            'orders' => $buyerOrders,
+            'showDetail' => !empty($orderNumber) && $order !== null,
         ]);
     }
 
@@ -514,7 +566,7 @@ class BuyerController extends Controller
                     'total' => (int) $o->total,
                     'table' => $table,
                     'type' => $serviceType,
-                    'paymentMethod' => 'QRIS Statis Stan ('.ucfirst($o->payment_status).')',
+                    'paymentMethod' => 'QRIS Statis Stan',
                     'items' => $o->items->map(fn (OrderItem $it) => [
                         'name' => $it->menu_name_snapshot,
                         'qty' => $it->quantity,
@@ -561,9 +613,20 @@ class BuyerController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:25'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
-        $user->update($validated);
+        $userData = [
+            'name' => $validated['name'],
+            'phone' => $validated['phone'] ?? null,
+        ];
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $userData['avatar_path'] = 'storage/' . $path;
+        }
+
+        $user->update($userData);
 
         return back()->with('profile_success', 'Data profil berhasil diperbarui.');
     }

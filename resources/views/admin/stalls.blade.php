@@ -120,7 +120,14 @@
             <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4 shadow-xs hover:border-slate-300 transition">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3.5 min-w-0">
-                        <img :src="stall.stallImage" :alt="stall.name" class="w-16 h-16 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 shadow-2xs">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 ring-1 ring-slate-200 shrink-0 shadow-2xs flex items-center justify-center">
+                            <template x-if="stall.stallImage">
+                                <img :src="stall.stallImage" :alt="stall.name" class="w-full h-full object-cover">
+                            </template>
+                            <template x-if="!stall.stallImage">
+                                <span class="text-slate-700 font-bold text-base" x-text="stall.stallInitials || 'ST'"></span>
+                            </template>
+                        </div>
                         <div class="min-w-0">
                             <h3 class="text-sm font-bold text-slate-900 truncate" x-text="stall.name"></h3>
                             <p class="text-xs text-slate-500 mt-0.5" x-text="stall.location"></p>
@@ -140,7 +147,14 @@
                 <!-- Owner Details Row -->
                 <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
                     <div class="flex items-center gap-2.5">
-                        <img :src="stall.ownerImage" :alt="stall.owner" class="w-8 h-8 rounded-lg object-cover ring-1 ring-slate-200 shrink-0">
+                        <div class="w-8 h-8 rounded-lg overflow-hidden bg-slate-200 ring-1 ring-slate-200 shrink-0 flex items-center justify-center">
+                            <template x-if="stall.ownerImage">
+                                <img :src="stall.ownerImage" :alt="stall.owner" class="w-full h-full object-cover">
+                            </template>
+                            <template x-if="!stall.ownerImage">
+                                <span class="text-slate-700 font-bold text-xs" x-text="stall.ownerInitials || 'P'"></span>
+                            </template>
+                        </div>
                         <div>
                             <span class="font-bold text-slate-800 block truncate" x-text="stall.owner"></span>
                             <span class="text-[10px] text-slate-500" x-text="stall.phone"></span>

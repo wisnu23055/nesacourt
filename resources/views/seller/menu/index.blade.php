@@ -10,23 +10,28 @@
     deleteModalOpen: false,
     menuToDelete: null,
     menus: {{ json_encode($menus) }},
-    executeDelete() {
+    async executeDelete() {
         if (!this.menuToDelete) return;
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ url('/penjual/menu') }}/' + this.menuToDelete.id;
-        const csrf = document.createElement('input');
-        csrf.type = 'hidden';
-        csrf.name = '_token';
-        csrf.value = '{{ csrf_token() }}';
-        const method = document.createElement('input');
-        method.type = 'hidden';
-        method.name = '_method';
-        method.value = 'DELETE';
-        form.appendChild(csrf);
-        form.appendChild(method);
-        document.body.appendChild(form);
-        form.submit();
+        try {
+            const res = await fetch('{{ url('/penjual/menu') }}/' + this.menuToDelete.id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            });
+            if (res.ok) {
+                this.menus = this.menus.filter(m => m.id !== this.menuToDelete.id);
+                this.deleteModalOpen = false;
+                this.menuToDelete = null;
+            } else {
+                window.location.reload();
+            }
+        } catch(e) {
+            console.error(e);
+            window.location.reload();
+        }
     },
     filteredMenus() {
         return this.menus.filter(item => {
@@ -42,20 +47,33 @@
     confirmDelete(menu) {
         this.menuToDelete = menu;
         this.deleteModalOpen = true;
+        this.$nextTick(() => {
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
     },
-    executeDelete() {
-        if (this.menuToDelete) {
-            this.menus = this.menus.filter(m => m.id !== this.menuToDelete.id);
-            this.deleteModalOpen = false;
-            this.menuToDelete = null;
-        }
-    },
-    toggleAvailability(menu) {
+    async toggleAvailability(menu) {
         menu.isAvailable = !menu.isAvailable;
         if (!menu.isAvailable) {
             menu.stock = 0;
         } else if (menu.stock === 0) {
             menu.stock = 10;
+        }
+        try {
+            await fetch('{{ route('seller.stock.update') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    items: [{ id: menu.id, stock: menu.stock }]
+                })
+            });
+        } catch(e) {
+            console.error(e);
         }
     }
 }">
@@ -213,7 +231,9 @@
 
                             <!-- Stock -->
                             <td class="py-3.5 px-4 whitespace-nowrap">
-                                <span class="font-bold" :class="menu.stock > 3 ? 'text-slate-800' : (menu.stock > 0 ? 'text-amber-600' : 'text-rose-600')" x-text="menu.stock + ' porsi'"></span>
+                                <span class="text-xs font-semibold"
+                                      :class="menu.stock > 5 ? 'text-slate-700' : (menu.stock > 0 ? 'text-amber-600' : 'text-rose-600')" 
+                                      x-text="menu.stock > 0 ? menu.stock + ' porsi' : 'Porsi Habis'"></span>
                             </td>
 
                             <!-- Status Toggle (Warna Hijau Kontras Font Putih & Titik Kedap-Kedip) -->
@@ -268,35 +288,37 @@
     </div>
 
     <!-- Delete Confirmation Modal (Alpine.js) -->
-    <div x-show="deleteModalOpen" 
-         x-cloak 
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
-         @keydown.escape.window="deleteModalOpen = false">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-xl border border-slate-200"
-             @click.away="deleteModalOpen = false">
-            <div class="w-11 h-11 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
-            </div>
-            <div class="space-y-1">
-                <h3 class="text-base font-bold text-slate-900">Hapus Menu Ini?</h3>
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    Menu <span class="font-bold text-slate-800" x-text="menuToDelete ? menuToDelete.name : ''"></span> akan dihapus dari daftar katalog stan Anda.
-                </p>
-            </div>
-            <div class="flex items-center justify-end gap-2 pt-2">
-                <button type="button" 
-                        @click="deleteModalOpen = false"
-                        class="h-10 py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
-                    Batal
-                </button>
-                <button type="button" 
-                        @click="executeDelete()"
-                        class="h-10 py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 transition">
-                    Ya, Hapus
-                </button>
+    <template x-teleport="body">
+        <div x-show="deleteModalOpen" 
+             x-cloak 
+             class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+             @keydown.escape.window="deleteModalOpen = false">
+            <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-slate-200"
+                 @click.away="deleteModalOpen = false">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
+                    <i data-lucide="trash-2" class="w-6 h-6 text-rose-600"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-base font-bold text-slate-900">Hapus Menu Ini?</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Menu <span class="font-bold text-slate-800" x-text="menuToDelete ? menuToDelete.name : ''"></span> akan dihapus dari daftar katalog stan Anda.
+                    </p>
+                </div>
+                <div class="flex items-center justify-center gap-2 pt-2">
+                    <button type="button" 
+                            @click="deleteModalOpen = false"
+                            class="w-1/2 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                        Batal
+                    </button>
+                    <button type="button" 
+                            @click="executeDelete()"
+                            class="w-1/2 h-10 py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 transition">
+                        Ya, Hapus
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 
 </div>
 

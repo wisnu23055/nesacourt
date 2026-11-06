@@ -11,22 +11,36 @@
     nim: '{{ addslashes($user->phone ?? '23055310001') }}',
     faculty: 'Fakultas Vokasi - D4 Manajemen Informatika',
     phone: '{{ addslashes($user->phone ?? '081234567890') }}',
+    avatarPreview: '{{ $user->avatar_url ?: '' }}',
+    handleAvatarChange(e) {
+        const file = e.target.files[0];
+        if (file) {
+            this.avatarPreview = URL.createObjectURL(file);
+        }
+    }
 }">
 
     <!-- Top Identity Card (Identik dengan Tema Dashboard & Halaman Buyer Lainnya) -->
     <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-5">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div class="flex items-center gap-3.5">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
-                     alt="Foto Mahasiswa" 
-                     class="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-200 shrink-0">
+                <div class="w-14 h-14 rounded-2xl ring-1 ring-slate-200 overflow-hidden shrink-0 flex items-center justify-center bg-slate-200 shadow-2xs">
+                    <template x-if="avatarPreview">
+                        <img :src="avatarPreview" 
+                             alt="Foto Mahasiswa" 
+                             class="w-full h-full object-cover">
+                    </template>
+                    <template x-if="!avatarPreview">
+                        <span class="text-slate-700 font-bold text-base">{{ $user->initials }}</span>
+                    </template>
+                </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight" x-text="name">Aditya Pratama</h1>
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight" x-text="name">{{ $user->name }}</h1>
                         <span class="text-slate-300 font-normal">|</span>
                         <span class="text-xs font-semibold text-brand-600">Mahasiswa Aktif</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: 23055310001)</p>
+                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: {{ $user->phone ?? '23055310001' }})</p>
                 </div>
             </div>
 
@@ -89,7 +103,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         <!-- Form 1: Biodata Mahasiswa -->
-        <form action="{{ route('buyer.profile.update') }}" method="POST" class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-4 shadow-xs flex flex-col justify-between">
+        <form action="{{ route('buyer.profile.update') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 space-y-4 shadow-xs flex flex-col justify-between">
             @csrf
             <div>
                 <h3 class="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
@@ -98,6 +112,31 @@
                 </h3>
 
                 <div class="space-y-3 pt-3">
+                    <!-- Upload Foto Profil -->
+                    <div class="space-y-2 pb-3 border-b border-slate-100">
+                        <label class="block text-xs font-semibold text-slate-700">Foto Profil Akun</label>
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-20 h-20 rounded-2xl ring-1 ring-slate-200 overflow-hidden shrink-0 flex items-center justify-center bg-slate-200 shadow-2xs">
+                                <template x-if="avatarPreview">
+                                    <img :src="avatarPreview" alt="Preview Foto Profil" class="w-full h-full object-cover">
+                                </template>
+                                <template x-if="!avatarPreview">
+                                    <span class="text-slate-700 font-bold text-xl">{{ $user->initials }}</span>
+                                </template>
+                            </div>
+                            <div class="flex-1 min-w-0 h-20 flex flex-col justify-between py-0.5">
+                                <p class="text-[11px] text-slate-500 leading-relaxed">Format: JPG, PNG, WEBP (Maksimal 2 MB). Jika tidak ada foto akan menggunakan inisial nama dengan latar abu-abu.</p>
+                                <div>
+                                    <label for="avatar_input" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer transition shadow-2xs">
+                                        <i data-lucide="camera" class="w-4 h-4 text-slate-700"></i>
+                                        <span x-text="avatarPreview ? 'Ganti Foto Profil' : 'Pilih File Foto Profil'">Pilih File Foto Profil</span>
+                                        <input type="file" id="avatar_input" name="avatar" accept="image/*" @change="handleAvatarChange($event)" class="hidden">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="space-y-1">
                         <label class="block text-xs font-semibold text-slate-700">Nama Lengkap</label>
                         <input type="text" name="name" x-model="name" required class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500">

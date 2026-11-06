@@ -30,7 +30,13 @@ class Order extends Model
             // Kembalikan kuantitas stok menu secara atomik (cegah pengembalian ganda)
             foreach ($locked->items as $item) {
                 if ($item->menu_id) {
-                    Menu::where('id', $item->menu_id)->increment('stock', $item->quantity);
+                    $menu = Menu::find($item->menu_id);
+                    if ($menu) {
+                        $menu->increment('stock', $item->quantity);
+                        if (! $menu->is_available) {
+                            $menu->update(['is_available' => true]);
+                        }
+                    }
                 }
             }
 
@@ -68,6 +74,15 @@ class Order extends Model
         'total' => 'decimal:2',
         'payment_deadline' => 'datetime',
     ];
+
+    protected $appends = [
+        'payment_method',
+    ];
+
+    public function getPaymentMethodAttribute(): string
+    {
+        return 'QRIS';
+    }
 
     public function buyer(): BelongsTo
     {

@@ -28,15 +28,63 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $buyer = User::firstOrCreate(
-            ['email' => 'aditya.23048@mhs.unesa.ac.id'],
-            [
-                'name' => 'Aditya Pratama',
-                'password' => Hash::make('password'),
-                'role' => 'buyer',
-                'phone' => '23055310001', // NIM Mahasiswa
-            ]
-        );
+        $buyers = [
+            'aditya' => User::firstOrCreate(
+                ['email' => 'aditya.23048@mhs.unesa.ac.id'],
+                [
+                    'name' => 'Aditya Pratama',
+                    'password' => Hash::make('aditya.23048@mhs.unesa.ac.id'),
+                    'role' => 'buyer',
+                    'phone' => '23055310001', // NIM Mahasiswa
+                ]
+            ),
+            'nadia' => User::firstOrCreate(
+                ['email' => 'nadia.salsabila@mhs.unesa.ac.id'],
+                [
+                    'name' => 'Nadia Salsabila',
+                    'password' => Hash::make('password'),
+                    'role' => 'buyer',
+                    'phone' => '23055310034',
+                ]
+            ),
+            'rizky' => User::firstOrCreate(
+                ['email' => 'rizky.kurniawan@mhs.unesa.ac.id'],
+                [
+                    'name' => 'Rizky Kurniawan',
+                    'password' => Hash::make('password'),
+                    'role' => 'buyer',
+                    'phone' => '23055310018',
+                ]
+            ),
+            'dewi' => User::firstOrCreate(
+                ['email' => 'dewi.lestari@mhs.unesa.ac.id'],
+                [
+                    'name' => 'Dewi Lestari',
+                    'password' => Hash::make('password'),
+                    'role' => 'buyer',
+                    'phone' => '23055310045',
+                ]
+            ),
+            'budi' => User::firstOrCreate(
+                ['email' => 'budi.santoso@mhs.unesa.ac.id'],
+                [
+                    'name' => 'Budi Santoso',
+                    'password' => Hash::make('password'),
+                    'role' => 'buyer',
+                    'phone' => '23055310052',
+                ]
+            ),
+            'siti' => User::firstOrCreate(
+                ['email' => 'siti.aisyah@mhs.unesa.ac.id'],
+                [
+                    'name' => 'Siti Aisyah',
+                    'password' => Hash::make('password'),
+                    'role' => 'buyer',
+                    'phone' => '23055310060',
+                ]
+            ),
+        ];
+        $buyer = $buyers['aditya'];
 
         $sellerUsers = [
             'barokah' => User::firstOrCreate(
@@ -121,7 +169,7 @@ class DatabaseSeeder extends Seeder
                     'slug' => 'geprek-mas-bro',
                     'description' => 'Nasi goreng spesial aroma wok dan aneka camilan kentang garing.',
                     'logo_path' => 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=120&q=80',
-                    'location' => 'Counter Timur No. 03 | Food Court Ketintang',
+                    'location' => 'Counter Timur No. 03 | Food Court Lidah Wetan',
                     'is_active' => true,
                     'open_time' => '08:30:00',
                     'close_time' => '17:30:00',
@@ -134,7 +182,7 @@ class DatabaseSeeder extends Seeder
                     'slug' => 'aneka-jus-vokasi',
                     'description' => 'Pusat es teh jumbo, aneka jus buah segar asli, dan kopi susu gula aren.',
                     'logo_path' => 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=120&q=80',
-                    'location' => 'Counter Timur No. 04 | Food Court Ketintang',
+                    'location' => 'Counter Timur No. 04 | Food Court Lidah Wetan',
                     'is_active' => true,
                     'open_time' => '07:30:00',
                     'close_time' => '17:00:00',
@@ -297,5 +345,8 @@ class DatabaseSeeder extends Seeder
                 $item
             );
         }
+
+        // 6. Orders and Transactions
+        $this->call(OrderSeeder::class);
     }
 }

@@ -18,9 +18,15 @@
     <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-5">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div class="flex items-center gap-3.5">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
-                     alt="Foto Mahasiswa" 
-                     class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
+                @if(auth()->user()->avatar_url)
+                    <img src="{{ auth()->user()->avatar_url }}" 
+                         alt="Foto Mahasiswa" 
+                         class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
+                @else
+                    <div class="w-12 h-12 rounded-xl bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center shrink-0">
+                        {{ auth()->user()->initials }}
+                    </div>
+                @endif
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Halo, {{ auth()->user()->name }}</h1>
@@ -281,17 +287,24 @@
                             </p>
                             <p class="text-xs text-slate-500 line-clamp-2 pt-0.5" x-text="item.desc"></p>
                             <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                                <span class="text-sm font-extrabold text-brand-700" x-text="formatRupiah(item.price)"></span>
-                                <span class="text-[11px] text-slate-400" x-text="item.prepTime"></span>
+                                <div>
+                                    <span class="text-sm font-extrabold text-brand-700 block" x-text="formatRupiah(item.price)"></span>
+                                    <span class="text-[10px] text-slate-400" x-text="item.prepTime"></span>
+                                </div>
+                                <span class="text-[11px] font-semibold"
+                                      :class="item.stock > 5 ? 'text-slate-500' : (item.stock > 0 ? 'text-amber-600' : 'text-rose-600')"
+                                      x-text="item.stock > 0 ? 'Sisa ' + item.stock + ' porsi' : 'Porsi Habis'"></span>
                             </div>
                         </div>
                     </div>
                     <div class="p-4 pt-0">
                         <button type="button" 
-                                @click="addToCart({ id: item.id, name: item.name, price: item.price, seller: item.sellerName })" 
-                                class="whitespace-nowrap w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-brand-600 text-white text-xs font-semibold hover:bg-brand-700 shadow-sm transition">
+                                :disabled="item.stock === 0"
+                                @click="addToCart({ id: item.id, name: item.name, price: item.price, seller: item.sellerName, image: item.image })" 
+                                :class="item.stock === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm'"
+                                class="whitespace-nowrap w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition">
                             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>Tambah ke Keranjang</span>
+                            <span x-text="item.stock === 0 ? 'Porsi Habis' : 'Tambah ke Keranjang'"></span>
                         </button>
                     </div>
                 </div>

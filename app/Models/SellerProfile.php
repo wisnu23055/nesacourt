@@ -25,6 +25,32 @@ class SellerProfile extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = [
+        'logo_url',
+        'initials',
+    ];
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (empty($this->logo_path)) {
+            return null;
+        }
+        if (str_starts_with($this->logo_path, 'http://') || str_starts_with($this->logo_path, 'https://')) {
+            return $this->logo_path;
+        }
+        return '/' . ltrim($this->logo_path, '/');
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $name = preg_replace('/^Stan\s+\d+\s*-\s*/i', '', $this->stall_name ?? 'Stan');
+        $words = preg_split('/\s+/', trim($name));
+        if (count($words) >= 2) {
+            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+        }
+        return strtoupper(substr($name, 0, 2));
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -29,6 +29,23 @@ class Menu extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = [
+        'image_url',
+    ];
+
+    public function getImageUrlAttribute(): string
+    {
+        if (empty($this->image_path)) {
+            return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80';
+        }
+
+        if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
+            return $this->image_path;
+        }
+
+        return asset(ltrim($this->image_path, '/'));
+    }
+
     public function seller(): BelongsTo
     {
         return $this->belongsTo(SellerProfile::class, 'seller_id');

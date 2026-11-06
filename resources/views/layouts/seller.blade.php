@@ -101,16 +101,10 @@
         <div class="flex-1 flex min-w-0">
             <!-- Desktop Sidebar Navigation (Kiri) -->
             <aside class="hidden lg:flex lg:flex-col lg:w-64 bg-white border-r border-slate-200 shrink-0 sticky top-0 self-start h-screen z-30">
-            <!-- Brand Logo & Stan Portal Info -->
+            <!-- Brand Logo -->
             <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-                <a href="{{ url('/penjual/dashboard') }}" class="flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-base shadow-sm shadow-brand-500/20 group-hover:bg-brand-700 transition shrink-0">
-                        N
-                    </div>
-                    <div>
-                        <span class="font-bold text-base text-slate-900 tracking-tight block leading-tight">NesaCourt</span>
-                        <p class="text-[10px] text-brand-600 font-semibold">Portal Stan Penjual</p>
-                    </div>
+                <a href="{{ url('/penjual/dashboard') }}" class="flex items-center group">
+                    <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-14 w-auto object-contain">
                 </a>
             </div>
 
@@ -208,12 +202,23 @@
             <!-- Bottom User Card in Sidebar -->
             <div class="p-4 border-t border-slate-100 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80" 
-                         alt="Foto Pemilik Stan" 
-                         class="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
+                    @php
+                        $stall = auth()->user()->sellerProfile;
+                        $stallLogo = $stall ? $stall->logo_url : null;
+                        $stallInitial = $stall ? $stall->initials : strtoupper(substr(auth()->user()->name, 0, 2));
+                    @endphp
+                    @if($stallLogo)
+                        <img src="{{ $stallLogo }}" 
+                             alt="{{ $stall ? $stall->stall_name : 'Foto Stan' }}" 
+                             class="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
+                    @else
+                        <div class="w-9 h-9 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
+                            {{ $stallInitial }}
+                        </div>
+                    @endif
                     <div class="min-w-0">
                         <span class="text-xs font-bold text-slate-900 block truncate">{{ auth()->user()->name }}</span>
-                        <span class="text-[10px] text-slate-400 block truncate">{{ auth()->user()->sellerProfile ? auth()->user()->sellerProfile->stall_name : 'Pengelola Stan' }}</span>
+                        <span class="text-[10px] text-slate-400 block truncate">{{ $stall ? $stall->stall_name : 'Pengelola Stan' }}</span>
                     </div>
                 </div>
                 <a href="{{ route('logout') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
@@ -234,17 +239,18 @@
                                 aria-label="Buka Menu Sidebar">
                             <i data-lucide="menu" class="w-5 h-5"></i>
                         </button>
-                        <a href="{{ url('/penjual/dashboard') }}" class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-sm">
-                                N
-                            </div>
-                            <span class="font-bold text-base text-slate-900">Stan Penjual</span>
+                        <a href="{{ url('/penjual/dashboard') }}" class="flex items-center">
+                            <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-9 w-auto object-contain">
                         </a>
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <a href="{{ url('/penjual/profil') }}" class="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-slate-200">
-                            <img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=120&q=80" alt="Penjual" class="w-full h-full object-cover">
+                        <a href="{{ url('/penjual/profil') }}" class="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-slate-200 flex items-center justify-center bg-slate-200 shrink-0">
+                            @if(isset($stallLogo) && $stallLogo)
+                                <img src="{{ $stallLogo }}" alt="Stan" class="w-full h-full object-cover">
+                            @else
+                                <span class="text-xs font-bold text-slate-700">{{ $stallInitial ?? 'ST' }}</span>
+                            @endif
                         </a>
                     </div>
                 </div>
@@ -276,10 +282,9 @@
                          x-transition:leave-end="-translate-x-full"
                          class="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-xl">
                         <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold">N</div>
-                                <span class="font-bold text-base text-slate-900">Stan Penjual</span>
-                            </div>
+                            <a href="{{ url('/penjual/dashboard') }}" class="flex items-center">
+                                <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-12 w-auto object-contain">
+                            </a>
                             <button type="button" @click="sidebarOpen = false" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition" aria-label="Tutup Menu Sidebar">
                                 <i data-lucide="x" class="w-5 h-5"></i>
                             </button>

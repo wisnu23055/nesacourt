@@ -25,14 +25,20 @@
     <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-xs space-y-5">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div class="flex items-center gap-3.5">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
-                     alt="Foto Mahasiswa" 
-                     class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
+                @if(auth()->user()->avatar_url)
+                    <img src="{{ auth()->user()->avatar_url }}" 
+                         alt="Foto Mahasiswa" 
+                         class="w-12 h-12 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
+                @else
+                    <div class="w-12 h-12 rounded-xl bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center shrink-0">
+                        {{ auth()->user()->initials }}
+                    </div>
+                @endif
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Riwayat Transaksi Pesanan</h1>
                         <span class="text-slate-300 font-normal">|</span>
-                        <span class="text-xs font-semibold text-brand-600">Aditya Pratama</span>
+                        <span class="text-xs font-semibold text-brand-600">{{ auth()->user()->name }}</span>
                     </div>
                     <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: 23055310001)</p>
                 </div>
@@ -173,12 +179,10 @@
             <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl overflow-y-auto max-h-[90vh]" @click.outside="receiptModalOpen = false">
                 
                 <!-- Receipt Header -->
-                <div class="text-center space-y-1 pb-4 border-b border-dashed border-slate-300">
-                    <div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-lg mx-auto shadow-xs">
-                        N
-                    </div>
-                    <h3 class="text-base font-bold text-slate-900 pt-1">NesaCourt UNESA</h3>
-                    <p class="text-xs text-slate-500" x-text="selectedOrder?.stall"></p>
+                <div class="text-center space-y-1.5 pb-4 border-b border-dashed border-slate-300">
+                    <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-9 w-auto object-contain mx-auto">
+                    <h3 class="text-sm font-bold text-slate-900 pt-0.5">NesaCourt UNESA</h3>
+                    <p class="text-xs text-slate-600 font-semibold" x-text="selectedOrder?.stall"></p>
                     <p class="text-[10px] text-slate-400">Food Court Vokasi Ketintang Surabaya</p>
                 </div>
 

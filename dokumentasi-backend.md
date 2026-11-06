@@ -19,7 +19,7 @@ Saat ini telah diselesaikan implementasi **Tahap 1: Fondasi Data, Skema Basis Da
 
 | Model | Tabel Database | Relasi Utama | Keterangan |
 | :--- | :--- | :--- | :--- |
-| `User` | `users` | `hasOne(SellerProfile)`, `hasMany(Order)`, `hasMany(OrderStatusLog)`, `hasMany(PaymentConfirmation)`, `hasMany(RecommendationLog)` | Entitas pengguna multi-role (`admin`, `seller`, `buyer`). Kolom `phone` difungsikan menyimpan nomor telepon atau NIM mahasiswa. |
+| `User` | `users` | `hasOne(SellerProfile)`, `hasMany(Order)`, `hasMany(OrderStatusLog)`, `hasMany(PaymentConfirmation)`, `hasMany(RecommendationLog)` | Entitas pengguna multi-role (`admin`, `seller`, `buyer`). Kolom `phone` difungsikan menyimpan nomor telepon/NIM, serta kolom `avatar_path` untuk foto profil pengguna. |
 | `Category` | `categories` | `hasMany(Menu)` | Klasifikasi menu hidangan (`makanan`, `camilan`, `minuman`, `kopi`, `paket`). |
 | `SellerProfile` | `seller_profiles` | `belongsTo(User)`, `hasOne(SellerPaymentQris)`, `hasMany(Menu)`, `hasMany(Order)` | Profil stan kantin di Food Court UNESA Ketintang (nama stan, slug, deskripsi, lokasi counter, jam buka/tutup). |
 | `SellerPaymentQris` | `seller_payment_qris` | `belongsTo(SellerProfile)` | Registrasi data QRIS statis tiap stan (`image_path`, `merchant_name`, status aktif). |
@@ -118,6 +118,7 @@ Seluruh fitur Sisi Pembeli (**F-05 s/d F-14**) telah terhubung penuh secara dina
    - Modal struk digital lengkap dengan nomor nota, tanggal transaksi WIB, stan penyedia, dan total pembayaran.
 9. **F-14: Profil Akun Pembeli (`/profil`)**:
    - Statistik riil: total transaksi selesai (`$totalCompleted`) dan stan langganan utama (`$favStall`).
+   - Fitur unggah foto profil pengguna (`avatar`, format JPG/PNG/WEBP, maks 2MB) disimpan di storage publik dengan fallback inisial berlatar abu-abu.
    - Form pembaruan data kontak WhatsApp (`POST /profil`).
    - Form pembaruan kata sandi akun dengan verifikasi hash sandi lama (`POST /profil/password`).
 
@@ -237,7 +238,29 @@ Seluruh komponen pendukung bersama dan proteksi sistem (**F-32 s/d F-34**) telah
 
 ---
 
-## 9. Status Akhir Roadmap Integrasi (100% SELESAI)
+## 9. Pembaruan Seeding Pesanan & Penanganan Status Penjual
+
+### A. Seeder Transaksi Komprehensif (`OrderSeeder.php`)
+Telah ditambahkan berkas `database/seeders/OrderSeeder.php` yang dipanggil melalui `DatabaseSeeder.php`. Seeder ini menyediakan dataset transaksi lengkap dan realistis untuk pengujian komprehensif alur kerja penjual (*Stan 01 - Barokah Rasa* dan stan lainnya) mencakup seluruh siklus pesanan:
+1. **`dibuat` / Menunggu Verifikasi QRIS (`NC-20261104-001`)**: Mahasiswa Aditya Pratama (Meja 08), pembayaran berstatus `perlu_pemeriksaan`.
+2. **`diproses` / Sedang Dimasak (`NC-20261104-002`)**: Mahasiswa Nadia Salsabila (Meja 12), pembayaran QRIS terkonfirmasi, status dapur dimasak.
+3. **`siap` / Siap Diambil (`NC-20261104-003`)**: Mahasiswa Rizky Kurniawan (Takeaway), siap diambil di meja counter.
+4. **`selesai` / Transaksi Sukses Hari Ini (`NC-20261104-004` & `NC-20261104-005`)**: Pesanan selesai hari ini untuk menguji metrik omzet dan grafik pesanan harian.
+5. **`selesai` / Transaksi Lampau (`NC-20261101-089` & `NC-20261025-045`)**: Pesanan selesai 3 hari lalu dan 10 hari lalu untuk memverifikasi keakuratan filter laporan pendapatan *7 Hari Terakhir* dan *Bulan Ini*.
+6. **`dibatalkan` (`NC-20261104-006`)**: Pesanan dibatalkan untuk menguji riwayat pembatalan transaksi.
+7. **Pesanan Stan Lain**: `NC-20261104-007` (Stan 02 - Soto Bu Siti) dan `NC-20261104-008` (Stan 04 - Aneka Jus Vokasi).
+
+Seluruh pesanan dilengkapi snapshot nama dan harga menu pada `order_items`, jejak audit pada `order_status_logs`, dan bukti verifikasi pada `payment_confirmations`.
+
+### B. Normalisasi Alias Status pada `SellerController@updateOrderStatus`
+Pada method `SellerController::updateOrderStatus()`, ditambahkan normalisasi payload request dari antarmuka Alpine.js:
+- Input `'memasak'` dinormalisasi menjadi `'diproses'`.
+- Input `'siap_ambil'` dinormalisasi menjadi `'siap'`.
+Normalisasi ini dilakukan sebelum aturan validasi enum database (`diterima,diproses,siap,selesai,dibatalkan`) dijalankan, menjamin tidak timbul galat validasi HTTP 422 saat penjual menekan tombol ubah status di halaman pesanan.
+
+---
+
+## 10. Status Akhir Roadmap Integrasi (100% SELESAI)
 
 Seluruh 5 Tahap Integrasi Sistem NesaCourt (**F-01 s/d F-34**) telah terselesaikan dan teruji secara penuh:
 - **Tahap 1**: Fondasi Data, Migrasi, Seeder, dan Autentikasi RBAC (**F-01 s/d F-04**).
@@ -245,3 +268,16 @@ Seluruh 5 Tahap Integrasi Sistem NesaCourt (**F-01 s/d F-34**) telah terselesaik
 - **Tahap 3**: Sisi Penjual / Stan Kantin (**F-15 s/d F-24**).
 - **Tahap 4**: Sisi Admin / Pengelola Food Court (**F-25 s/d F-31**).
 - **Tahap 5**: Komponen Bersama, Halaman Kesalahan, dan Hardening (**F-32 s/d F-34**).
+
+---
+
+## 11. Pembaruan Pelacakan Pesanan Pembeli & Rekapitulasi Kasir
+
+### A. Redesain Status Pesanan Pembeli Bertema Dapur Penjual (`BuyerController@orderStatus`)
+1. **Endpoint**: `GET /pesanan/status` (mendukung query parameter opsional `?order=NC-XXXX`).
+2. **Logika Controller**:
+   - Mengambil seluruh daftar pesanan milik pembeli (`$allOrders`) dan memetakannya ke representasi array Alpine.js dengan struktur lengkap: `id`, `queueNo`, `stallName`, `stallImage`, `stallInitials`, `status`, `statusLabel`, `diningType`, `notes`, `totalPrice`, dan `items`.
+   - Menentukan mode tampilan melalui flag `showDetail`: bernilai `true` jika pengguna membuka order spesifik atau baru menyelesaikan pesanan, dan `false` jika membuka daftar antrean semua pesanan.
+3. **Dua Mode Antarmuka**:
+   - **Mode Daftar Antrean**: Menampilkan filter toolbar tabs (`Semua Pesanan`, `Perlu Verifikasi`, `Sedang Dimasak`, `Siap Diambil`, `Selesai`), search bar, dan card grid pesanan 2 kolom bertema identik dengan halaman dapur penjual (`penjual/pesanan`) dengan titik kedap-kedip animasi status serta tombol **"Lihat Detail"**.
+   - **Mode Detail Pelacakan**: Menampilkan navigasi kembali ke daftar pesanan, kartu ringkasan nomor ID, lokasi counter stan, nomor antrean, dan stepper tracker 6 tahapan real-time (Dibuat -> Menunggu Bayar -> Dikonfirmasi -> Sedang Dimasak -> Siap Diambil -> Selesai) beserta rincian nota pesanan.

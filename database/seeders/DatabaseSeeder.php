@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
                 ['email' => 'aditya.23048@mhs.unesa.ac.id'],
                 [
                     'name' => 'Aditya Pratama',
-                    'password' => Hash::make('aditya.23048@mhs.unesa.ac.id'),
+                    'password' => Hash::make('password'),
                     'role' => 'buyer',
                     'phone' => '23055310001', // NIM Mahasiswa
                 ]

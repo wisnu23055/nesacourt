@@ -33,10 +33,10 @@ class DatabaseSeeder extends Seeder
         );
 
         // 2. Pembeli (20 Mahasiswa UNESA Kampus 1 Ketintang — proporsi fakultas sesuai Tabel 1 Jurnal)
-        // 6 akun demo utama tetap dipertahankan agar kompatibel dengan dokumentasi tim.
+        // 6 akun demo utama tetap dipertahankan agar kompatibel dengan dokumentasi tim (password default: 'password').
         $buyerSeedList = [
             // Fakultas Teknik (~40% — jarak terdekat ke Foodcourt Baseball Ketintang, 21% total responden)
-            ['email' => 'aditya.23048@mhs.unesa.ac.id', 'name' => 'Aditya Pratama', 'phone' => '23055310001', 'password' => Hash::make('aditya.23048@mhs.unesa.ac.id')],
+            ['email' => 'aditya.23048@mhs.unesa.ac.id', 'name' => 'Aditya Pratama', 'phone' => '23055310001', 'password' => $defaultPasswordHash],
             ['email' => 'rizky.kurniawan@mhs.unesa.ac.id', 'name' => 'Rizky Kurniawan', 'phone' => '23055310018', 'password' => $defaultPasswordHash],
             ['email' => 'budi.santoso@mhs.unesa.ac.id', 'name' => 'Budi Santoso', 'phone' => '23055310052', 'password' => $defaultPasswordHash],
             ['email' => 'fajar.nugroho@mhs.unesa.ac.id', 'name' => 'Fajar Nugroho', 'phone' => '24050974011', 'password' => $defaultPasswordHash],

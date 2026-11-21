@@ -166,18 +166,18 @@
                 <!-- Bottom User Card in Sidebar -->
                 <div class="p-4 border-t border-slate-100 flex items-center justify-between gap-3">
                     <a href="{{ url('/profil') }}" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition">
-                        @if(auth()->user()->avatar_url)
+                        @if(auth()->user()?->avatar_url)
                             <img src="{{ auth()->user()->avatar_url }}" 
                                  alt="Foto Mahasiswa" 
                                  class="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0">
                         @else
                             <div class="w-9 h-9 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
-                                {{ auth()->user()->initials }}
+                                {{ auth()->user()?->initials ?? 'TM' }}
                             </div>
                         @endif
                         <div class="min-w-0">
-                            <span class="text-xs font-bold text-slate-900 block truncate">{{ auth()->user()->name ?? 'Aditya Pratama' }}</span>
-                            <span class="text-[10px] text-slate-400 block truncate">NIM: {{ auth()->user()->phone ?? '23055310001' }}</span>
+                            <span class="text-xs font-bold text-slate-900 block truncate">{{ auth()->user()?->name ?? 'Tamu' }}</span>
+                            <span class="text-[10px] text-slate-400 block truncate">NIM: {{ auth()->user()?->phone ?? '-' }}</span>
                         </div>
                     </a>
                     <a href="{{ route('logout') }}" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition shrink-0" title="Keluar">
@@ -217,10 +217,10 @@
                                 </span>
                             </button>
                             <a href="{{ url('/profil') }}" class="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-slate-200 flex items-center justify-center bg-slate-200 shrink-0">
-                                @if(auth()->user()->avatar_url)
+                                @if(auth()->user()?->avatar_url)
                                     <img src="{{ auth()->user()->avatar_url }}" alt="Mahasiswa" class="w-full h-full object-cover">
                                 @else
-                                    <span class="text-xs font-bold text-slate-700">{{ auth()->user()->initials }}</span>
+                                    <span class="text-xs font-bold text-slate-700">{{ auth()->user()?->initials ?? 'TM' }}</span>
                                 @endif
                             </a>
                         </div>

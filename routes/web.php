@@ -30,6 +30,7 @@ Route::view('/forgot-password', 'auth.forgot-password')->name('password.request'
 // Menu & katalog publik
 Route::get('/katalog', [BuyerController::class, 'catalog'])->name('buyer.catalog');
 Route::get('/rekomendasi', [BuyerController::class, 'recommendation'])->name('buyer.recommendation');
+Route::post('/rekomendasi/ai', [BuyerController::class, 'recommendationAi'])->name('buyer.recommendation.ai');
 Route::get('/keranjang', [BuyerController::class, 'cart'])->name('buyer.cart');
 
 // Area pembeli terautentikasi
@@ -68,6 +69,7 @@ Route::middleware(['auth', 'role:seller,admin'])->prefix('penjual')->name('selle
     Route::post('/pesanan/{order_number}/status', [SellerController::class, 'updateOrderStatus'])->name('orders.status');
     Route::get('/laporan', [SellerController::class, 'reportsIndex'])->name('reports');
     Route::get('/prediksi', [SellerController::class, 'forecastIndex'])->name('forecast');
+    Route::get('/prediksi/hourly/{menu_id}', [SellerController::class, 'forecastHourly'])->name('forecast.hourly');
     Route::get('/profil', [SellerController::class, 'profileIndex'])->name('profile');
     Route::post('/profil', [SellerController::class, 'profileUpdate'])->name('profile.update');
 });

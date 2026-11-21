@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\OrderStatusLog;
 use App\Models\RecommendationLog;
 use App\Models\SellerProfile;
+use App\Services\NesaCourtAiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -134,42 +135,235 @@ class BuyerController extends Controller
     }
 
     /**
-     * F-08: Rekomendasi Menu AI
+     * F-08: Rekomendasi Menu AI (Terintegrasi dengan Python FastAPI + Fallback Lokal)
      */
-    public function recommendation(Request $request): View
+    public function recommendation(Request $request, NesaCourtAiService $aiService): View
     {
-        $menus = Menu::with('seller')
-            ->where('is_active', true)
-            ->where('stock', '>', 0)
-            ->get()
-            ->map(function (Menu $m) {
-                $tags = is_array($m->taste_tags) ? array_map('strtolower', $m->taste_tags) : [];
-                $taste = 'gurih';
-                foreach (['pedas', 'manis', 'berkuah', 'segar', 'gurih'] as $t) {
-                    if (in_array($t, $tags, true)) {
-                        $taste = $t;
-                        break;
-                    }
-                }
+        $result = $this->runRecommendationQuery(
+            aiService: $aiService,
+            budgetParam: 'semua',
+            tasteParam: 'semua',
+            timeParam: 'semua',
+            logSearch: false
+        );
 
-                return [
+        return view('buyer.recommendation', [
+            'menus' => $result['menus'],
+            'aiOnline' => $result['ai_online'],
+            'aiMessage' => $result['message'],
+            'aiSource' => $result['ai_source'],
+        ]);
+    }
+
+    /**
+     * F-08 AJAX Endpoint: Memanggil NesaCourt Python AI Service untuk skor rekomendasi real-time.
+     */
+    public function recommendationAi(Request $request, NesaCourtAiService $aiService): JsonResponse
+    {
+        $budgetParam = (string) $request->input('budget', 'semua');
+        $tasteParam = (string) $request->input('taste', 'semua');
+        $timeParam = (string) $request->input('max_wait', 'semua');
+
+        $result = $this->runRecommendationQuery(
+            aiService: $aiService,
+            budgetParam: $budgetParam,
+            tasteParam: $tasteParam,
+            timeParam: $timeParam,
+            logSearch: true,
+            sessionId: $request->session()->getId()
+        );
+
+        return response()->json($result);
+    }
+
+    /**
+     * Helper internal untuk memanggil Python AI Service / fallback lokal secara konsisten.
+     */
+    private function runRecommendationQuery(
+        NesaCourtAiService $aiService,
+        string $budgetParam,
+        string $tasteParam,
+        string $timeParam,
+        bool $logSearch = false,
+        string $sessionId = ''
+    ): array {
+        $dbMenus = Menu::with(['seller', 'category'])
+            ->where('is_active', true)
+            ->where('is_available', true)
+            ->where('stock', '>', 0)
+            ->get();
+
+        // Hitung antrean aktif riil per tenant dari MySQL
+        $sellerQueues = Order::whereIn('order_status', ['dibuat', 'diterima', 'diproses'])
+            ->selectRaw('seller_id, COUNT(*) as queue_count')
+            ->groupBy('seller_id')
+            ->pluck('queue_count', 'seller_id')
+            ->map(fn ($v) => (int) $v)
+            ->all();
+
+        $budgetInt = $budgetParam === 'semua' ? 100000 : max(0, (int) $budgetParam);
+        $tasteClean = strtolower(trim($tasteParam ?: 'semua'));
+        $maxWaitInt = match ($timeParam) {
+            'semua', '20' => 30,
+            default => max(1, (int) $timeParam),
+        };
+        $strictWait = !in_array($timeParam, ['semua', '20'], true);
+
+        // Lookup cepat detail menu MySQL (foto, kategori, dll.)
+        $menuLookup = $dbMenus->keyBy('id');
+
+        // Kirim data menu riil dari MySQL ke layanan Python FastAPI
+        $aiMenusPayload = $dbMenus->map(function (Menu $m) {
+            $catSlug = $m->category->slug ?? 'makanan';
+            $itemType = in_array($catSlug, ['minuman', 'kopi'], true) ? 'minuman' : 'makanan';
+
+            return [
+                'menu_id' => $m->id,
+                'seller_id' => $m->seller_id,
+                'stall_name' => $m->seller->stall_name ?? 'Stan Kantin',
+                'menu_name' => $m->name,
+                'item_type' => $itemType,
+                'price_idr' => (int) $m->price,
+                'estimated_time_minutes' => (int) ($m->estimated_time_minutes ?? 5),
+                'stock' => (int) ($m->stock ?? 0),
+                'is_available' => (bool) $m->is_available,
+                'is_active' => (bool) $m->is_active,
+                'taste_tags' => is_array($m->taste_tags) ? $m->taste_tags : ['Gurih'],
+                'journal_popularity_weight' => $this->estimatePopularityWeight($m->name),
+            ];
+        })->values()->all();
+
+        $aiResponse = $aiService->recommend([
+            'budget' => $budgetInt,
+            'taste_preference' => $tasteClean,
+            'max_wait_minutes' => $maxWaitInt,
+            'strict_wait_time' => $strictWait,
+            'seller_queues' => $sellerQueues,
+            'menus' => $aiMenusPayload,
+            'limit' => 20,
+        ]);
+
+        $aiOnline = $aiResponse !== null;
+        $aiSource = $aiOnline ? 'python_fastapi' : 'local_fallback';
+        $message = '';
+        $mappedMenus = [];
+
+        if ($aiOnline) {
+            $message = (string) ($aiResponse['message'] ?? 'Rekomendasi dihitung oleh layanan AI NesaCourt.');
+            foreach (($aiResponse['recommendations'] ?? []) as $rec) {
+                /** @var Menu|null $m */
+                $m = $menuLookup->get($rec['menu_id']);
+                if (!$m) {
+                    continue;
+                }
+                $mappedMenus[] = [
                     'id' => $m->id,
                     'name' => $m->name,
                     'price' => (int) $m->price,
-                    'seller' => $m->seller->stall_name ?? 'Stan Kantin',
-                    'prepTime' => (int) ($m->estimated_time_minutes ?? 5),
-                    'taste' => $taste,
+                    'seller' => $m->seller->stall_name ?? $rec['stall_name'] ?? 'Stan Kantin',
+                    'prepTime' => (int) ($rec['effective_wait_minutes'] ?? $m->estimated_time_minutes ?? 5),
+                    'basePrepTime' => (int) ($m->estimated_time_minutes ?? 5),
+                    'activeQueue' => (int) ($rec['active_queue_count'] ?? 0),
+                    'taste' => $this->extractPrimaryTaste($m->taste_tags),
+                    'tags' => is_array($m->taste_tags) ? $m->taste_tags : [],
                     'category' => $m->category->slug ?? 'makanan',
                     'stock' => (int) ($m->stock ?? 0),
                     'image' => $m->image_url,
-                    'aiReason' => $m->description ?: 'Menu porsi pas, lezat, dan cepat disajikan di kantin UNESA.',
+                    'matchScore' => (float) ($rec['match_score'] ?? 85),
+                    'aiReason' => (string) ($rec['summary_reason'] ?? $m->description ?? 'Cocok dengan kriteria pencarian Anda.'),
                 ];
-            })
-            ->values();
+            }
+        } else {
+            // Fallback lokal aman jika server Python FastAPI belum dinyalakan
+            $message = 'Layanan AI Python sedang tidak aktif; menampilkan pencocokan fallback lokal.';
+            $mappedMenus = $dbMenus
+                ->filter(function (Menu $m) use ($budgetParam, $budgetInt, $tasteClean, $timeParam, $maxWaitInt) {
+                    $okBudget = $budgetParam === 'semua' || (int) $m->price <= $budgetInt;
+                    $tags = is_array($m->taste_tags) ? array_map('strtolower', $m->taste_tags) : [];
+                    $okTaste = $tasteClean === 'semua' || in_array($tasteClean, $tags, true);
+                    $okTime = in_array($timeParam, ['semua', '20'], true) || (int) ($m->estimated_time_minutes ?? 5) <= $maxWaitInt;
 
-        return view('buyer.recommendation', [
-            'menus' => $menus,
-        ]);
+                    return $okBudget && $okTaste && $okTime;
+                })
+                ->map(function (Menu $m) use ($sellerQueues) {
+                    $q = (int) ($sellerQueues[$m->seller_id] ?? 0);
+                    $prep = (int) ($m->estimated_time_minutes ?? 5);
+
+                    return [
+                        'id' => $m->id,
+                        'name' => $m->name,
+                        'price' => (int) $m->price,
+                        'seller' => $m->seller->stall_name ?? 'Stan Kantin',
+                        'prepTime' => $prep + (int) round($q * 1.5),
+                        'basePrepTime' => $prep,
+                        'activeQueue' => $q,
+                        'taste' => $this->extractPrimaryTaste($m->taste_tags),
+                        'tags' => is_array($m->taste_tags) ? $m->taste_tags : [],
+                        'category' => $m->category->slug ?? 'makanan',
+                        'stock' => (int) ($m->stock ?? 0),
+                        'image' => $m->image_url,
+                        'matchScore' => null,
+                        'aiReason' => $m->description ?: 'Menu tersedia sesuai filter anggaran dan waktu tunggu.',
+                    ];
+                })
+                ->values()
+                ->all();
+        }
+
+        // Catat log pencarian ke tabel recommendation_logs saat user memfilter
+        if ($logSearch) {
+            try {
+                RecommendationLog::create([
+                    'user_id' => Auth::id(),
+                    'session_id' => $sessionId !== '' ? Str::limit($sessionId, 100, '') : 'guest-' . Str::random(12),
+                    'budget' => $budgetParam === 'semua' ? 50000 : $budgetInt,
+                    'taste_preference' => $tasteClean,
+                    'max_wait_minutes' => $maxWaitInt,
+                    'recommended_menu_ids' => array_slice(array_column($mappedMenus, 'id'), 0, 5),
+                ]);
+            } catch (\Throwable) {
+                // Logging tidak boleh menggagalkan tampilan rekomendasi
+            }
+        }
+
+        return [
+            'status' => empty($mappedMenus) ? 'no_match' : 'ok',
+            'ai_online' => $aiOnline,
+            'ai_source' => $aiSource,
+            'message' => $message,
+            'menus' => $mappedMenus,
+        ];
+    }
+
+    private function extractPrimaryTaste($tasteTags): string
+    {
+        $tags = is_array($tasteTags) ? array_map('strtolower', $tasteTags) : [];
+        foreach (['pedas', 'manis', 'berkuah', 'segar', 'gurih'] as $t) {
+            if (in_array($t, $tags, true)) {
+                return $t;
+            }
+        }
+
+        return 'gurih';
+    }
+
+    private function estimatePopularityWeight(string $menuName): float
+    {
+        $n = strtolower($menuName);
+
+        return match (true) {
+            str_contains($n, 'es teh') => 35.0,
+            str_contains($n, 'air mineral') => 34.0,
+            str_contains($n, 'geprek') => 34.0,
+            str_contains($n, 'nasi goreng') => 24.0,
+            str_contains($n, 'soto') => 20.0,
+            str_contains($n, 'nasi campur') => 18.0,
+            str_contains($n, 'kremes') => 17.0,
+            str_contains($n, 'nutrisari') => 16.0,
+            str_contains($n, 'susu coklat') => 15.0,
+            str_contains($n, 'katsu') => 14.0,
+            default => 12.0,
+        };
     }
 
     /**

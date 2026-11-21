@@ -1,0 +1,162 @@
+{
+  "generated_at": "2026-11-21T16:27:54",
+  "data_integrity": {
+    "raw_completed_qty": 66772,
+    "daily_completed_qty": 66772,
+    "raw_cancelled_qty": 1174,
+    "daily_cancelled_qty": 1174,
+    "cancelled_excluded_correctly": true
+  },
+  "daily_forecast": {
+    "split": {
+      "total_operating_days": 77,
+      "train_operating_days": 54,
+      "test_operating_days": 16,
+      "test_date_range": [
+        "2026-11-03",
+        "2026-11-20"
+      ],
+      "train_rows": 2700,
+      "test_rows": 800
+    },
+    "selected_model": "random_forest",
+    "model_comparison": {
+      "baseline_ma7": {
+        "mae": 3.366,
+        "rmse": 4.143,
+        "mape_pct": 39.12,
+        "wape_pct": 18.86,
+        "r2": 0.8487
+      },
+      "ridge_regression": {
+        "mae": 1.304,
+        "rmse": 2.045,
+        "mape_pct": 14.18,
+        "wape_pct": 7.31,
+        "r2": 0.9631
+      },
+      "random_forest": {
+        "mae": 0.808,
+        "rmse": 1.423,
+        "mape_pct": 9.84,
+        "wape_pct": 4.53,
+        "r2": 0.9821
+      },
+      "hist_gradient_boosting": {
+        "mae": 0.816,
+        "rmse": 1.341,
+        "mape_pct": 9.2,
+        "wape_pct": 4.57,
+        "r2": 0.9842
+      }
+    },
+    "improvement_vs_ma7_mae_pct": 76.0,
+    "per_regime_test": {
+      "normal": {
+        "mae": 0.902,
+        "rmse": 1.358,
+        "mape_pct": 9.0,
+        "wape_pct": 4.7,
+        "r2": 0.9828,
+        "samples": 100
+      },
+      "ramai": {
+        "mae": 0.432,
+        "rmse": 0.887,
+        "mape_pct": 4.28,
+        "wape_pct": 2.1,
+        "r2": 0.9907,
+        "samples": 350
+      },
+      "ramai_event": {
+        "mae": 0.439,
+        "rmse": 0.883,
+        "mape_pct": 3.57,
+        "wape_pct": 2.1,
+        "r2": 0.99,
+        "samples": 50
+      },
+      "sedang_jumat": {
+        "mae": 1.115,
+        "rmse": 1.622,
+        "mape_pct": 14.74,
+        "wape_pct": 7.38,
+        "r2": 0.9805,
+        "samples": 150
+      },
+      "sepi": {
+        "mae": 1.438,
+        "rmse": 2.2,
+        "mape_pct": 20.54,
+        "wape_pct": 11.73,
+        "r2": 0.9578,
+        "samples": 150
+      }
+    },
+    "per_tenant_test": {
+      "Stan 01 - Gado-Gado Bu Ismah": {
+        "mae": 0.746,
+        "rmse": 1.269,
+        "mape_pct": 11.32,
+        "wape_pct": 4.14,
+        "r2": 0.9857,
+        "samples": 160
+      },
+      "Stan 02 - Dapur Budhe' Gun": {
+        "mae": 0.812,
+        "rmse": 1.375,
+        "mape_pct": 9.73,
+        "wape_pct": 4.56,
+        "r2": 0.984,
+        "samples": 160
+      },
+      "Stan 03 - Bakul Sego Bu Ani": {
+        "mae": 0.893,
+        "rmse": 1.561,
+        "mape_pct": 9.24,
+        "wape_pct": 4.51,
+        "r2": 0.9797,
+        "samples": 144
+      },
+      "Stan 04 - Nasi Campur Bestie": {
+        "mae": 0.821,
+        "rmse": 1.307,
+        "mape_pct": 9.4,
+        "wape_pct": 5.07,
+        "r2": 0.983,
+        "samples": 176
+      },
+      "Stan 05 - Nasi Goreng Markisa": {
+        "mae": 0.774,
+        "rmse": 1.596,
+        "mape_pct": 9.48,
+        "wape_pct": 4.35,
+        "r2": 0.9771,
+        "samples": 160
+      }
+    }
+  },
+  "hourly_forecast": {
+    "selected_model": "hist_gradient_boosting",
+    "train_rows": 24300,
+    "test_rows": 7200,
+    "metrics": {
+      "mae": 0.992,
+      "rmse": 1.344,
+      "mape_pct": 45.38,
+      "wape_pct": 50.04,
+      "r2": 0.6148
+    },
+    "peak_hour_distribution": {
+      "08:00": 6.0,
+      "09:00": 8.9,
+      "10:00": 10.2,
+      "11:00": 18.1,
+      "12:00": 24.3,
+      "13:00": 12.7,
+      "14:00": 8.8,
+      "15:00": 6.9,
+      "16:00": 4.1
+    }
+  }
+}

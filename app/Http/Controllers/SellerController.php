@@ -8,8 +8,11 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderStatusLog;
 use App\Models\PaymentConfirmation;
+use App\Models\PredictionLog;
 use App\Models\SellerPaymentQris;
 use App\Models\SellerProfile;
+use App\Services\NesaCourtAiService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -689,38 +692,261 @@ class SellerController extends Controller
     }
 
     /**
-     * F-23: Modul Prediksi Kebutuhan Porsi AI
+     * F-23: Modul Prediksi Kebutuhan Porsi AI (Terintegrasi dengan Python FastAPI + Fallback MySQL)
      */
-    public function forecastIndex(): View
+    public function forecastIndex(Request $request, NesaCourtAiService $aiService): View
     {
         $seller = $this->getSeller();
 
-        $forecasts = Menu::where('seller_id', $seller->id)
-            ->where('is_active', true)
-            ->get()
-            ->map(function (Menu $m) {
-                $base = $m->stock ?: 15;
-                $recommended = (int) round($base * 1.2);
+        // Default besok (jika besok Minggu / libur, default ke Senin agar langsung menampilkan hari aktif)
+        $defaultDate = now()->addDay();
+        if ($defaultDate->isSunday()) {
+            $defaultDate = $defaultDate->addDay();
+        }
 
-                return [
-                    'id' => $m->id,
-                    'name' => $m->name,
-                    'category' => $m->category->name ?? 'Makanan Utama',
-                    'image' => $m->image_url,
-                    'lastWeekPortions' => $base,
-                    'recommendedPortions' => $recommended,
-                    'trendPercent' => '+20%',
-                    'trendPositive' => true,
-                    'confidence' => '95%',
-                    'keyFactor' => 'Pola perkuliahan luring dan cuaca kampus Ketintang cerah.',
-                ];
-            })
-            ->values();
+        $targetDateInput = (string) $request->query('date', $defaultDate->format('Y-m-d'));
+        try {
+            $targetCarbon = Carbon::createFromFormat('Y-m-d', $targetDateInput);
+        } catch (\Throwable) {
+            $targetCarbon = $defaultDate;
+        }
+        $targetDateStr = $targetCarbon->format('Y-m-d');
+
+        $weather = $request->query('weather') === 'hujan' ? 'hujan' : 'cerah';
+        $hasEvent = $request->boolean('event', false);
+
+        $menus = Menu::with('category')
+            ->where('seller_id', $seller->id)
+            ->where('is_active', true)
+            ->orderBy('id')
+            ->get();
+
+        // Ambil penjualan riil hari yang sama 7 hari lalu (hanya transaksi 'selesai', bukan 'dibatalkan')
+        $sameDayLastWeek = $targetCarbon->copy()->subDays(7)->format('Y-m-d');
+        $lastWeekSales = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.seller_id', $seller->id)
+            ->where('orders.order_status', 'selesai')
+            ->whereDate('orders.created_at', $sameDayLastWeek)
+            ->selectRaw('order_items.menu_id, SUM(order_items.quantity) as qty')
+            ->groupBy('order_items.menu_id')
+            ->pluck('qty', 'menu_id')
+            ->map(fn ($v) => (int) $v)
+            ->all();
+
+        // Ambil rata-rata 7 hari operasional terakhir dari MySQL untuk pembanding / fallback
+        $recentDailyRows = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.seller_id', $seller->id)
+            ->where('orders.order_status', 'selesai')
+            ->where('orders.created_at', '>=', now()->subDays(14))
+            ->selectRaw('order_items.menu_id, DATE(orders.created_at) as dt, SUM(order_items.quantity) as qty')
+            ->groupBy('order_items.menu_id', DB::raw('DATE(orders.created_at)'))
+            ->orderBy('dt')
+            ->get()
+            ->groupBy('menu_id');
+
+        // Panggil Python AI FastAPI (Forecast 1 tenant + metrik evaluasi model)
+        $aiSellerResp = $aiService->forecastSeller($seller->id, $targetDateStr, $weather, $hasEvent);
+        $aiEval = $aiService->evaluation();
+        $aiOnline = $aiSellerResp !== null && ($aiSellerResp['status'] ?? '') === 'ok';
+
+        $aiByMenu = [];
+        if ($aiOnline) {
+            foreach (($aiSellerResp['forecasts'] ?? []) as $row) {
+                if (isset($row['menu_id'])) {
+                    $aiByMenu[(int) $row['menu_id']] = $row;
+                }
+            }
+        }
+
+        $forecasts = [];
+        $totalPredictedFood = 0;
+        $totalPredictedDrink = 0;
+
+        foreach ($menus as $m) {
+            $catSlug = $m->category->slug ?? 'makanan';
+            $isDrink = in_array($catSlug, ['minuman', 'kopi'], true);
+            $itemType = $isDrink ? 'minuman' : 'makanan';
+
+            $menuHistory = $recentDailyRows->get($m->id, collect());
+            $avg7 = $menuHistory->isNotEmpty()
+                ? (int) round($menuHistory->take(-7)->avg('qty'))
+                : max(1, (int) round(($m->stock ?: 15) * 0.8));
+
+            $lastWeekQty = $lastWeekSales[$m->id] ?? $avg7;
+            $aiRow = $aiByMenu[$m->id] ?? null;
+
+            // Jika AI online tapi menu ini baru ditambahkan (belum ada di model), panggil /api/ai/forecast/daily dengan custom_history
+            if ($aiOnline && $aiRow === null) {
+                $customHistory = $menuHistory->map(fn ($r) => [
+                    'date' => (string) $r->dt,
+                    'quantity' => (int) $r->qty,
+                    'order_status' => 'selesai',
+                ])->values()->all();
+
+                $aiRow = $aiService->forecastDaily([
+                    'menu_id' => $m->id,
+                    'seller_id' => $seller->id,
+                    'target_date' => $targetDateStr,
+                    'weather' => $weather,
+                    'has_campus_event' => $hasEvent,
+                    'item_type' => $itemType,
+                    'price_idr' => (int) $m->price,
+                    'daily_stock_quota' => max(1, (int) ($m->stock ?: 15)),
+                    'custom_history' => $customHistory,
+                ]);
+            }
+
+            if ($aiRow !== null) {
+                $recommended = (int) ($aiRow['predicted_quantity'] ?? $avg7);
+                $rangeMin = (int) ($aiRow['range_min'] ?? max(0, $recommended - 2));
+                $rangeMax = (int) ($aiRow['range_max'] ?? $recommended + 2);
+                $confidenceRaw = strtolower((string) ($aiRow['confidence_level'] ?? 'sedang'));
+                $dataStatus = (string) ($aiRow['data_status'] ?? 'sufficient');
+                $isTemporary = (bool) ($aiRow['is_temporary_estimate'] ?? false);
+                $keyFactor = (string) ($aiRow['explanation'] ?? 'Prediksi berbasis riwayat penjualan selesai.');
+                $modelVersion = (string) ($aiRow['model_version'] ?? 'random_forest-daily-v1');
+                $inputPoints = (int) ($aiRow['input_data_points'] ?? $menuHistory->count());
+
+                // Simpan log prediksi harian ke tabel prediction_logs (hindari duplikat di tanggal sama)
+                try {
+                    PredictionLog::updateOrCreate(
+                        [
+                            'seller_id' => $seller->id,
+                            'menu_id' => $m->id,
+                            'prediction_date' => $targetDateStr,
+                            'period_type' => 'daily',
+                        ],
+                        [
+                            'predicted_quantity' => $recommended,
+                            'model_version' => Str::limit($modelVersion, 50, ''),
+                            'input_data_points' => $inputPoints,
+                        ]
+                    );
+                } catch (\Throwable) {
+                    // Jangan gagalkan halaman bila logging bermasalah
+                }
+            } else {
+                // Fallback lokal: rata-rata 7 hari operasional dari MySQL (bukan angka hardcode +20%)
+                $recommended = $targetCarbon->isSunday() ? 0 : max(1, $avg7);
+                $rangeMin = max(0, $recommended - 2);
+                $rangeMax = $recommended + 2;
+                $confidenceRaw = $menuHistory->count() >= 7 ? 'sedang' : 'rendah';
+                $dataStatus = $menuHistory->count() >= 7 ? 'local_fallback' : 'insufficient_data';
+                $isTemporary = true;
+                $keyFactor = $targetCarbon->isSunday()
+                    ? 'Hari Minggu operasional foodcourt tutup/libur.'
+                    : 'Fallback lokal rata-rata 7 hari terakhir (nyalakan server Python AI untuk prediksi ML penuh).';
+                $modelVersion = 'mysql-ma7-fallback';
+                $inputPoints = $menuHistory->count();
+            }
+
+            $diffPct = $lastWeekQty > 0 ? (int) round((($recommended - $lastWeekQty) / $lastWeekQty) * 100) : 0;
+            $trendStr = ($diffPct >= 0 ? '+' : '') . $diffPct . '%';
+
+            $confidenceLabel = match ($confidenceRaw) {
+                'tinggi' => 'Tinggi',
+                'rendah' => 'Rendah (Sementara)',
+                default => 'Sedang',
+            };
+
+            if ($isDrink) {
+                $totalPredictedDrink += $recommended;
+            } else {
+                $totalPredictedFood += $recommended;
+            }
+
+            $forecasts[] = [
+                'id' => $m->id,
+                'name' => $m->name,
+                'category' => $m->category->name ?? 'Makanan Utama',
+                'itemType' => $itemType,
+                'image' => $m->image_url,
+                'currentStock' => (int) ($m->stock ?? 0),
+                'lastWeekPortions' => $lastWeekQty,
+                'recommendedPortions' => $recommended,
+                'rangeMin' => $rangeMin,
+                'rangeMax' => $rangeMax,
+                'trendPercent' => $trendStr,
+                'trendPositive' => $diffPct >= 0,
+                'confidence' => $confidenceLabel,
+                'confidenceLevel' => $confidenceRaw,
+                'dataStatus' => $dataStatus,
+                'isTemporary' => $isTemporary,
+                'keyFactor' => $keyFactor,
+                'modelVersion' => $modelVersion,
+                'inputDataPoints' => $inputPoints,
+            ];
+        }
+
+        // Ambil metrik evaluasi jujur dari model AI terlatih
+        $dailyEval = $aiEval['daily_forecast'] ?? null;
+        $selectedModel = $dailyEval['selected_model'] ?? 'random_forest';
+        $bestMetrics = $dailyEval['model_comparison'][$selectedModel] ?? null;
+        $wapePct = $bestMetrics['wape_pct'] ?? null;
+        $maeVal = $bestMetrics['mae'] ?? null;
+        $operatingDays = $dailyEval['split']['total_operating_days'] ?? 77;
+
+        $aiMeta = [
+            'online' => $aiOnline,
+            'modelName' => $aiOnline ? $selectedModel : 'mysql-ma7-fallback',
+            'accuracyLabel' => $wapePct !== null
+                ? number_format(max(0, 100 - (float) $wapePct), 1) . '% (MAE ' . $maeVal . ' porsi)'
+                : 'Mode Fallback MA-7',
+            'operatingDaysLabel' => $aiOnline ? ($operatingDays . ' Hari Operasional') : 'Riwayat 14 Hari MySQL',
+            'factorsLabel' => ($weather === 'hujan' ? 'Hujan' : 'Cerah')
+                . ($hasEvent ? ' + Acara Kampus' : ' + Pola Kuliah'),
+        ];
+
+        $summary = [
+            'totalMenus' => count($forecasts),
+            'totalFood' => $totalPredictedFood,
+            'totalDrink' => $totalPredictedDrink,
+            'targetDateIso' => $targetDateStr,
+            'targetDateHuman' => $targetCarbon->locale('id')->translatedFormat('l, d F Y'),
+            'targetDayName' => $targetCarbon->locale('id')->translatedFormat('l'),
+            'isSunday' => $targetCarbon->isSunday(),
+        ];
 
         return view('seller.forecast', [
             'seller' => $seller,
             'forecasts' => $forecasts,
+            'summary' => $summary,
+            'aiMeta' => $aiMeta,
+            'filters' => [
+                'date' => $targetDateStr,
+                'weather' => $weather,
+                'event' => $hasEvent,
+            ],
         ]);
+    }
+
+    /**
+     * F-23 AJAX Endpoint: Prediksi per jam (08:00-16:00) untuk 1 menu milik penjual.
+     */
+    public function forecastHourly(Request $request, int $menu_id, NesaCourtAiService $aiService): JsonResponse
+    {
+        $seller = $this->getSeller();
+        $menu = Menu::where('id', $menu_id)->where('seller_id', $seller->id)->first();
+        if (!$menu) {
+            return response()->json(['status' => 'not_found', 'message' => 'Menu tidak ditemukan pada stan ini.'], 404);
+        }
+
+        $targetDate = (string) $request->query('date', now()->addDay()->format('Y-m-d'));
+        $weather = $request->query('weather') === 'hujan' ? 'hujan' : 'cerah';
+        $hasEvent = $request->boolean('event', false);
+
+        $resp = $aiService->forecastHourly($menu->id, $targetDate, $weather, $hasEvent);
+        if ($resp === null) {
+            return response()->json([
+                'status' => 'offline',
+                'message' => 'Layanan AI Python (port 8001) sedang tidak aktif sehingga pola prediksi per jam belum dapat dimuat.',
+                'hourly_predictions' => [],
+            ]);
+        }
+
+        return response()->json($resp);
     }
 
     /**

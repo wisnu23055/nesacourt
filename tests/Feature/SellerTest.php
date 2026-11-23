@@ -46,9 +46,10 @@ class SellerTest extends TestCase
         $this->assertNotNull($createdMenu);
         $this->assertEquals(12500, $createdMenu->price);
 
-        // Verify Menu Edit Route
+        // Verify Menu Edit Route (D-01: ID dari route harus mengisi form, bukan kosong)
         $response = $this->actingAs($sellerUser)->get('/penjual/menu/' . $createdMenu->id . '/edit');
         $response->assertStatus(200);
+        $response->assertViewHas('menu', fn ($m) => $m && $m->id === $createdMenu->id);
 
         // 3. Stock Update
         $response = $this->actingAs($sellerUser)->postJson('/penjual/stok', [

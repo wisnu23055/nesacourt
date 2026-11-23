@@ -258,7 +258,7 @@ class AdminController extends Controller
      */
     public function orderDetail(Request $request): View
     {
-        $orderNumber = $request->query('order', $request->query('id'));
+        $orderNumber = $request->query('order') ?? $request->query('id') ?? $request->route('id'); // ponytail: dukung ?id= lama + rute /pesanan/{id}
 
         $order = null;
         if ($orderNumber) {
@@ -266,6 +266,8 @@ class AdminController extends Controller
                 ->where('order_number', $orderNumber)
                 ->orWhere('id', $orderNumber)
                 ->first();
+
+            abort_if(! $order, 404); // ID di URL harus menentukan halaman, bukan fallback ke order terbaru
         }
 
         if (!$order) {

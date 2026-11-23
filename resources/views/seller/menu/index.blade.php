@@ -253,7 +253,7 @@
                             <!-- Actions (Center) -->
                             <td class="py-3.5 px-4 text-center whitespace-nowrap">
                                 <div class="inline-flex items-center justify-center gap-1.5">
-                                    <a :href="'{{ url('/penjual/menu/create') }}?id=' + menu.id" 
+                                    <a :href="'{{ url('/penjual/menu') }}/' + menu.id + '/edit'" 
                                        class="p-2 rounded-xl text-slate-500 hover:text-brand-600 hover:bg-brand-50 transition"
                                        title="Ubah Menu">
                                         <i data-lucide="edit-3" class="w-4 h-4"></i>

@@ -169,8 +169,9 @@ class SellerController extends Controller
         $categories = Category::where('is_active', true)->orderBy('sort_order')->get();
 
         $menu = null;
-        if ($request->has('id')) {
-            $menu = Menu::where('seller_id', $seller->id)->find($request->id);
+        $menuId = $request->route('id') ?? $request->query('id'); // ponytail: rute /menu/{id}/edit + link lama ?id=
+        if ($menuId) {
+            $menu = Menu::where('seller_id', $seller->id)->find($menuId);
         }
 
         return view('seller.menu.form', [

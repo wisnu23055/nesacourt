@@ -82,7 +82,11 @@ class AdminTest extends TestCase
         if ($order) {
             $response = $this->actingAs($adminUser)->get("/admin/pesanan/{$order->id}");
             $response->assertStatus(200);
+            // D-02: ID di URL harus menentukan transaksi yang ditampilkan, bukan selalu order terbaru
+            $response->assertViewHas('order', fn ($o) => $o && $o->id === $order->id);
         }
+        $response = $this->actingAs($adminUser)->get('/admin/pesanan/999999');
+        $response->assertStatus(404);
 
         // 6. Admin Financial Reports (F-30)
         $response = $this->actingAs($adminUser)->get('/admin/laporan');

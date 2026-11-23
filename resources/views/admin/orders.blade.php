@@ -160,7 +160,7 @@
 
                     <!-- Column 4: Action Button Center Tengah -->
                     <div class="md:col-span-3 flex items-center justify-center">
-                        <a :href="'{{ url('/admin/pesanan/detail') }}?id=' + order.id" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition shadow-2xs">
+                        <a :href="'{{ url('/admin/pesanan') }}/' + order.id" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition shadow-2xs">
                             <i data-lucide="file-check" class="w-3.5 h-3.5 text-white"></i>
                             <span>Audit Detail</span>
                         </a>

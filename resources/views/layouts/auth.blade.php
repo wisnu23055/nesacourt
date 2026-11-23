@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Autentikasi') — NesaCourt Smart Food Court</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,14 +67,8 @@
     <header class="w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 py-3 flex items-center">
             <!-- Brand Logo -->
-            <a href="{{ url('/') }}" class="flex items-center gap-2.5 group shrink-0">
-                <div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-base shadow-sm shadow-brand-500/20 group-hover:bg-brand-700 transition shrink-0">
-                    N
-                </div>
-                <div>
-                    <span class="font-bold text-base sm:text-lg text-slate-900 tracking-tight block">NesaCourt</span>
-                    <p class="text-[11px] text-slate-500 font-medium -mt-0.5">Food Court UNESA Ketintang</p>
-                </div>
+            <a href="{{ url('/') }}" class="flex items-center group shrink-0">
+                <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-11 sm:h-12 w-auto object-contain">
             </a>
         </div>
     </header>
@@ -90,12 +86,9 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <!-- Col 1: Brand -->
                 <div class="space-y-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-base shrink-0">
-                            N
-                        </div>
-                        <span class="font-bold text-base text-white tracking-tight">NesaCourt</span>
-                    </div>
+                    <a href="{{ url('/') }}" class="inline-flex items-center hover:opacity-90 transition">
+                        <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-11 w-auto object-contain brightness-0 invert">
+                    </a>
                     <p class="text-slate-400 text-xs leading-relaxed">
                         Sistem Pemesanan dan Rekomendasi Makanan berbasis web untuk Food Court Universitas Negeri Surabaya (UNESA).
                     </p>

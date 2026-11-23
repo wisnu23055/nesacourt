@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NesaCourt — Smart Food Court UNESA Ketintang</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,13 +62,33 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-700" x-data="{ mobileMenuOpen: false }">
+    @php
+        $dashboardUrl = url('/dashboard');
+        $dashboardLabel = 'Dashboard';
+        if (auth()->check()) {
+            if (auth()->user()->role === 'admin') {
+                $dashboardUrl = url('/admin/dashboard');
+                $dashboardLabel = 'Dashboard Admin';
+            } elseif (auth()->user()->role === 'seller') {
+                $dashboardUrl = url('/penjual/dashboard');
+                $dashboardLabel = 'Dashboard Stan';
+            } else {
+                $dashboardUrl = url('/dashboard');
+                $dashboardLabel = 'Dashboard';
+            }
+        }
+    @endphp
 
     <!-- Top Announcement Bar -->
     <div class="bg-brand-700 text-white text-xs py-2 px-4 text-center font-medium shadow-sm">
         <div class="max-w-6xl mx-auto flex items-center justify-center gap-2 flex-wrap">
             <span class="px-2 py-0.5 rounded bg-brand-800 text-white font-semibold text-[11px] whitespace-nowrap">Informasi</span>
             <span>Layanan pemesanan digital Food Court UNESA Ketintang telah aktif.</span>
-            <a href="{{ url('/login') }}" class="underline font-semibold hover:text-amber-300 ml-1 whitespace-nowrap">Masuk untuk Memesan</a>
+            @auth
+                <a href="{{ $dashboardUrl }}" class="underline font-semibold hover:text-amber-300 ml-1 whitespace-nowrap">Buka {{ $dashboardLabel }}</a>
+            @else
+                <a href="{{ url('/login') }}" class="underline font-semibold hover:text-amber-300 ml-1 whitespace-nowrap">Masuk untuk Memesan</a>
+            @endauth
         </div>
     </div>
 
@@ -74,14 +96,8 @@
     <header class="w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <!-- Brand Logo -->
-            <a href="{{ url('/') }}" class="flex items-center gap-2.5 group shrink-0">
-                <div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-lg shadow-sm shadow-brand-500/20 group-hover:bg-brand-700 transition shrink-0">
-                    N
-                </div>
-                <div>
-                    <span class="font-bold text-lg sm:text-xl text-slate-900 tracking-tight block">NesaCourt</span>
-                    <p class="text-[11px] text-slate-500 font-medium -mt-0.5">Food Court UNESA Ketintang</p>
-                </div>
+            <a href="{{ url('/') }}" class="flex items-center group shrink-0">
+                <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-12 sm:h-14 w-auto object-contain">
             </a>
 
             <!-- Desktop Menu Links (Shown only on XL / Wide Screens) -->
@@ -95,13 +111,20 @@
 
             <!-- Desktop Right CTA (Shown only on XL / Wide Screens) -->
             <div class="hidden xl:flex items-center gap-3 shrink-0">
-                <a href="{{ url('/login') }}" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:text-brand-600 hover:bg-slate-100 transition whitespace-nowrap shrink-0">
-                    Masuk
-                </a>
-                <a href="{{ url('/register') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap shrink-0">
-                    <span>Daftar Akun</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4 shrink-0"></i>
-                </a>
+                @auth
+                    <a href="{{ $dashboardUrl }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap shrink-0">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i>
+                        <span>{{ $dashboardLabel }}</span>
+                    </a>
+                @else
+                    <a href="{{ url('/login') }}" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:text-brand-600 hover:bg-slate-100 transition whitespace-nowrap shrink-0">
+                        Masuk
+                    </a>
+                    <a href="{{ url('/register') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap shrink-0">
+                        <span>Daftar Akun</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 shrink-0"></i>
+                    </a>
+                @endauth
             </div>
 
             <!-- Hamburger Button (Switches immediately on any screen width below XL) -->
@@ -124,12 +147,23 @@
             <a href="#rekomendasi" @click="mobileMenuOpen = false" class="block py-2 text-sm font-semibold text-slate-700 hover:text-brand-600 whitespace-nowrap">Rekomendasi Cerdas</a>
             <a href="#fasilitas" @click="mobileMenuOpen = false" class="block py-2 text-sm font-semibold text-slate-700 hover:text-brand-600 whitespace-nowrap">Fasilitas</a>
             <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2.5">
-                <a href="{{ url('/login') }}" class="w-full text-center py-2.5 px-4 rounded-xl text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 whitespace-nowrap">
-                    Masuk ke Akun
-                </a>
-                <a href="{{ url('/register') }}" class="w-full text-center py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm whitespace-nowrap">
-                    Daftar Akun Baru
-                </a>
+                @auth
+                    <a href="{{ $dashboardUrl }}" class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm whitespace-nowrap">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i>
+                        <span>{{ $dashboardLabel }}</span>
+                    </a>
+                    <a href="{{ route('logout') }}" class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 whitespace-nowrap">
+                        <i data-lucide="log-out" class="w-4 h-4 shrink-0"></i>
+                        <span>Keluar</span>
+                    </a>
+                @else
+                    <a href="{{ url('/login') }}" class="w-full text-center py-2.5 px-4 rounded-xl text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 whitespace-nowrap">
+                        Masuk ke Akun
+                    </a>
+                    <a href="{{ url('/register') }}" class="w-full text-center py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm whitespace-nowrap">
+                        Daftar Akun Baru
+                    </a>
+                @endauth
             </div>
         </div>
     </header>
@@ -160,10 +194,17 @@
 
                     <!-- CTA Buttons (All Single Line) -->
                     <div class="pt-1 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5">
-                        <a href="{{ url('/login') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap">
-                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                            <span>Pesan Sekarang</span>
-                        </a>
+                        @auth
+                            <a href="{{ auth()->user()->role === 'buyer' ? url('/katalog') : $dashboardUrl }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap">
+                                <i data-lucide="{{ auth()->user()->role === 'buyer' ? 'shopping-bag' : 'layout-dashboard' }}" class="w-4 h-4"></i>
+                                <span>{{ auth()->user()->role === 'buyer' ? 'Pesan Sekarang' : 'Buka ' . $dashboardLabel }}</span>
+                            </a>
+                        @else
+                            <a href="{{ url('/login') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap">
+                                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                                <span>Pesan Sekarang</span>
+                            </a>
+                        @endauth
                         <a href="#rekomendasi" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition whitespace-nowrap">
                             <i data-lucide="sparkles" class="w-4 h-4 text-brand-600"></i>
                             <span>Lihat Rekomendasi Menu</span>
@@ -358,7 +399,7 @@
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-500 mt-1">Daftar hidangan yang banyak diminati di lingkungan kantin UNESA.</p>
                 </div>
-                <a href="{{ url('/login') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 whitespace-nowrap">
+                <a href="{{ auth()->check() ? url('/katalog') : url('/login') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 whitespace-nowrap">
                     <span>Lihat Semua Menu</span>
                     <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                 </a>
@@ -390,7 +431,7 @@
                     </div>
                     <div class="px-4 pb-4 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
                         <span class="text-sm font-bold text-brand-600">Rp15.000</span>
-                        <a href="{{ url('/login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-600 hover:text-white transition whitespace-nowrap">
+                        <a href="{{ auth()->check() ? url('/katalog') : url('/login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-600 hover:text-white transition whitespace-nowrap">
                             Pesan
                         </a>
                     </div>
@@ -420,7 +461,7 @@
                     </div>
                     <div class="px-4 pb-4 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
                         <span class="text-sm font-bold text-brand-600">Rp13.000</span>
-                        <a href="{{ url('/login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-600 hover:text-white transition whitespace-nowrap">
+                        <a href="{{ auth()->check() ? url('/katalog') : url('/login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-600 hover:text-white transition whitespace-nowrap">
                             Pesan
                         </a>
                     </div>
@@ -450,7 +491,7 @@
                     </div>
                     <div class="px-4 pb-4 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
                         <span class="text-sm font-bold text-brand-600">Rp17.000</span>
-                        <a href="{{ url('/login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-600 hover:text-white transition whitespace-nowrap">
+                        <a href="{{ auth()->check() ? url('/katalog') : url('/login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-600 hover:text-white transition whitespace-nowrap">
                             Pesan
                         </a>
                     </div>
@@ -480,7 +521,7 @@
                     </div>
                     <div class="px-4 pb-4 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
                         <span class="text-sm font-bold text-brand-600">Rp4.000</span>
-                        <a href="{{ url('/login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-600 hover:text-white transition whitespace-nowrap">
+                        <a href="{{ auth()->check() ? url('/katalog') : url('/login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-600 hover:text-white transition whitespace-nowrap">
                             Pesan
                         </a>
                     </div>
@@ -520,7 +561,7 @@
                     </div>
 
                     <div class="pt-2">
-                        <a href="{{ url('/login') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 shadow-sm transition whitespace-nowrap">
+                        <a href="{{ auth()->check() ? url('/rekomendasi') : url('/login') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 shadow-sm transition whitespace-nowrap">
                             <i data-lucide="sparkles" class="w-4 h-4"></i>
                             <span>Buka Rekomendasi Menu</span>
                         </a>
@@ -582,12 +623,23 @@
                 Gunakan akun mahasiswa UNESA Anda untuk memesan menu dari stan favorit tanpa perlu mengantre.
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                <a href="{{ url('/register') }}" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap">
-                    Daftar Akun Mahasiswa
-                </a>
-                <a href="{{ url('/login') }}" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition whitespace-nowrap">
-                    Masuk ke Akun
-                </a>
+                @auth
+                    <a href="{{ $dashboardUrl }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Buka {{ $dashboardLabel }}</span>
+                    </a>
+                    <a href="{{ url('/katalog') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition whitespace-nowrap">
+                        <i data-lucide="utensils" class="w-4 h-4 text-brand-600"></i>
+                        <span>Lihat Katalog Menu</span>
+                    </a>
+                @else
+                    <a href="{{ url('/register') }}" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition whitespace-nowrap">
+                        Daftar Akun Mahasiswa
+                    </a>
+                    <a href="{{ url('/login') }}" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 shadow-sm transition whitespace-nowrap">
+                        Masuk ke Akun
+                    </a>
+                @endauth
             </div>
         </div>
     </section>
@@ -598,12 +650,9 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
                 <!-- Col 1: Brand -->
                 <div class="space-y-3.5">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-lg shrink-0">
-                            N
-                        </div>
-                        <span class="font-bold text-lg text-white tracking-tight">NesaCourt</span>
-                    </div>
+                    <a href="{{ url('/') }}" class="inline-flex items-center hover:opacity-90 transition">
+                        <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-12 w-auto object-contain brightness-0 invert">
+                    </a>
                     <p class="text-slate-400 text-sm leading-relaxed">
                         Sistem Pemesanan dan Rekomendasi Makanan cerdas berbasis web untuk Food Court Universitas Negeri Surabaya (UNESA).
                     </p>

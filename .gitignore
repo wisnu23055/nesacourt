@@ -23,3 +23,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 .codegraph
+/test-results
+/playwright-report
+/playwright/.cache

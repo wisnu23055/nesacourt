@@ -10,6 +10,20 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+// Fallback penyajian file storage/app/public tanpa perlu symlink (siap pakai di cPanel)
+Route::get('/storage/{path}', function (string $path) {
+    $baseDir = realpath(storage_path('app/public'));
+    $fullPath = realpath(storage_path('app/public/' . ltrim($path, '/')));
+
+    if (!$baseDir || !$fullPath || !str_starts_with($fullPath, $baseDir . DIRECTORY_SEPARATOR) || !is_file($fullPath)) {
+        abort(404);
+    }
+
+    return response()->file($fullPath, [
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->withoutMiddleware('web')->where('path', '.*')->name('storage.serve');
+
 /*
 |--------------------------------------------------------------------------
 | Autentikasi (F-01 s/d F-04)

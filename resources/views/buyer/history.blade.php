@@ -40,7 +40,7 @@
                         <span class="text-slate-300 font-normal">|</span>
                         <span class="text-xs font-semibold text-brand-600">{{ auth()->user()->name }}</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: 23055310001)</p>
+                    <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
                 </div>
             </div>
 
@@ -183,7 +183,7 @@
                     <img src="{{ asset('images/logo/Logo.webp') }}" alt="NesaCourt" class="h-9 w-auto object-contain mx-auto">
                     <h3 class="text-sm font-bold text-slate-900 pt-0.5">NesaCourt UNESA</h3>
                     <p class="text-xs text-slate-600 font-semibold" x-text="selectedOrder?.stall"></p>
-                    <p class="text-[10px] text-slate-400">Food Court Vokasi Ketintang Surabaya</p>
+                    <p class="text-[10px] text-slate-400">Food Court UNESA Ketintang Surabaya</p>
                 </div>
 
                 <!-- Receipt Metadata -->
@@ -198,7 +198,7 @@
                     </div>
                     <div class="flex justify-between">
                         <span>Pelanggan:</span>
-                        <span>Aditya Pratama (NIM: 23055310001)</span>
+                        <span>{{ auth()->user()->name }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Tipe Layanan:</span>

@@ -33,7 +33,7 @@
                         <span class="text-slate-300 font-normal">|</span>
                         <span class="text-xs font-semibold text-brand-600">Mahasiswa</span>
                     </div>
-                    <p class="text-xs text-slate-500 mt-0.5">D4 Manajemen Informatika | Vokasi UNESA Ketintang (NIM: {{ auth()->user()->phone ?? '23055310001' }})</p>
+                    <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
                 </div>
             </div>
 

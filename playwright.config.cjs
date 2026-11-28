@@ -1,7 +1,7 @@
 // ponytail: minimal Playwright config. Server assumed running at BASE_URL (php artisan serve).
 const { defineConfig, devices } = require('@playwright/test');
 
-const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8123';
+const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
 
 module.exports = defineConfig({
   testDir: './tests/e2e',
